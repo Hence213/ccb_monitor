@@ -4,6 +4,7 @@ import csv
 import os
 from bs4 import BeautifulSoup
 from collections import defaultdict
+from history_data import extract_history_nav_with_bs4
 
 # 产品ID与名称的映射列表
 PRODUCTS = [
@@ -118,6 +119,7 @@ def fetch_product_nav(product_id, product_name):
         response = requests.get(url, headers=HEADERS, timeout=15)
         response.raise_for_status()
         response.encoding = 'utf-8'
+        # data = extract_history_nav_with_bs4(response.text)
         nav, nav_date = extract_nav_with_bs4(response.text)
         if nav and nav_date:
             print(f"🔍 提取成功 -> {product_name} | 净值: {nav}, 日期: {nav_date}")
