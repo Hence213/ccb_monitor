@@ -4,30 +4,9 @@ import csv
 import os
 from bs4 import BeautifulSoup
 from collections import defaultdict
-from history_data import extract_history_nav_with_bs4
-
-# 产品ID与名称的映射列表
-PRODUCTS = [
-    (11372340, "日开45a"),
-    (10638258, "日开44a"),
-    (10903623, "日开40a"),
-    (10723694, "日开64a"),
-    (11228000, "7天24a"),
-    (11255435, "7天18专享"),
-    (10996348, "7天21a"),
-    (10812787, "14天21a"),
-    (11158964, "14天19专享"),
-    (11091037, "21天14a"),
-    (11372337, "30天26a"),
-    (10723698, "日申月赎27日到账"),
-    (10638260, "日申月赎20日到账"),
-    (10549516, "日申月赎2日到账"),
-]
+from products import PRODUCTS, CSV_FILE
 
 BASE_URL = "https://www.wealthccb.com/product/{}.html"
-CSV_FILE = "data/ccb_nav_history.csv"
-
-
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
@@ -112,23 +91,27 @@ def save_to_csv(nav_date, nav_list):
                 writer.writerow([product_name, nav])
 
     
-
-def fetch_product_nav(product_id, product_name):
+def get_html_text(product_id, product_name):
     url = BASE_URL.format(product_id)
     try:
         response = requests.get(url, headers=HEADERS, timeout=15)
         response.raise_for_status()
         response.encoding = 'utf-8'
-        # data = extract_history_nav_with_bs4(response.text)
-        nav, nav_date = extract_nav_with_bs4(response.text)
+        return response.text
+    except Exception as e:
+        print(f"⚠️ 请求或解析出错（{product_name}）: {e}")
+        return None
+def fetch_product_nav(product_id, product_name):
+    html_text = get_html_text(product_id, product_name)
+    if html_text:
+        nav, nav_date = extract_nav_with_bs4(html_text)
         if nav and nav_date:
             print(f"🔍 提取成功 -> {product_name} | 净值: {nav}, 日期: {nav_date}")
         else:
-            print(f"❌ 未提取到净值信息：{product_name} ({url})")
+            print(f"❌ 未提取到净值信息：{product_name}")
             nav, nav_date = None, None
         return nav, nav_date
-    except Exception as e:
-        print(f"⚠️ 请求或解析出错（{product_name}）: {e}")
+    else:
         return None, None
 
 

@@ -1,23 +1,25 @@
+from datetime import date
 import re
 from bs4 import BeautifulSoup
-
+from ccb_monitor import BASE_URL, get_html_text
+from products import PRODUCTS,CSV_FILE
 import re
-import json
 
 def extract_history_nav_with_bs4(html_text):
     soup = BeautifulSoup(html_text, 'html.parser')
     script_tags = soup.find_all('script')
     
     for script in script_tags:
-        # todo 默认提取一个月，如何提取更多历史数据？
         if script.string and ('sData =' in script.string or 'xData =' in script.string):
             return js_to_json(script.string)
     
     return None
 def js_to_json(js_code: str):
-    js_code_1 = js_code.replace(r'\r\n', '').replace(' ', '')
-    sdata_match = re.search(r'sData\s*=\s*\[\s*([\d.,\s\n\r]+?)\s*\];', js_code_1, re.DOTALL)
-    xdata_match = re.search(r'xData\s*=\s*\[\s*([\d,\s\n\r]+?)\s*\];', js_code_1, re.DOTALL)
+    idx = js_code.find("成立以来数据")
+    js_code_filter = js_code[idx:] if idx != -1 else js_code
+    js_code_no_space = js_code_filter.replace(r'\r\n', '').replace(' ', '')
+    sdata_match = re.search(r'sData\s*=\s*\[\s*([\d.,\s\n\r]+?)\s*\];', js_code_no_space, re.DOTALL)
+    xdata_match = re.search(r'xData\s*=\s*\[\s*([\d,\s\n\r]+?)\s*\];', js_code_no_space, re.DOTALL)
     
     if sdata_match and xdata_match:
         sdata_str = sdata_match.group(1)
@@ -31,17 +33,43 @@ def js_to_json(js_code: str):
             for date, nav in zip(date_values, nav_values):
                 formatted_date = f"{date[:4]}-{date[4:6]}-{date[6:8]}"
                 data_list.append({"date": formatted_date, "nav": nav})
-            return {"data": data_list}
+            return  data_list
     return None
 
 # ===== 使用示例 =====
-js_string = r'''
-           \r\n           var clientwidth_small = $(window).width();\r\n           if(clientwidth_small < 800){\r\n               \r\n                $(".chanpin-box .tubiao .table").css({"width":(clientwidth_small-60)+"px"});\r\n           }\r\n           myChart = echarts.init(document.getElementById(\'table1\'));\r\n           echartsBox(\'week\',false,false);\r\n           function echartsBox(time,boolear,bool) {\r\n                \r\n               var textBox,xData,sData,textName;\r\n               if(bool){\r\n                   textName = \'累计净值\';\r\n               }else{\r\n                   textName = "单位净值";\r\n               }\r\n                if(time == \'week\'){\r\n                    textBox = \'近一个月数据\';\r\n                    //xData = [\'周一\', \'周二\', \'周三\', \'周四\', \'周五\', \'周六\', \'周日\'];\r\n                    //var sData = Array();\r\n                    xData = [\r\n                                20260120\r\n                                ,20260121\r\n                                ,20260122\r\n                    ];\r\n                    if(bool){\r\n                        sData = [\r\n                                        1.000039\r\n                                        ,1.000072\r\n                                    \r\n                                        ,1.000105\r\n                                    \r\n                        ];\r\n                    }else{\r\n                        sData = [\r\n                                       1.000039\r\n                                    \r\n                                        ,1.000072\r\n                                    \r\n                                        ,1.000105\r\n                                    \r\n                        ];\r\n                    }\r\n                    \r\n                }else if(time == \'month\'){\r\n                    textBox = \'近三个月数据\';\r\n                    xData = [\r\n                                20260120\r\n                                ,20260121\r\n                                ,20260122\r\n                    ];\r\n                    if(bool){\r\n                        sData = [\r\n                                        1.000039\r\n                                        ,1.000072\r\n                                    \r\n                                        ,1.000105\r\n                                    \r\n                        ];\r\n                    }else{\r\n                        sData = [\r\n                                       1.000039\r\n                                    \r\n                                        ,1.000072\r\n                                    \r\n                                        ,1.000105\r\n                                    \r\n                        ];\r\n                    }\r\n                    \r\n                    \r\n                }else if(time == \'byear\'){\r\n                    textBox = \'近半年数据\';\r\n                    xData = [\r\n                                20260120\r\n                                ,20260121\r\n                                ,20260122\r\n                    ];\r\n                    if(bool){\r\n                        sData = [\r\n                                        1.000039\r\n                                        ,1.000072\r\n                                    \r\n                                        ,1.000105\r\n                                    \r\n                        ];\r\n                    }else{\r\n                        sData = [\r\n                                       1.000039\r\n                                    \r\n                                        ,1.000072\r\n                                    \r\n                                        ,1.000105\r\n                                    \r\n                        ];\r\n                    }\r\n                    \r\n                    \r\n                }else if(time == \'yyear\'){\r\n                    textBox = \'近一年数据\';\r\n                    xData = [\r\n                                20260120\r\n                                ,20260121\r\n                                ,20260122\r\n                    ];\r\n                    if(bool){\r\n                        sData = [\r\n                                        1.000039\r\n                                        ,1.000072\r\n                                    \r\n                                        ,1.000105\r\n                                    \r\n                        ];\r\n                    }else{\r\n                        sData = [\r\n                                       1.000039\r\n                                    \r\n                                        ,1.000072\r\n                                    \r\n                                        ,1.000105\r\n                                    \r\n                        ];\r\n                    }\r\n                    \r\n                    \r\n                }else{\r\n                    textBox = \'成立以来数据\';\r\n                    xData = [\r\n                                20260120\r\n                                ,20260121\r\n                                ,20260122\r\n                    ];\r\n                    if(bool){\r\n                        sData = [\r\n                                        1.000039\r\n                                        ,1.000072\r\n                                    \r\n                                        ,1.000105\r\n                                    \r\n                        ];\r\n                    }else{\r\n                        sData = [\r\n                                       1.000039\r\n                                    \r\n                                        ,1.000072\r\n                                    \r\n                                        ,1.000105\r\n                                    \r\n                        ];\r\n                    }\r\n                }\r\n                \r\n                var option = {\r\n                    title: {\r\n                        text: textBox\r\n                    },\r\n                    tooltip: {\r\n                        trigger: \'axis\',\r\n                        axisPointer: {\r\n                            type: \'cross\',\r\n                            label: {\r\n                                backgroundColor: \'#2799FF\'\r\n                            }\r\n                        }\r\n                    },\r\n                    toolbox: {\r\n                        feature: {\r\n                            saveAsImage: {}\r\n                        }\r\n                    },\r\n                    grid: {\r\n                        left: \'3%\',\r\n                        right: \'4%\',\r\n                        bottom: \'3%\',\r\n                        containLabel: true\r\n                    },\r\n                    xAxis: [\r\n                        {\r\n                            type: \'category\',\r\n                            boundaryGap: false,\r\n                            data: xData\r\n                        }\r\n                    ],\r\n                    yAxis: [\r\n                        {\r\n                            type: \'value\',\r\n                            min:((Math.min.apply(null, sData)).toFixed(3)-0.01),\r\n                            //min:0,\r\n                            //max:2.5,\r\n                            scale:true,\r\n                        }\r\n                    ],\r\n                    series: [\r\n                        {\r\n                            name: textName,\r\n                            type: \'line\',\r\n                            stack: \'总量\',\r\n                            smooth: true,\r\n                            areaStyle: {},\r\n                            data: sData\r\n                        },\r\n                    ],\r\n                    color:["#2799FF"],\r\n                    \r\n                };\r\n                if(boolear){\r\n                    myChart.clear();\r\n                }\r\n                myChart.setOption(option);\r\n                //console.log(sData);\r\n           }\r\n        
-'''
+import csv
 if __name__ == "__main__":
-    result = js_to_json(js_string)
-    if result:
-        json_output = json.dumps(result, indent=2, ensure_ascii=False)
-        print(json_output)
+    history_data = {}
+    for product_id, product_name in PRODUCTS:
+        html_text = get_html_text(product_id, product_name)
+        result = extract_history_nav_with_bs4(html_text)
+        if result:
+            history_data[product_name] = result
+            print(f"🔍 提取成功 -> {product_name} | 数据点数: {len(result)}")
+        else:
+            print(f"❌ 未能提取{product_name}数据")
+
+    if not history_data:
+        print("⚠️ 没有成功提取任何产品数据，跳过写入 CSV。")
     else:
-        print("❌ 未能提取数据")
+        # 找出最长的数据列表
+        max_len_data = max(history_data.values(), key=len)
+        # 倒序：最新日期在前
+        max_len_data_reversed = list(reversed(max_len_data))
+        all_dates = [dat['date'] for dat in max_len_data_reversed]
+
+        with open(CSV_FILE, mode='w', encoding='utf-8', newline='') as f:
+            writer = csv.writer(f)
+            # header 使用倒序日期
+            header = ['产品名称'] + all_dates
+            writer.writerow(header)
+
+            # 构建日期到索引的映射（用于对齐）
+            date_set = set(all_dates)  # 可选，用于快速判断
+
+            for product_name, nav_list in history_data.items():
+                # 转为字典便于查找
+                nav_dict = {item['date']: item['nav'] for item in nav_list}
+                # 按倒序的 all_dates 顺序取值
+                row = [product_name] + [nav_dict.get(date, 'null') for date in all_dates]
+                writer.writerow(row)
