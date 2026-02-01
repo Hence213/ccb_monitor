@@ -1,12 +1,12 @@
 from datetime import date
 import re
+from time import sleep
 from bs4 import BeautifulSoup
 from ccb_monitor import BASE_URL, get_html_text
 from products import PRODUCTS,CSV_FILE
 import re
 
-def extract_history_nav_with_bs4(html_text):
-    soup = BeautifulSoup(html_text, 'html.parser')
+def extract_history_nav_with_bs4(soup):
     script_tags = soup.find_all('script')
     
     for script in script_tags:
@@ -41,8 +41,13 @@ import csv
 if __name__ == "__main__":
     history_data = {}
     for product_id, product_name in PRODUCTS:
-        html_text = get_html_text(product_id, product_name)
-        result = extract_history_nav_with_bs4(html_text)
+        soup = None
+        for i in range(10):
+            soup = get_html_text(product_id, product_name)
+            if soup:
+                break
+            sleep(1)
+        result = extract_history_nav_with_bs4(soup)
         if result:
             history_data[product_name] = result
             print(f"🔍 提取成功 -> {product_name} | 数据点数: {len(result)}")

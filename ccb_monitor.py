@@ -1,3 +1,4 @@
+from time import sleep
 import requests
 import re
 import csv
@@ -35,8 +36,7 @@ def check_date_exist(date_str) -> bool:
             if date_str in existing_records:
                 return True 
     return False
-def extract_nav_with_bs4(html_text):
-    soup = BeautifulSoup(html_text, 'html.parser')
+def extract_nav_with_bs4(soup):
     li_list = soup.select('li.float-left')
     for li in li_list:
         first_p = li.find('p', class_='firtst')  # 注意 typo
@@ -97,14 +97,20 @@ def get_html_text(product_id, product_name):
         response = requests.get(url, headers=HEADERS, timeout=15)
         response.raise_for_status()
         response.encoding = 'utf-8'
-        return response.text
+        soup = BeautifulSoup(response.text, 'html.parser')
+        return soup
     except Exception as e:
         print(f"⚠️ 请求或解析出错（{product_name}）: {e}")
         return None
 def fetch_product_nav(product_id, product_name):
-    html_text = get_html_text(product_id, product_name)
-    if html_text:
-        nav, nav_date = extract_nav_with_bs4(html_text)
+    soup = None
+    for i in range(10):
+        soup = get_html_text(product_id, product_name)
+        if soup:
+            break
+        sleep(1)
+    if soup:
+        nav, nav_date = extract_nav_with_bs4(soup)
         if nav and nav_date:
             print(f"🔍 提取成功 -> {product_name} | 净值: {nav}, 日期: {nav_date}")
         else:
@@ -112,6 +118,7 @@ def fetch_product_nav(product_id, product_name):
             nav, nav_date = None, None
         return nav, nav_date
     else:
+        print(f"❌ 连续10次请求失败，跳过产品：{product_name}")
         return None, None
 
 
