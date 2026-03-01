@@ -2,10 +2,25 @@ from datetime import date
 import re
 from time import sleep
 from bs4 import BeautifulSoup
-from ccb_monitor import BASE_URL, get_html_text
+import requests
+import csv
 from products import PRODUCTS,CSV_FILE
 import re
-
+BASE_URL = "https://www.wealthccb.com/product/{}.html"
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+}
+def get_html_text(product_id, product_name):
+    url = BASE_URL.format(product_id)
+    try:
+        response = requests.get(url, headers=HEADERS, timeout=15)
+        response.raise_for_status()
+        response.encoding = 'utf-8'
+        soup = BeautifulSoup(response.text, 'html.parser')
+        return soup
+    except Exception as e:
+        print(f"⚠️ 请求或解析出错（{product_name}）: {e}")
+        return None
 def extract_history_nav_with_bs4(soup):
     script_tags = soup.find_all('script')
     
@@ -37,7 +52,7 @@ def js_to_json(js_code: str):
     return None
 
 # ===== 使用示例 =====
-import csv
+
 if __name__ == "__main__":
     history_data = {}
     for product_id, product_name in PRODUCTS:
