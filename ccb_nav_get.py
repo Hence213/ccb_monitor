@@ -4,23 +4,58 @@ from time import sleep
 from bs4 import BeautifulSoup
 import requests
 import csv
-from products import PRODUCTS,CSV_FILE
 import re
+from request_url import get_html_text
+# 产品ID与名称的映射列表
+PRODUCTS = [
+    ### 在售短期产品
+    # (10638258, "0_日开44a"),
+    (11955168, "0_日开41"),
+    (11464059,"0_7天28a"),
+    (11557288, "0_7天25a"),
+    (11228000, "0_7天24a"),
+    (11756508, "0_7天35"),
+    (11372337, "0_30天26a"),
+    (11091037, "0_21天14a"),
+    (10812787, "0_14天21a"),
+    (11995099, "0_30天35a"),
+
+    #### 已售罄
+    # (10214651, "1_日开17a"),
+    (10996348, "1_7天21a"),
+    (10723694, "1_日开64a"),
+    (11756509, "1_日开10"),
+
+    (11570433, "1_日申周赎10"),
+    (11570434, "1_日申周赎9"),
+    (11570435, "1_日申周赎8"),
+    (11464060,"1_日申周赎7"),
+    (11464047, "1_日申周赎6"),
+    (10903623, "1_日开40a"), 
+    (11557292, "1_日开65a"),
+    (11372340, "1_日开45a"),
+    (10297146, "1_7天20a"),
+    (9532835,  "1_日开5a"),
+
+    ### 在售中长期产品
+    (11255435, "2_7天18专享"),
+    (11158964, "2_14天19专享"),
+    (10297149, "2_30天23a"),
+    (10549511, "2_30天17a"),
+    (11636594, "2_30天34专享"),
+    (10903617, "2_30天27a"),
+    (10723691, "2_30天21a"),
+    (10297144, "2_60天4a"),
+    (11372334, "2_90天13a"),
+    (11649887, "2_90天6a"),
+    (11227991, "2_90天1a"),
+    (10996342, "2_180天4a睿鑫"),
+    (9750144,  "2_180天6a睿鑫"),
+    (11649884, "2_180天1a睿鑫")
+]
+CSV_FILE = "data/ccb_nav_history.csv"
 BASE_URL = "https://www.wealthccb.com/product/{}.html"
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-}
-def get_html_text(product_id, product_name):
-    url = BASE_URL.format(product_id)
-    try:
-        response = requests.get(url, headers=HEADERS, timeout=15)
-        response.raise_for_status()
-        response.encoding = 'utf-8'
-        soup = BeautifulSoup(response.text, 'html.parser')
-        return soup
-    except Exception as e:
-        print(f"⚠️ 请求或解析出错（{product_name}）: {e}")
-        return None
+
 def extract_history_nav_with_bs4(soup):
     script_tags = soup.find_all('script')
     
@@ -55,10 +90,11 @@ def js_to_json(js_code: str):
 
 if __name__ == "__main__":
     history_data = {}
+    PRODUCTS.sort(key=lambda x: x[1])  # 按产品名称排序，便于后续对齐
     for product_id, product_name in PRODUCTS:
         soup = None
         for i in range(10):
-            soup = get_html_text(product_id, product_name)
+            soup = get_html_text(BASE_URL,product_id, product_name)
             if soup:
                 break
             sleep(1)
