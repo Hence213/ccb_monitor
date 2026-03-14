@@ -1,9 +1,6 @@
-from datetime import date
+from common import save_to_cvs
 import re
 from time import sleep
-from bs4 import BeautifulSoup
-import requests
-import csv
 import re
 from request_url import get_html_text
 # 产品ID与名称的映射列表
@@ -109,24 +106,4 @@ if __name__ == "__main__":
     if not history_data:
         print("⚠️ 没有成功提取任何产品数据，跳过写入 CSV。")
     else:
-        # 找出最长的数据列表
-        max_len_data = max(history_data.values(), key=len)
-        # 倒序：最新日期在前
-        max_len_data_reversed = list(reversed(max_len_data))
-        all_dates = [dat['date'] for dat in max_len_data_reversed]
-
-        with open(CSV_FILE, mode='w', encoding='utf-8', newline='') as f:
-            writer = csv.writer(f)
-            # header 使用倒序日期
-            header = ['产品名称'] + all_dates
-            writer.writerow(header)
-
-            # 构建日期到索引的映射（用于对齐）
-            date_set = set(all_dates)  # 可选，用于快速判断
-
-            for product_name, nav_list in history_data.items():
-                # 转为字典便于查找
-                nav_dict = {item['date']: item['nav'] for item in nav_list}
-                # 按倒序的 all_dates 顺序取值
-                row = [product_name] + [nav_dict.get(date, 'null') for date in all_dates]
-                writer.writerow(row)
+        save_to_cvs(CSV_FILE, history_data)

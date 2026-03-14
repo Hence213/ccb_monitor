@@ -1,4 +1,6 @@
-from request_url import get_json_text
+import csv
+
+from request_url import get_post_json_text
 # 请求 URL
 url = "https://www.bocwm.cn/webApi/cms/product/queryStaticProducts"
 
@@ -39,26 +41,37 @@ PAYLOAD = {
     "pageSize": 10
 }
 
-def get_productcode(response_json):
-    products = []
+def updat_products(response_json):
+    product_names = set()  # 使用集合避免重复
+    with open('cob_products.csv', mode='r', encoding='utf-8') as file:
+        # 创建 CSV 读取器
+        reader = csv.DictReader(file)
+    
+    # 遍历每一行，提取 productName 字段
+        for row in reader:
+            product_name = row['productName']
+            product_names.add(product_name)
+    new_products = []
     for item in response_json['data']['rows']:
         product_name = item['productName']
-        product_id = item['productCode']  # 使用    productCode 作为 ID
-        products.append({
-            'product_name': product_name,
-            'product_id': product_id
-        })
+        product_id = item['productCode']  # 使用productCode 作为 ID
+        if product_name not in product_names:
+            new_products.append((product_name, product_id))
 
-    # 打印结果
-    for p in products:
-        print(f"产品名称: {p['product_name']}, 产品ID: {p['product_id']}")
+    # 将新产品添加到 CSV 文件中
+    if new_products:
+        with open('cob_products.csv', mode='a', encoding='utf-8', newline='') as file:
+            writer = csv.writer(file)
+            for product_name, product_id in new_products:
+                writer.writerow([product_name, product_id])
+
 # 发送 POST 请求
 if __name__ == "__main__":
     for product in RRODUCTS:
         PAYLOAD["productName"] = product
-        response_json = get_json_text(url, PAYLOAD, HEADERS)
+        response_json = get_post_json_text(url, PAYLOAD, HEADERS)
         if response_json:
-            get_productcode(response_json)
+            updat_products(response_json)
             print(f"✅ 成功获取 {product} 的数据:")
         else:
             print(f"❌ 获取 {product} 的数据失败")
