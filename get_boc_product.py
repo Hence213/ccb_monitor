@@ -22,11 +22,23 @@ HEADERS = {
     "sec-ch-ua-platform": '"Windows"'
 }
 RRODUCTS = [
-    "稳富信用精选日开",
-    "稳富信用精选7天",
-    "稳富信用精选14天",
-    "稳富信用精选30天",
+    "稳富信用精选",
+    "增强打新策略",
+    "增强全球配置",
+    "增强信用精选",
+    "稳富纯债",
+    # "稳富信用精选日开",
+    # "稳富信用精选7天",
+    # "稳富信用精选14天",
+    # "稳富信用精选30天",
 ]
+DAYS = [
+    "日开",
+    "7天",
+    "14天",
+    "30天",
+]
+
 # 请求体（JSON 数据）
 PAYLOAD = {
     "style": "",
@@ -38,7 +50,7 @@ PAYLOAD = {
     "investorRange": "个人",
     "productName": "{}",
     "pageNo": 1,
-    "pageSize": 10
+    "pageSize": 1000
 }
 
 def updat_products(response_json):
@@ -55,14 +67,20 @@ def updat_products(response_json):
     for item in response_json['data']['rows']:
         product_name = item['productName']
         product_id = item['productCode']  # 使用productCode 作为 ID
+        if not any(day in product_name for day in DAYS):
+            continue  # 如果产品名称中不包含指定的天数关键词，则跳过
         if product_name not in product_names:
             new_products.append((product_name, product_id))
 
     # 将新产品添加到 CSV 文件中
     if new_products:
+        sorted_new_products = sorted(new_products, key=lambda x: x[0])  # 按产品名称排序
         with open('cob_products.csv', mode='a', encoding='utf-8', newline='') as file:
+            if len(product_names) == 0:  # 如果原文件没有任何产品，写入表头
+                writer = csv.writer(file)
+                writer.writerow(['productName', 'productCode'])
             writer = csv.writer(file)
-            for product_name, product_id in new_products:
+            for product_name, product_id in sorted_new_products:
                 writer.writerow([product_name, product_id])
 
 # 发送 POST 请求

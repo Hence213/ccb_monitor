@@ -1,6 +1,23 @@
 
 import csv
-def save_to_cvs(CSV_FILE, history_data):
+from enum import Enum
+class Bank(Enum):
+    CCB = 1
+    BOC = 2
+
+def compute_nianhua(nav_list, jiange=7):
+    if len(nav_list) < jiange + 1 or (nav_list[jiange] == '1' and nav_list[jiange - 1] == '1'):
+        return None  # 数据点不足，无法计算
+    try:
+        nav_start = float(nav_list[0])  # 最新的 NAV
+        nav_end = float(nav_list[jiange])  # jiange 天前的 NAV
+        nianhua = ((nav_start - nav_end) / nav_end) * (365 / jiange) * 100
+        return round(nianhua, 2)
+    except (ValueError, ZeroDivisionError) as e:
+        print(f"⚠️ 计算年化收益率出错: {e}")
+        return None
+
+def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB):
     max_len_data = max(history_data.values(), key=len)# 找出最长的数据列表
         # 倒序：最新日期在前
     max_len_data_reversed = list(reversed(max_len_data))
@@ -9,7 +26,7 @@ def save_to_cvs(CSV_FILE, history_data):
     with open(CSV_FILE, mode='w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
             # header 使用倒序日期
-        header = ['产品名称'] + all_dates
+        header = ['产品名称'] + all_dates[0:1] +['近7日年化'] +['近14日年化'] +['近30日年化'] + all_dates[1:]
         writer.writerow(header)
         for product_name, nav_list in history_data.items():
                 # 转为字典便于查找
@@ -18,5 +35,14 @@ def save_to_cvs(CSV_FILE, history_data):
             nav_list = [nav_dict.get(date, '1') for date in all_dates]  # 没有数据的日期填 '1'
                 # 计算差值
             nav_diffs = [round((float(nav_list[i]) - float(nav_list[i+1])) * 10000, 2) for i in range(0, len(nav_list) - 1)]
-            row = [product_name] + nav_list[0:1] + nav_diffs
+            nianhua_30, nianhua_14, nianhua_7 = None, None, None
+            if bank == Bank.CCB:
+                nianhua_30 = str(compute_nianhua(nav_list, jiange=30)) + '%'
+                nianhua_14 = str(compute_nianhua(nav_list, jiange=14)) + '%'
+                nianhua_7 = str(compute_nianhua(nav_list, jiange=7)) + '%'
+            elif bank == Bank.BOC:
+                nianhua_7 = str(compute_nianhua(nav_list, jiange=5)) + '%'
+                nianhua_14 = str(compute_nianhua(nav_list, jiange=10)) + '%'
+                nianhua_30 = str(compute_nianhua(nav_list, jiange=len(nav_list)-1)) + '%'
+            row = [product_name] + nav_diffs[0:1] + [nianhua_7] + [nianhua_14] + [nianhua_30] + nav_diffs[1:]
             writer.writerow(row)
