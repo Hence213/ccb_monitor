@@ -1,19 +1,20 @@
 
 import csv
+from datetime import datetime
 from enum import Enum
 class Bank(Enum):
     CCB = 1
     BOC = 2
 
-def compute_nianhua(nav_list, jiange=7, is_30_day=False):
-    if len(nav_list) < jiange + 1 or (nav_list[jiange] == '1' and nav_list[jiange - 1] == '1'):
+def compute_nianhua(nav_list, jiange=7, is_all_day=False):
+    if (not is_all_day) and ((len(nav_list) < jiange + 1) or (nav_list[jiange] == '1' and nav_list[jiange - 1] == '1')):
         return None  # 数据点不足，无法计算
     try:
-        nav_start = float(nav_list[0])  # 最新的 NAV
-        nav_end = float(nav_list[jiange])  # jiange 天前的 NAV
-        if is_30_day:
-            nianhua = ((nav_start - nav_end) / nav_end) * (365 / 30) * 100
+        nav_start = float(nav_list[0])  # 最新的 NAV        
+        if is_all_day:
+            nianhua = (nav_start - 1) * (365 / (jiange + 1)) * 100
         else:
+            nav_end = float(nav_list[jiange])  # jiange 天前的 NAV
             nianhua = ((nav_start - nav_end) / nav_end) * (365 / jiange) * 100
         return round(nianhua, 2)
     except (ValueError, ZeroDivisionError) as e:
@@ -29,23 +30,31 @@ def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB):
     with open(CSV_FILE, mode='w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
             # header 使用倒序日期
-        header = ['产品名称'] + all_dates[0:1] +['近7日年化'] +['近14日年化'] +['近30日年化'] + all_dates[1:]
+        header = ['产品名称'] + ['成立来年化'] + all_dates[0:3] +['近7日年化'] +['近14日年化'] + all_dates[3:]
         writer.writerow(header)
         for product_name, nav_list in history_data.items():
-                # 转为字典便于查找
+            # 计算产品成立以来的天数
+            product_day = 0
+            if nav_list:
+                start_day = datetime.strptime(nav_list[0]['date'], "%Y-%m-%d")
+                end_day = datetime.strptime(nav_list[-1]['date'], "%Y-%m-%d")
+                product_day = (end_day - start_day).days + 1
+            # 转为字典便于查找
             nav_dict = {item['date']: item['nav'] for item in nav_list}
                 # 按倒序的 all_dates 顺序取值
             nav_list = [nav_dict.get(date, '1') for date in all_dates]  # 没有数据的日期填 '1'
                 # 计算差值
             nav_diffs = [round((float(nav_list[i]) - float(nav_list[i+1])) * 10000, 2) for i in range(0, len(nav_list) - 1)]
-            nianhua_30, nianhua_14, nianhua_7 = None, None, None
+            nianhua, nianhua_14, nianhua_7 = None, None, None
+            if product_day >= 1:
+                nianhua = str(compute_nianhua(nav_list, jiange=product_day -1, is_all_day=True)) + '%'
+            
             if bank == Bank.CCB:
-                nianhua_30 = str(compute_nianhua(nav_list, jiange=30)) + '%'
                 nianhua_14 = str(compute_nianhua(nav_list, jiange=14)) + '%'
                 nianhua_7 = str(compute_nianhua(nav_list, jiange=7)) + '%'
             elif bank == Bank.BOC:
                 nianhua_7 = str(compute_nianhua(nav_list, jiange=5)) + '%'
                 nianhua_14 = str(compute_nianhua(nav_list, jiange=10)) + '%'
-                nianhua_30 = str(compute_nianhua(nav_list, jiange=len(nav_list)-1, is_30_day=True)) + '%'
-            row = [product_name] + nav_diffs[0:1] + [nianhua_7] + [nianhua_14] + [nianhua_30] + nav_diffs[1:]
+
+            row = [product_name] + [nianhua] + nav_diffs[0:3] + [nianhua_7] + [nianhua_14] + nav_diffs[3:]
             writer.writerow(row)

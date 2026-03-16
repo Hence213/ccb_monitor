@@ -73,6 +73,9 @@ def updat_products(response_json):
         if not any(day in product_name for day in DAYS):
             continue  # 如果产品名称中不包含指定的天数关键词，则跳过
         if product_name not in product_names:
+            # product_name去除"中银理财"前缀
+            if product_name.startswith("中银理财-"):
+                product_name = product_name[len("中银理财-"):]
             new_products.append((product_name, product_id))
 
     # 将新产品添加到 CSV 文件中

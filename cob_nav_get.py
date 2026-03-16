@@ -1,4 +1,5 @@
-URL_NAV = "https://www.bocwm.cn/webApi/cms/productNetWorth/getNetWorthImageByCode?productCode={}&dayCount=30"
+URL_NAV = "https://www.bocwm.cn/webApi/cms/productNetWorth/getNetWorthImageByCode?productCode={}"
+# &dayCount=30
 from common import Bank, save_to_cvs
 from get_boc_product import HEADERS
 import csv
