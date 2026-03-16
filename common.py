@@ -5,13 +5,16 @@ class Bank(Enum):
     CCB = 1
     BOC = 2
 
-def compute_nianhua(nav_list, jiange=7):
+def compute_nianhua(nav_list, jiange=7, is_30_day=False):
     if len(nav_list) < jiange + 1 or (nav_list[jiange] == '1' and nav_list[jiange - 1] == '1'):
         return None  # 数据点不足，无法计算
     try:
         nav_start = float(nav_list[0])  # 最新的 NAV
         nav_end = float(nav_list[jiange])  # jiange 天前的 NAV
-        nianhua = ((nav_start - nav_end) / nav_end) * (365 / jiange) * 100
+        if is_30_day:
+            nianhua = ((nav_start - nav_end) / nav_end) * (365 / 30) * 100
+        else:
+            nianhua = ((nav_start - nav_end) / nav_end) * (365 / jiange) * 100
         return round(nianhua, 2)
     except (ValueError, ZeroDivisionError) as e:
         print(f"⚠️ 计算年化收益率出错: {e}")
@@ -43,6 +46,6 @@ def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB):
             elif bank == Bank.BOC:
                 nianhua_7 = str(compute_nianhua(nav_list, jiange=5)) + '%'
                 nianhua_14 = str(compute_nianhua(nav_list, jiange=10)) + '%'
-                nianhua_30 = str(compute_nianhua(nav_list, jiange=len(nav_list)-1)) + '%'
+                nianhua_30 = str(compute_nianhua(nav_list, jiange=len(nav_list)-1, is_30_day=True)) + '%'
             row = [product_name] + nav_diffs[0:1] + [nianhua_7] + [nianhua_14] + [nianhua_30] + nav_diffs[1:]
             writer.writerow(row)
