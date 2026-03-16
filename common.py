@@ -47,7 +47,7 @@ def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB):
             nav_diffs = [round((float(nav_list[i]) - float(nav_list[i+1])) * 10000, 2) for i in range(0, len(nav_list) - 1)]
             nianhua, nianhua_14, nianhua_7 = None, None, None
             if product_day >= 1:
-                nianhua = str(compute_nianhua(nav_list, jiange=product_day -1, is_all_day=True)) + '%'
+                nianhua = str(compute_nianhua(nav_list, jiange=product_day -1, is_all_day=True)) + '%' #todo 中行数据对不上
             
             if bank == Bank.CCB:
                 nianhua_14 = str(compute_nianhua(nav_list, jiange=14)) + '%'
