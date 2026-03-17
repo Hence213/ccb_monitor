@@ -1,6 +1,7 @@
 URL_NAV = "https://www.bocwm.cn/webApi/cms/productNetWorth/getNetWorthImageByCode?productCode={}"
 # &dayCount=30
-from common import Bank, save_to_cvs
+from ccb_nav_get import CSV_FILE
+from common import Bank, save_to_cvs, sort_csv
 from get_boc_product import HEADERS
 import csv
 import requests
@@ -40,6 +41,7 @@ if __name__ == "__main__":
     nav_history = update_nav_history()
     if nav_history:
         save_to_cvs(NAV_FILE, nav_history, bank = Bank.BOC)
+        sort_csv(NAV_FILE)
         print(f"✅ 成功保存 NAV 历史数据到 {NAV_FILE}")
     else:
         print("⚠️ 没有成功获取任何 NAV 数据，跳过保存 CSV。")
