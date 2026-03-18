@@ -21,22 +21,26 @@ HEADERS = {
     "sec-ch-ua-mobile": "?0",
     "sec-ch-ua-platform": '"Windows"'
 }
+EXCLUDE_PRODUCTS = [
+    "稳富信用精选稳健日开",
+    "短债"
+]
 RRODUCTS = [
     "稳富信用精选",
     "增强信用精选",
+    
     "增强打新策略",
+    
+    "稳富全球配置",
     "增强全球配置",
-    "增强信用精选",
+    
     "稳富纯债",
+    
     "行业轮动策略",
     "指数轮动策略",
-    # "稳富信用精选日开",
-    # "稳富信用精选7天",
-    # "稳富信用精选14天",
-    # "稳富信用精选30天",
 ]
 DAYS = [
-    "日开",
+    "日开", #短债 删除
     "7天",
     "14天",
     "30天",
@@ -57,7 +61,7 @@ PAYLOAD = {
 }
 
 def updat_products(response_json):
-    product_names = set()  # 使用集合避免重复
+    product_names_set = set()  # 使用集合避免重复
     with open('cob_products.csv', mode='r', encoding='utf-8') as file:
         # 创建 CSV 读取器
         reader = csv.DictReader(file)
@@ -65,29 +69,36 @@ def updat_products(response_json):
     # 遍历每一行，提取 productName 字段
         for row in reader:
             product_name = row['productName']
-            product_names.add(product_name)
+            product_names_set.add(product_name)
     new_products = []
     for item in response_json['data']['rows']:
         product_name = item['productName']
         product_id = item['productCode']  # 使用productCode 作为 ID
         if not any(day in product_name for day in DAYS):
             continue  # 如果产品名称中不包含指定的天数关键词，则跳过
-        if product_name not in product_names:
+        # product_name不与product_names_set中的任何名称重叠
+        if product_name.startswith("中银理财-"):
+            product_name = product_name[len("中银理财-"):]
+        is_exist = False
+        for item in product_names_set:
+            if product_name in item:
+                is_exist = True
+                break
             # product_name去除"中银理财"前缀
-            if product_name.startswith("中银理财-"):
-                product_name = product_name[len("中银理财-"):]
+        if not is_exist:
             new_products.append((product_name, product_id))
 
     # 将新产品添加到 CSV 文件中
     if new_products:
         sorted_new_products = sorted(new_products, key=lambda x: x[0])  # 按产品名称排序
         with open('cob_products.csv', mode='a', encoding='utf-8', newline='') as file:
-            if len(product_names) == 0:  # 如果原文件没有任何产品，写入表头
+            if len(product_names_set) == 0:  # 如果原文件没有任何产品，写入表头
                 writer = csv.writer(file)
                 writer.writerow(['productName', 'productCode'])
             writer = csv.writer(file)
             for product_name, product_id in sorted_new_products:
-                writer.writerow([product_name, product_id])
+                if not any(exclude in product_name for exclude in EXCLUDE_PRODUCTS): # 排除包含特定关键词的产品
+                    writer.writerow([product_name, product_id])
 
 # 发送 POST 请求
 if __name__ == "__main__":

@@ -30,7 +30,7 @@ def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB):
     with open(CSV_FILE, mode='w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
             # header 使用倒序日期
-        header = ['产品名称'] + ['成立来年化'] + all_dates[0:3] +['近7日年化'] +['近14日年化'] + all_dates[3:]
+        header = ['产品名称'] + ['成立天数'] + ['成立来年化'] + all_dates[0:3] +['近7日年化'] +['近14日年化'] + all_dates[3:]
         writer.writerow(header)
         for product_name, nav_list in history_data.items():
             # 计算产品成立以来的天数
@@ -47,7 +47,7 @@ def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB):
             nav_diffs = [round((float(nav_list[i]) - float(nav_list[i+1])) * 10000, 2) for i in range(0, len(nav_list) - 1)]
             nianhua, nianhua_14, nianhua_7 = None, None, None
             if product_day >= 1:
-                nianhua = str(compute_nianhua(nav_list, jiange=product_day -1, is_all_day=True)) + '%' #todo 中行数据对不上
+                nianhua = str(compute_nianhua(nav_list, jiange=product_day -1, is_all_day=True)) + '%' #todo 中行长时间的数据对不上，从产品网页获取成立日期，https://www.bocwm.cn/html/1//4/7875.html
             
             if bank == Bank.CCB:
                 nianhua_14 = str(compute_nianhua(nav_list, jiange=14)) + '%'
@@ -56,5 +56,5 @@ def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB):
                 nianhua_7 = str(compute_nianhua(nav_list, jiange=5)) + '%'
                 nianhua_14 = str(compute_nianhua(nav_list, jiange=10)) + '%'
 
-            row = [product_name] + [nianhua] + nav_diffs[0:3] + [nianhua_7] + [nianhua_14] + nav_diffs[3:]
+            row = [product_name] + [product_day] + [nianhua] + nav_diffs[0:3] + [nianhua_7] + [nianhua_14] + nav_diffs[3:]
             writer.writerow(row)
