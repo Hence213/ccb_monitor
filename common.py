@@ -21,6 +21,27 @@ def compute_nianhua(nav_list, jiange=7, is_all_day=False):
         print(f"⚠️ 计算年化收益率出错: {e}")
         return None
 
+# 读取 CSV
+def sort_csv(csv_file):
+    with open(csv_file, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        header = next(reader)  # 读取表头
+        rows = list(reader)
+
+# 按第3列（索引2）倒序排序
+# 假设第三列是数字；如果是字符串，去掉 key 中的 float 转换
+    try:
+        rows.sort(key=lambda x: float(x[2]), reverse=True)
+    except ValueError:
+    # 如果无法转为数字，则按字符串排序
+        rows.sort(key=lambda x: x[2], reverse=True)
+
+# 写入新文件或打印
+    with open(csv_file, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+        writer.writerows(rows)
+
 def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB):
     max_len_data = max(history_data.values(), key=len)# 找出最长的数据列表
         # 倒序：最新日期在前
