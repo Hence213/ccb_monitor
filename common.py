@@ -28,10 +28,10 @@ def sort_csv(csv_file):
         header = next(reader)  # 读取表头
         rows = list(reader)
 
-# 按第3列（索引2）倒序排序
-# 假设第三列是数字；如果是字符串，去掉 key 中的 float 转换
+# 按第2列（索引1）倒序排序
+# 假设第二列是数字；如果是字符串，去掉 key 中的 float 转换
     try:
-        rows.sort(key=lambda x: float(x[2]), reverse=True)
+        rows.sort(key=lambda x: float(x[1]), reverse=True)
     except ValueError:
     # 如果无法转为数字，则按字符串排序
         rows.sort(key=lambda x: x[2], reverse=True)
@@ -42,7 +42,7 @@ def sort_csv(csv_file):
         writer.writerow(header)
         writer.writerows(rows)
 
-def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB):
+def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB,start_date = "2026-01-01"):
     max_len_data = max(history_data.values(), key=len)# 找出最长的数据列表
         # 倒序：最新日期在前
     max_len_data_reversed = list(reversed(max_len_data))
@@ -51,11 +51,13 @@ def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB):
     with open(CSV_FILE, mode='w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
             # header 使用倒序日期
-        header = ['产品名称'] + ['成立天数'] + ['成立来年化'] + all_dates[0:3] +['近7日年化'] +['近14日年化'] + all_dates[3:]
+        header = ['产品名称'] + all_dates[0:3] + ['近7日年化'] +['近14日年化'] + ['成立来年化'] + ['成立日期'] + ['成立天数'] + all_dates[3:] 
         writer.writerow(header)
         for product_name, nav_list in history_data.items():
             # 计算产品成立以来的天数
             product_day = 0
+            if bank == Bank.CCB:
+                start_date = nav_list[0]['date']
             if nav_list:
                 start_day = datetime.strptime(nav_list[0]['date'], "%Y-%m-%d")
                 end_day = datetime.strptime(nav_list[-1]['date'], "%Y-%m-%d")
@@ -77,5 +79,5 @@ def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB):
                 nianhua_7 = str(compute_nianhua(nav_list, jiange=5)) + '%'
                 nianhua_14 = str(compute_nianhua(nav_list, jiange=10)) + '%'
 
-            row = [product_name] + [product_day] + [nianhua] + nav_diffs[0:3] + [nianhua_7] + [nianhua_14] + nav_diffs[3:]
+            row = [product_name] + nav_diffs[0:3] + [nianhua_7] + [nianhua_14] + [nianhua] + [start_date] + [product_day] + nav_diffs[3:] 
             writer.writerow(row)
