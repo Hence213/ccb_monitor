@@ -10,7 +10,7 @@ def compute_nianhua(nav_list, jiange=7, is_all_day=False):
     if (not is_all_day) and ((len(nav_list) < jiange + 1) or (nav_list[jiange] == '1' and nav_list[jiange - 1] == '1')):
         return None  # 数据点不足，无法计算
     try:
-        nav_start = float(nav_list[0])  # 最新的 NAV        
+        nav_start = float(nav_list[0]) if nav_list[0] != '1' else float(nav_list[1])  # 最新的 NAV 区分t+1和
         if is_all_day:
             nianhua = (nav_start - 1) * (365 / (jiange + 1)) * 100
         else:
@@ -42,7 +42,7 @@ def sort_csv(csv_file):
         writer.writerow(header)
         writer.writerows(rows)
 
-def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB,start_date = "2026-01-01"):
+def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB,product_start_date = {}):
     max_len_data = max(history_data.values(), key=len)# 找出最长的数据列表
         # 倒序：最新日期在前
     max_len_data_reversed = list(reversed(max_len_data))
@@ -58,6 +58,8 @@ def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB,start_date = "2026-01-01
             product_day = 0
             if bank == Bank.CCB:
                 start_date = nav_list[0]['date']
+            elif bank == Bank.BOC:
+                start_date = product_start_date.get(product_name, '未知')
             if nav_list:
                 start_day = datetime.strptime(nav_list[0]['date'], "%Y-%m-%d")
                 end_day = datetime.strptime(nav_list[-1]['date'], "%Y-%m-%d")

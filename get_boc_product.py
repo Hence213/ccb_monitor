@@ -1,9 +1,8 @@
+from common.request_url import get_post_json_text,get_html_text
 import csv
-
-from request_url import get_post_json_text
 # 请求 URL
 url = "https://www.bocwm.cn/webApi/cms/product/queryStaticProducts"
-
+CSV_PATH = 'products/cob.csv'
 # 请求头（Headers）
 HEADERS = {
     "Accept": "application/json, text/plain, */*",
@@ -59,10 +58,9 @@ PAYLOAD = {
     "pageNo": 1,
     "pageSize": 1000
 }
-
-def updat_products(response_json):
-    product_names_set = set()  # 使用集合避免重复
-    with open('cob_products.csv', mode='r', encoding='utf-8') as file:
+def get_product_names_set():
+    product_names_set = set()
+    with open(CSV_PATH, mode='r', encoding='utf-8') as file:
         # 创建 CSV 读取器
         reader = csv.DictReader(file)
     
@@ -70,10 +68,50 @@ def updat_products(response_json):
         for row in reader:
             product_name = row['productName']
             product_names_set.add(product_name)
-    new_products = []
+    return product_names_set
+def save_to_csv(new_products, product_names_set):
+    # 将新产品添加到 CSV 文件中
+    if new_products:
+        sorted_new_products = sorted(new_products, key=lambda x: x[0])  # 按产品名称排序
+        with open(CSV_PATH, mode='a', encoding='utf-8', newline='') as file:
+            if len(product_names_set) == 0:  # 如果原文件没有任何产品，写入表头
+                writer = csv.writer(file)
+                writer.writerow(['productName', '剩余额度', '成立日期', 'productCode','html'])
+            writer = csv.writer(file)
+            for product_name, chengli_date,product_id, productDetailUrl in sorted_new_products:
+                writer.writerow([product_name, '', chengli_date,product_id, productDetailUrl])
+                print(f"✅ 已添加新产品: {product_name}，成立日期: {chengli_date}, 产品ID: {product_id}")
+BASE_URL = "https://www.bocwm.cn/html/2/{}"
+# '/3/9289.html'
+def get_chengli_date(productDetailUrl, product_name):
+    soup = get_html_text(BASE_URL,product_id = productDetailUrl, product_name = product_name)
+
+    try:
+    # 找到包含“成立日:”的 span 标签
+        span_tag = soup.find('span', string='成立日:') # type: ignore
+        if span_tag:
+            # 获取父级 div，并提取其文本内容
+            parent_div = span_tag.parent
+            full_text = parent_div.get_text(strip=True)
+
+            # 去掉“成立日:”部分，保留日期
+            if full_text.startswith('成立日:'):
+                establishment_date = full_text[len('成立日:'):]
+                print(f"{product_name} 成立日: {establishment_date}")
+                return establishment_date
+            else:
+                print(f"⚠️ 未找到成立日（{product_name}）")
+        else:
+            print(f"⚠️ 未找到包含'成立日:'的标签（{product_name}）")
+    except Exception as e:
+        print(f"⚠️ 请求或解析出错（{productDetailUrl}）: {e}")
+    return '未知'                    
+def updat_products(response_json, new_products: list = [], product_names_set = set()):
     for item in response_json['data']['rows']:
         product_name = item['productName']
         product_id = item['productCode']  # 使用productCode 作为 ID
+        productDetailUrl = item['productDetailUrl']  # 获取 HTML 链接
+        
         if not any(day in product_name for day in DAYS):
             continue  # 如果产品名称中不包含指定的天数关键词，则跳过
         # product_name不与product_names_set中的任何名称重叠
@@ -85,28 +123,24 @@ def updat_products(response_json):
                 is_exist = True
                 break
             # product_name去除"中银理财"前缀
+        if any(exclude in product_name for exclude in EXCLUDE_PRODUCTS): # 排除包含特定关键词的产品
+            is_exist = True
         if not is_exist:
-            new_products.append((product_name, product_id))
+            chengli_date = get_chengli_date(productDetailUrl, product_name)  # 从 HTML 链接中提取成立日期
+            new_products.append((product_name,  chengli_date,product_id,productDetailUrl))  # 将新产品添加到列表中
 
-    # 将新产品添加到 CSV 文件中
-    if new_products:
-        sorted_new_products = sorted(new_products, key=lambda x: x[0])  # 按产品名称排序
-        with open('cob_products.csv', mode='a', encoding='utf-8', newline='') as file:
-            if len(product_names_set) == 0:  # 如果原文件没有任何产品，写入表头
-                writer = csv.writer(file)
-                writer.writerow(['productName', 'productCode'])
-            writer = csv.writer(file)
-            for product_name, product_id in sorted_new_products:
-                if not any(exclude in product_name for exclude in EXCLUDE_PRODUCTS): # 排除包含特定关键词的产品
-                    writer.writerow([product_name, product_id])
+
 
 # 发送 POST 请求
 if __name__ == "__main__":
+    new_products = []
+    product_names_set = get_product_names_set()
     for product in RRODUCTS:
         PAYLOAD["productName"] = product
         response_json = get_post_json_text(url, PAYLOAD, HEADERS)
         if response_json:
-            updat_products(response_json)
+            updat_products(response_json, new_products, product_names_set)
             print(f"✅ 成功获取 {product} 的数据:")
         else:
             print(f"❌ 获取 {product} 的数据失败")
+    save_to_csv(new_products, product_names_set)

@@ -1,11 +1,11 @@
 URL_NAV = "https://www.bocwm.cn/webApi/cms/productNetWorth/getNetWorthImageByCode?productCode={}"
 # &dayCount=30
 from ccb_nav_get import CSV_FILE
-from common import Bank, save_to_cvs, sort_csv
+from common.process_csv import Bank, save_to_cvs, sort_csv
 from get_boc_product import HEADERS
 import csv
 import requests
-PRODUCTS_FILE = "cob_products.csv"
+PRODUCTS_FILE = "./products/cob.csv"
 NAV_FILE = "data/boc_nav_history.csv"
 
 def get_url_nav(product_id, product_name):
@@ -17,16 +17,17 @@ def get_url_nav(product_id, product_name):
     except Exception as e:
         print(f"⚠️ 请求或解析出错（{product_name}）: {e}")
         return None
-def update_nav_history():
+def update_nav_history(product_start_date):
     history_data ={'0_30天26a': [{'date': '2026-01-20', 'nav': '1.000012'}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, ...]}
     nav_data = {}
-    with open(PRODUCTS_FILE, mode='r', encoding='utf-8') as file:
+    with open(PRODUCTS_FILE, mode='r', encoding='utf-8-sig') as file:
         # 创建 CSV 读取器
         reader = csv.DictReader(file)
         # 遍历每一行，提取 productName 字段
         for row in reader:
             product_name = row['productName']
             product_id = row['productCode']
+            product_start_date[product_name] = row['成立日期']
             res = get_url_nav(product_id, product_name)
             if res and 'dateList' in res and 'shareNetWorthList' in res:
                 product_data = [{"date": item, "nav": item1} for item,item1 in zip(res['dateList'], res['shareNetWorthList'])]
@@ -38,9 +39,10 @@ def update_nav_history():
 
 
 if __name__ == "__main__":
-    nav_history = update_nav_history()
+    product_start_date = {}
+    nav_history = update_nav_history(product_start_date)
     if nav_history:
-        save_to_cvs(NAV_FILE, nav_history, bank = Bank.BOC)
+        save_to_cvs(NAV_FILE, nav_history, bank = Bank.BOC,product_start_date = product_start_date)
         sort_csv(NAV_FILE)
         print(f"✅ 成功保存 NAV 历史数据到 {NAV_FILE}")
     else:
