@@ -6,7 +6,7 @@ class Bank(Enum):
     CCB = 1
     BOC = 2
 
-def compute_nianhua(nav_list, jiange=7, is_all_day=False):
+def compute_nianhua(nav_list, jiange=7, is_all_day=False,bank = Bank.CCB):
     if (not is_all_day) and ((len(nav_list) < jiange + 1) or (nav_list[jiange] == '1' and nav_list[jiange - 1] == '1')):
         return None  # 数据点不足，无法计算
     try:
@@ -15,7 +15,10 @@ def compute_nianhua(nav_list, jiange=7, is_all_day=False):
             nianhua = (nav_start - 1) * (365 / (jiange + 1)) * 100
         else:
             nav_end = float(nav_list[jiange])  # jiange 天前的 NAV
-            nianhua = ((nav_start - nav_end) / nav_end) * (365 / jiange) * 100
+            if bank == Bank.CCB:
+                nianhua = ((nav_start - nav_end) / nav_end) * (365 / jiange) * 100
+            elif bank == Bank.BOC:
+                nianhua = ((nav_start - nav_end) / nav_end) * 365 / (jiange/5*7) * 100
         return round(nianhua, 2)
     except (ValueError, ZeroDivisionError) as e:
         print(f"⚠️ 计算年化收益率出错: {e}")
@@ -59,9 +62,9 @@ def save_to_cvs(CSV_FILE, history_data, bank = Bank.CCB,product_start_date = {})
             if bank == Bank.CCB:
                 start_date = nav_list[0]['date']
             elif bank == Bank.BOC:
-                start_date = product_start_date.get(product_name, '未知')
+                start_date = product_start_date.get(product_name, '2023-01-01')  # 如果没有提供成立日期，使用默认值
             if nav_list:
-                start_day = datetime.strptime(nav_list[0]['date'], "%Y-%m-%d")
+                start_day = datetime.strptime(start_date, "%Y-%m-%d")
                 end_day = datetime.strptime(nav_list[-1]['date'], "%Y-%m-%d")
                 product_day = (end_day - start_day).days + 1
             # 转为字典便于查找

@@ -5,7 +5,7 @@ from common.process_csv import Bank, save_to_cvs, sort_csv
 from get_boc_product import HEADERS
 import csv
 import requests
-PRODUCTS_FILE = "./products/cob.csv"
+PRODUCTS_FILE = "./products/boc.csv"
 NAV_FILE = "data/boc_nav_history.csv"
 
 def get_url_nav(product_id, product_name):

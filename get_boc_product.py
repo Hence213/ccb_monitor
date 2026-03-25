@@ -2,7 +2,7 @@ from common.request_url import get_post_json_text,get_html_text
 import csv
 # 请求 URL
 url = "https://www.bocwm.cn/webApi/cms/product/queryStaticProducts"
-CSV_PATH = 'products/cob.csv'
+CSV_PATH = 'products/boc.csv'
 # 请求头（Headers）
 HEADERS = {
     "Accept": "application/json, text/plain, */*",
