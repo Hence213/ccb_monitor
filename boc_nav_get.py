@@ -18,7 +18,7 @@ def get_url_nav(product_id, product_name):
         print(f"⚠️ 请求或解析出错（{product_name}）: {e}")
         return None
 def update_nav_history(product_start_date):
-    history_data ={'0_30天26a': [{'date': '2026-01-20', 'nav': '1.000012'}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, ...]}
+    # history_data ={'0_30天26a': [{'date': '2026-01-20', 'nav': '1.000012'}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, {...}, ...]}
     nav_data = {}
     with open(PRODUCTS_FILE, mode='r', encoding='utf-8-sig') as file:
         # 创建 CSV 读取器
