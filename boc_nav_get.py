@@ -7,7 +7,10 @@ import csv
 import requests
 PRODUCTS_FILE = "./products/boc.csv"
 NAV_FILE = "data/boc_nav_history.csv"
-
+T2_PRODUCTS = [
+    "行业轮动策略",
+    "指数轮动策略",
+]
 def get_url_nav(product_id, product_name):
     url = URL_NAV.format(product_id)
     try:
