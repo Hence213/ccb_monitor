@@ -34,9 +34,10 @@ RRODUCTS = [
     "增强全球配置",
     
     "稳富纯债",
-    
+    # t+2
     "行业轮动策略",
     "指数轮动策略",
+    "指数跟踪策略"
 ]
 DAYS = [
     "日开", #短债 删除
@@ -49,7 +50,7 @@ DAYS = [
 PAYLOAD = {
     "style": "",
     "timeLimit": "3个月及以内",
-    "riskLevel": "",
+    "riskLevel": "R2中低风险",
     "currency": "",
     "productTypeName": "",
     "productClass": [],
