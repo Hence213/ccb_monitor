@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOC 理财产品 - 成立年化收益率走势</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #0f1117; color: #e0e0e0; min-height: 100vh;
+  }
+  .header { padding: 20px 32px 16px; border-bottom: 1px solid #1e2130; }
+  .header-top { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .header h1 { font-size: 20px; font-weight: 600; color: #fff; letter-spacing: 0.5px; white-space: nowrap; }
+  .search-box { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+  .search-box input {
+    background: #252840; border: 1px solid #363d5a; border-radius: 20px;
+    padding: 5px 14px; font-size: 13px; color: #e0e0e0; width: 220px;
+    outline: none; transition: border-color 0.15s;
+  }
+  .search-box input:focus { border-color: #5b8af0; }
+  .search-box input::placeholder { color: #555a70; }
+  .search-btn {
+    background: #2a4080; border: 1px solid #5b8af0;
+    color: #5b8af0; font-size: 12px; padding: 5px 14px;
+    border-radius: 20px; cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .search-btn:hover { background: #3a5090; }
+  .search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .prod-meta { font-size: 13px; color: #7a8299; margin-top: 6px; }
+  .subtitle { font-size: 13px; color: #7a8299; margin-top: 4px; }
+  .stats-row { display: flex; gap: 16px; padding: 16px 32px; flex-wrap: wrap; }
+  .stat-card {
+    background: #1a1d2e; border: 1px solid #252840;
+    border-radius: 10px; padding: 14px 20px; min-width: 160px;
+  }
+  .stat-card .label { font-size: 12px; color: #7a8299; margin-bottom: 4px; }
+  .stat-card .value { font-size: 20px; font-weight: 700; }
+  .value.pos { color: #f04c44; }
+  .value.neg { color: #1dba7a; }
+  .value.neu { color: #e0e0e0; }
+  .chart-container {
+    margin: 8px 32px 24px; height: 420px;
+    background: #1a1d2e; border: 1px solid #252840;
+    border-radius: 12px; padding: 20px 24px 14px; overflow: hidden;
+  }
+  .chart-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .chart-legend { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #b0b8cc; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .range-btns { display: flex; gap: 6px; margin-left: auto; }
+  .range-btn {
+    background: #252840; border: 1px solid #363d5a;
+    color: #7a8299; font-size: 12px; padding: 4px 12px;
+    border-radius: 20px; cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .range-btn:hover { background: #2e3355; color: #b0b8cc; }
+  .range-btn.active { background: #2a4080; border-color: #5b8af0; color: #5b8af0; }
+  canvas { width: 100% !important; height: 360px !important; }
+  .table-section {
+    margin: 0 32px 32px; background: #1a1d2e; border: 1px solid #252840;
+    border-radius: 12px; overflow: hidden;
+  }
+  .table-section h3 { padding: 14px 20px; font-size: 14px; color: #b0b8cc; border-bottom: 1px solid #252840; }
+  .table-wrapper { max-height: 320px; overflow-y: auto; }
+  .table-wrapper::-webkit-scrollbar { width: 5px; }
+  .table-wrapper::-webkit-scrollbar-track { background: #1a1d2e; }
+  .table-wrapper::-webkit-scrollbar-thumb { background: #363d5a; border-radius: 3px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    position: sticky; top: 0;
+    background: #141624; color: #7a8299; font-weight: 500;
+    padding: 10px 16px; text-align: right; border-bottom: 1px solid #252840;
+  }
+  thead th:first-child { text-align: left; }
+  tbody tr { transition: background 0.15s; }
+  tbody tr:hover { background: #20243a; }
+  tbody td { padding: 8px 16px; border-bottom: 1px solid #1e2130; text-align: right; color: #d0d8e8; }
+  tbody td:first-child { text-align: left; color: #8090b0; }
+  .td-pos { color: #f04c44 !important; }
+  .td-neg { color: #1dba7a !important; }
+  .loading-mask {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 999;
+    justify-content: center; align-items: center;
+  }
+  .loading-mask.show { display: flex; }
+  .loading-text { color: #fff; font-size: 16px; }
+</style>
+</head>
+<body>
+
+<div class="loading-mask" id="loadingMask"><div class="loading-text">正在加载数据...</div></div>
+
+<div class="header">
+  <div class="header-top">
+    <h1 id="pageTitle">BOC 理财产品 - 成立年化收益率走势</h1>
+    <div class="search-box">
+      <input type="text" id="prodInput" placeholder="输入产品代码，如 WFZQQQPZRKA" />
+      <button class="search-btn" id="searchBtn" onclick="searchProduct()">查询</button>
+    </div>
+  </div>
+  <div class="prod-meta" id="prodMeta"></div>
+  <div class="subtitle" id="subtitle">输入产品代码后点击「查询」加载数据</div>
+  <div style="padding:4px 0 0 0; font-size:12px; color:#4a5270;">
+    💡 如遇 CORS 跨域报错，请先运行 <code>boc_proxy.py</code> 启动本地代理（<a href="#" onclick="alert('运行命令：\n\npython boc_proxy.py\n\n然后在浏览器中访问：\nhttp://127.0.0.1:8080/nav?code=WFZQQQPZRKA\n\n保持代理窗口运行，再使用本页面查询。');return false;" style="color:#5b8af0;">查看说明</a>）
+  </div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<div class="chart-container">
+  <div class="chart-header">
+    <div class="chart-legend">
+      <span class="dot" style="background:#f04c44"></span>成立年化(%)
+      &nbsp;&nbsp;
+      <span class="dot" style="background:#5b8af0"></span>单位净值
+    </div>
+    <div class="range-btns">
+      <button class="range-btn" data-range="1m">近1月</button>
+      <button class="range-btn" data-range="3m">近3月</button>
+      <button class="range-btn" data-range="6m">近半年</button>
+      <button class="range-btn" data-range="1y">近一年</button>
+      <button class="range-btn active" data-range="all">全部</button>
+    </div>
+  </div>
+  <canvas id="navChart"></canvas>
+</div>
+
+<div class="table-section">
+  <h3>完整净值 &amp; 成立年化数据（共 <span id="totalCount">0</span> 条）</h3>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>日期</th>
+          <th>单位净值</th>
+          <th>当日万收(元)</th>
+          <th>成立年化(%)</th>
+          <th>成立天数</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+var processed = [];
+var chartObj = null;
+var currentRange = "all";
+
+/* 回车触发搜索 */
+document.getElementById("prodInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") searchProduct();
+});
+
+/* 搜索主函数 - 先尝试直连中银API，失败后fallback到本地代理 */
+function searchProduct() {
+  var code = document.getElementById("prodInput").value.trim().toUpperCase();
+  if (!code) { alert("请输入产品代码"); return; }
+  document.getElementById("loadingMask").classList.add("show");
+  document.getElementById("searchBtn").disabled = true;
+  document.getElementById("subtitle").textContent = "正在请求中银API（直连）...";
+
+  // 先尝试直连，失败则走本地代理
+  tryFetch(code, false).then(function(data) {
+    if (!data || data.length === 0) throw new Error("返回数据为空");
+    var pdata = processRawData(data);
+    renderAll(code, pdata);
+  }).catch(function(e) {
+    console.warn("直连失败:", e.message, "尝试本地代理...");
+    document.getElementById("subtitle").textContent = "直连失败，尝试本地代理 (localhost:8080)...";
+    return tryFetch(code, true);
+  }).then(function(data) {
+    if (!data || data.length === 0) throw new Error("未获取到数据，请检查产品代码");
+    var pdata = processRawData(data);
+    renderAll(code, pdata);
+  }).catch(function(e2) {
+    console.error("所有请求方式均失败:", e2);
+    alert("请求失败：" + e2.message + "\n\n请先运行 boc_proxy.py 启动本地代理，或检查产品代码是否正确。");
+  }).finally(function() {
+    document.getElementById("loadingMask").classList.remove("show");
+    document.getElementById("searchBtn").disabled = false;
+    document.getElementById("subtitle").textContent = "输入产品代码后点击「查询」加载数据";
+  });
+}
+
+/* 统一请求入口：isProxy=true 时走本地代理 */
+function tryFetch(prodCode, isProxy) {
+  if (isProxy) {
+    // 依次尝试 8082、8080、8081
+    return fetch("http://127.0.0.1:8082/nav?code=" + encodeURIComponent(prodCode))
+      .then(function(r) { return r.json(); })
+      .then(function(result) {
+        if (result.success) return result.data || [];
+        throw new Error(result.error || "代理返回错误");
+      }).catch(function(e) {
+        return fetch("http://127.0.0.1:8080/nav?code=" + encodeURIComponent(prodCode))
+          .then(function(r) { return r.json(); })
+          .then(function(result) {
+            if (result.success) return result.data || [];
+            throw new Error(result.error || "代理返回错误");
+          });
+      }).catch(function(e2) {
+        return fetch("http://127.0.0.1:8081/nav?code=" + encodeURIComponent(prodCode))
+          .then(function(r) { return r.json(); })
+          .then(function(result) {
+            if (result.success) return result.data || [];
+            throw new Error(result.error || "代理返回错误");
+          });
+      });
+  }
+  return fetchNavData(prodCode);
+}
+
+/* 请求中银API接口 */
+function fetchNavData(prodCode) {
+  var payload = {
+    header: {
+      agent: "X-ANDR", version: "3.1.9", device: "android", platform: "android",
+      plugins: "5", page: "6", local: "zh_CN",
+      uuid: "177842367864015718698", ext: "8", cipherType: "0", appSequence: ""
+    },
+    method: "PsnxWmpHistoryNavQueryOutlay",
+    params: { productId: prodCode, subChannelId: "31", circle: "3Y" }
+  };
+  var body = "json=" + encodeURIComponent(JSON.stringify(payload));
+  return fetch("https://ebsnew.boc.cn/BMPS/_bfwajax.do?rnd=" + Date.now() + "&_locale=zh_CN", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+      "Accept": "application/json",
+      "Accept-Encoding": "gzip, deflate",
+      "bfw-ctrl": "json",
+      "Origin": "https://ebsnew.boc.cn",
+      "X-Requested-With": "com.android.browser",
+      "Referer": "https://ebsnew.boc.cn/preview/bocphone/VueLocalCli4/bocFinanceDetail/index.html",
+      "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"
+    },
+    body: body,
+    mode: "cors"
+  }).then(function(resp) {
+    return resp.text();
+  }).then(function(text) {
+    console.log("API原始返回:", text.substring(0, 1000));
+    var data = parseResponse(text);
+    if (data && data.length > 0) return data;
+    throw new Error("返回数据为空，请检查产品代码或Cookie是否过期");
+  }).catch(function(e) {
+    console.error("API请求失败:", e);
+    throw e;
+  });
+}
+
+
+/* 处理原始数据 */
+function processRawData(rawList) {
+  if (!rawList || rawList.length === 0) return [];
+  var sorted = rawList.slice().sort(function(a, b) {
+    var da = (a.updateDate || a.update_date || "").replace(/\//g, "-");
+    var db = (b.updateDate || b.update_date || "").replace(/\//g, "-");
+    return da.localeCompare(db);
+  });
+  var startStr = (sorted[0].updateDate || sorted[0].update_date || "").replace(/\//g, "-");
+  var startDate = new Date(startStr);
+  return sorted.map(function(item, idx) {
+    var dateStr = (item.updateDate || item.update_date || "").replace(/\//g, "-");
+    var navVal = parseFloat(item.nav || item.NAV || item.netValue || 0);
+    var dObj = new Date(dateStr);
+    var days = Math.round((dObj - startDate) / 86400000) + 1;
+    var annualized = days > 0 ? (navVal - 1) * 100 / days * 365 : 0;
+    var prevItem = idx > 0 ? sorted[idx - 1] : item;
+    var prevNav = parseFloat(prevItem.nav || prevItem.NAV || prevItem.netValue || navVal);
+    var wan = (navVal - prevNav) * 10000;
+    return { date: dateStr, nav: navVal, days: days, annualized: annualized, wan: wan };
+  });
+}
+
+/* 渲染全部 */
+function renderAll(prodCode, data) {
+  processed = data;
+  var startD = data[0].date;
+  var endD = data[data.length - 1].date;
+  var latest = data[data.length - 1];
+  var maxAnn = Math.max.apply(null, data.map(function(x) { return x.annualized; }));
+  document.getElementById("pageTitle").textContent = prodCode + " - 成立年化收益率走势";
+  document.getElementById("subtitle").innerHTML = "成立年化收益率 / 历史净值走势 | 成立日：" + startD + " | 数据截至：" + endD;
+  document.getElementById("prodMeta").innerHTML = "产品代码：<b>" + prodCode + "</b>";
+  document.getElementById("totalCount").textContent = data.length;
+  renderStats(latest, maxAnn);
+  renderChart();
+  renderTable(data);
+}
+
+function renderStats(latest, maxAnn) {
+  var cards = [
+    { label: "最新净值", value: latest.nav.toFixed(6), cls: "neu" },
+    { label: "当前成立年化", value: latest.annualized.toFixed(2) + "%", cls: latest.annualized >= 0 ? "pos" : "neg" },
+    { label: "成立天数", value: latest.days + " 天", cls: "neu" },
+    { label: "最高成立年化", value:   maxAnn.toFixed(2) + "%", cls: "pos" }
+  ];
+  var html = "";
+  for (var i = 0; i < cards.length; i++) {
+    html += '<div class="stat-card"><div class="label">' + cards[i].label + '</div><div class="value ' + cards[i].cls + '">' + cards[i].value + '</div></div>';
+  }
+  document.getElementById("statsRow").innerHTML = html;
+}
+
+/* 解析API响应 */
+function parseResponse(text) {
+  try {
+    var json = JSON.parse(text);
+    // 实际API返回格式: {"result": {"recordNumber":"208","list":[...]}}
+    if (json && json.result && json.result.list && Array.isArray(json.result.list)) {
+      return json.result.list;
+    }
+    if (json && json.result && Array.isArray(json.result)) {
+      return json.result;
+    }
+    if (json && json.response && json.response.data && json.response.data.navList) {
+      return json.response.data.navList;
+    } else if (json && json.response && json.response.data) {
+      return json.response.data;
+    } else if (json && json.data) {
+      return json.data;
+    } else if (Array.isArray(json)) {
+      return json;
+    } else {
+      console.error("无法解析响应数据:", json);
+      return [];
+    }
+  } catch(e) {
+    console.error("解析响应失败:", e, "原始文本前500字:", text.substring(0, 500));
+    return [];
+  }
+}
+
+/* 图表 */
+function renderChart() {
+  var ctx = document.getElementById("navChart").getContext("2d");
+  if (chartObj) chartObj.destroy();
+  var filtered = getFiltered(currentRange);
+  if (filtered.length === 0) return;
+  var gradAnn = ctx.createLinearGradient(0, 0, 0, 320);
+  gradAnn.addColorStop(0, "rgba(240,76,68,0.22)");
+  gradAnn.addColorStop(1, "rgba(240,76,68,0.01)");
+  var gradNav = ctx.createLinearGradient(0, 0, 0, 320);
+  gradNav.addColorStop(0, "rgba(91,138,240,0.18)");
+  gradNav.addColorStop(1, "rgba(91,138,240,0.01)");
+  chartObj = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: filtered.map(function(x) { return x.date; }),
+      datasets: [
+        {
+          label: "成立年化(%)",
+          data: filtered.map(function(x) { return x.annualized; }),
+          borderColor: "#f04c44",
+          backgroundColor: gradAnn,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: "#f04c44",
+          pointHoverBorderColor: "#fff",
+          pointHoverBorderWidth: 2,
+          tension: 0.3,
+          fill: true,
+          yAxisID: "y"
+        },
+        {
+          label: "单位净值",
+          data: filtered.map(function(x) { return x.nav; }),
+          borderColor: "#5b8af0",
+          backgroundColor: gradNav,
+          borderWidth: 1.5,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: "#5b8af0",
+          pointHoverBorderColor: "#fff",
+          pointHoverBorderWidth: 2,
+          tension: 0.3,
+          fill: true,
+          yAxisID: "y2"
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#1e2338",
+          borderColor: "#363d5a",
+          borderWidth: 1,
+          titleColor: "#fff",
+          bodyColor: "#b0b8cc",
+          padding: 12,
+          callbacks: {
+            title: function(items) {
+              var d = filtered[items[0].dataIndex];
+              return d.date + " （成立第 " + d.days + " 天）";
+            },
+            label: function(item) {
+              var d = filtered[item.dataIndex];
+              if (item.datasetIndex === 0) {
+                return "  成立年化：" + d.annualized.toFixed(2) + "%";
+              } else {
+                var wanStr = (d.wan >= 0 ? "+" : "") + d.wan.toFixed(2);
+                return "  单位净值：" + d.nav.toFixed(6) + "    当日万收：" + wanStr + " 元";
+              }
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: "#5a6480", maxTicksLimit: 10, maxRotation: 0 },
+          grid: { color: "#1e2240" }
+        },
+        y: {
+          position: "left",
+          title: { display: true, text: "成立年化(%)", color: "#f04c44" },
+          ticks: { color: "#f04c44", callback: function(v) { return v.toFixed(2) + "%"; } },
+          grid: { color: "#1e2240" }
+        },
+        y2: {
+          position: "right",
+          title: { display: true, text: "净值", color: "#5b8af0" },
+          ticks: { color: "#5b8af0", callback: function(v) { return v.toFixed(4); } },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+/* 时间范围过滤 */
+function getFiltered(range) {
+  if (!processed.length) return [];
+  var lastStr = processed[processed.length - 1].date;
+  var lastDt = new Date(lastStr);
+  var cutoff;
+  if (range === "1m") { cutoff = new Date(lastDt); cutoff.setMonth(cutoff.getMonth() - 1); }
+  else if (range === "3m") { cutoff = new Date(lastDt); cutoff.setMonth(cutoff.getMonth() - 3); }
+  else if (range === "6m") { cutoff = new Date(lastDt); cutoff.setMonth(cutoff.getMonth() - 6); }
+  else if (range === "1y") { cutoff = new Date(lastDt); cutoff.setFullYear(cutoff.getFullYear() - 1); }
+  else { return processed; }
+  return processed.filter(function(x) { return new Date(x.date) >= cutoff; });
+}
+
+/* 范围按钮 */
+document.querySelectorAll(".range-btn").forEach(function(btn) {
+  btn.addEventListener("click", function() {
+    document.querySelectorAll(".range-btn").forEach(function(b) { b.classList.remove("active"); });
+    btn.classList.add("active");
+    currentRange = btn.getAttribute("data-range");
+    renderChart();
+  });
+});
+
+/* 表格 */
+function renderTable(data) {
+  var tbody = document.getElementById("tableBody");
+  var rows = [];
+  for (var i = data.length - 1; i >= 0; i--) {
+    var d = data[i];
+    var annCls = d.annualized >= 0 ? "td-pos" : "td-neg";
+    var wanCls = d.wan >= 0 ? "td-pos" : "td-neg";
+    var wanStr = (d.wan >= 0 ? "+" : "") + d.wan.toFixed(2);
+    rows.push("<tr>" +
+      "<td>" + d.date + "</td>" +
+      "<td>" + d.nav.toFixed(6) + "</td>" +
+      "<td class="" + wanCls + "">" + wanStr + "</td>" +
+      "<td class="" + annCls + "">" + d.annualized.toFixed(2) + "%</td>" +
+      "<td>" + d.days + "</td>" +
+      "</tr>");
+  }
+  tbody.innerHTML = rows.join("");
+}
+</script>
+</body>
+</html>

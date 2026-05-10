@@ -1,0 +1,578 @@
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="renderer" content="ie-stand" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
+<title>中国建设银行 个人网上银行</title>
+<script src="/P1StaRes/V6/STY1/CN/js/jquery.min.js?ver=20260417"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/udc_header.js?ver=20260417" language="javascript"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/widget.js?ver=20260417" language="javascript"></script>
+<link href="/P1StaRes/V6/STY1/CN/css/ccb_new.css?ver=20260417" rel="stylesheet" type="text/css" />
+<style type="text/css">
+.text_error1 {
+padding:0px 10px 0px 34px;
+border:1px solid #FFCC00;
+background:#FAF7D5  5px 50% no-repeat;
+}
+.text_error2 {
+/*background:#f0f7ff url(/P1StaRes/V6/STY1/CN/images5/blue/icon_gantan.gif) 5px 50% no-repeat;
+border:#69c;*/
+
+background:#f0f7f7 url(/P1StaRes/V6/STY1/CN/images5/blue/icon_gantan.gif) 10px 10px no-repeat;
+border:1px solid #ccdded;
+height:105px;
+}
+.subwrap_fankui {   
+  vertical-align:middle;   
+  display:table-cell;    
+}
+.subwrap_fankui p {
+	width:100%;
+}
+</style>
+<script language="javascript">
+var isErrorPage=true;
+var errcode="";
+var popError="";
+function Back(State) {
+				if(State==null){
+                State=-1;
+        }
+        
+        var isFromMenu = "" + "" ;
+		
+		var exTxcode = "" + "NFN005" ;
+		
+		if("E31020,E31021,E31030,E31031,E31040,E31041,E31042,E31050,E31051,E31052".indexOf(exTxcode)!=-1){
+			top.submitTX('100112','MENU_ID=0175,');
+			return;
+		}
+
+		if("300100,G10000,G10010,G20200,G20100,350401,350100,350800,G10000,350601,380000,490100,490307,490500,490200,B41101,NJ1900,SSI914,930030,930033,SSI924,300100,301001,H30400,490600,G30300,T31000,SSI930,SSI940,SSI960,SSI970,Q11000,NJ1800,NJ1000,900105".indexOf(exTxcode)!=-1&&BROWSER.isFirefox()){
+			top.submitTX('100112','MENU_ID=0016,');
+			return;
+		}
+
+		 if(BROWSER.isFirefox()){
+		 	try{
+				if(top.sysCurrentMenuId!='undefined'&&top.sysCurrentMenuId!=''&&top.submitTX!='undefined'){
+					top.submitTX(top.sysCurrentMenuId);
+					return;
+				}
+		 	}catch(e){}
+		}
+		
+
+		var exList = "G10010,G10000,G20200,G20100,390101,390200,490100,490300,490500,490200,B60100,900105,300100,380000,B41101,NJ0100,NJ0200,NJ0300,NJ0400,NJ0500,NJ0600";
+		
+		if(isFromMenu == "1" && exList.indexOf(exTxcode)!=-1){
+			State = -3;
+			
+			for(var i = 0; i< 3; i++){
+				history.go(-1);
+			}
+			
+			return;
+		}
+		
+         if(typeof parent!="undefined"&& parent!=null) {
+			if ("520108"!="NFN005"){
+				if(typeof checkObj("Menu3BackFlag") != "undefined"){
+					var k1=0;
+					var k2=0;
+					k1=parent.parent.getPubValue2P("historyLength");
+					k2=history.length;
+					
+					//State=k1-k2-2;
+					//alert('State:'+State);
+					
+					for(var i =0; i< k2 +3 -k1; i++ ){
+						if(history.length>0)
+							history.go(-1);
+					}
+					return;
+				}
+			}
+        }
+        
+        
+        history.go(State);
+}
+function checkObj(arg) {
+	var r_obj = null;
+	if(typeof(arg) == 'object') {
+		return arg;
+	}
+	r_obj = parent.document.getElementById(arg);
+	if (r_obj == null) {
+		r_obj = parent.document.getElementsByName(arg)[0];
+	}
+	return r_obj;
+}
+
+function Load() {
+    //progressSH(0);
+	try{
+		if(typeof parent!="undefined"&& parent!=null) {
+			if(typeof parent.document.forms[0]!="undefined"&& parent.document.forms[0]!=null) {
+			
+				if(typeof checkObj("QUERYFLAG370001") !="undefined"){
+					
+							
+					checkObj("check2").className="btn";
+					checkObj("check2").disabled = false;
+					
+					checkObj("check3").className="button_lessThan12";
+					checkObj("check3").disabled = false;
+				}
+				
+				if(typeof checkObj("PLflag")!="undefined") {
+					var pljf=checkObj("PLflag").value;				
+					if(pljf=="500507"){  
+						window.parent.splitstr(window.name);
+					} else {
+						alert('信息提示：YTMA03216290\n不是交易日不支持交易。\n');
+						if(pljf=="500506"){
+							window.parent.defaultimg();
+							window.parent.document.forms[0].sflag.value="1";
+						} else {
+							window.parent.repeatSubmit();
+						}	
+					}
+				}
+				
+				if(typeof checkObj("ONTIME_PRICE")!="undefined") {	
+					var price=checkObj("ONTIME_PRICE").value;	
+					if(price=="470006"){  
+						alert('信息提示：YTMA03216290\n不是交易日不支持交易。\n');
+					} 
+				}
+				if(typeof checkObj("BIDIRECTION_PRICE")!="undefined") {	
+					var price=checkObj("BIDIRECTION_PRICE").value;	
+					if(price=="473110"){  
+						alert('信息提示：YTMA03216290\n不是交易日不支持交易。\n');
+					} 
+				}
+	
+				//财务分析错误处理
+				if(typeof checkObj("caiWuFlag")!="undefined") {	
+					var price=checkObj("caiWuFlag").value;	
+					if(price=="1"){  
+						alert('信息提示：YTMA03216290\n不是交易日不支持交易。\n');
+					} 
+				}
+				//财务分析循环发错误处理
+				if(typeof checkObj("caiWuLoopFlag")!="undefined") {	
+					var price=checkObj("caiWuLoopFlag").value;	
+					if(price=="1"){  
+						alert('信息提示：YTMA03216290\n不是交易日不支持交易。\n');
+					} 
+				}
+				
+				if(typeof checkObj("TABLEHEAD")!="undefined") {	
+					var tablehead = checkObj("TABLEHEAD").value;
+					setTimeout("parent.setButtonStyle();",1000);
+				}	
+				
+				
+				//E30608 信用卡余额查询出现错误所需要作出的父页面处理
+				if(typeof window.parent.document.forms[0].XIN!="undefined") {
+	
+					var XIN=checkObj("XIN").value;
+					var sflag=window.parent.document.forms[0].sflag.value;
+					if(XIN=="E30608"){  
+						alert('信息提示：YTMA03216290\n不是交易日不支持交易。\n');
+						checkObj('img'+sflag).src="../V5/images5/icon_plus.gif";
+						checkObj('acc'+sflag).style.display="none";
+						
+						window.parent.document.forms[0].sflag.value="1";
+						window.parent.document.forms[0].picClickFlag.value="1";
+						if (checkObj("result")!=null) {
+							setChooseTableStyle2(checkObj("result"));
+						}
+					} else {
+						//do something.....
+					}
+		    	}
+						
+			    if(typeof parent.document.forms[0]['qd1']!="undefined") {
+			    
+					if(typeof window.parent.document.forms[0].timeOut!="undefined"&&("2D0015"=="NFN005"||"2D0115"=="NFN005")){
+				        var b = window.parent.checkTimeout();
+				        var PER_SEQUREY_TIME = window.parent.document.getElementById("PER_SEQUREY_TIME").value;
+						var tran_state="";
+						if(b && (tran_state=="2")){
+							window.parent.document.getElementById("wait").style.display = "";
+							setTimeout("window.parent.document.forms[0].submit()",PER_SEQUREY_TIME*1000);//没超时重新发送取原流水号
+						}else{
+							window.parent.document.getElementById("wait").style.display = "none";
+							//window.parent.document.getElementById("result").height="0%";
+							alert('信息提示：YTMA03216290\n不是交易日不支持交易。\n');
+							window.parent.disableYNParent("qd1","1");
+						}  
+					}
+				}
+				
+			    if(typeof parent.document.forms[0]['qd1']!="undefined") {	
+					var classname=parent.document.forms[0]['qd1'].className;
+					var indexflag=classname.indexOf("_dis");
+					if(indexflag!=-1){
+						classname=classname.substr(0,indexflag);
+					}			
+					parent.document.forms[0]['qd1'].disabled=false;
+					parent.document.forms[0]['qd1'].className=classname;
+					if("SF0402"=="NFN005"){
+						for(var j=0; j < window.parent.document.getElementsByName('qd1').length; j++){
+							parent.document.getElementsByName('qd1')[j].disabled=false;
+							parent.document.getElementsByName('qd1')[j].className="btn";
+						}
+					}
+				} else if(typeof window.parent.document.forms[0].sflag!="undefined") {
+					
+					sflag=window.parent.document.forms[0].sflag.value;
+					if (sflag!="1") {   
+						if(typeof window.parent.document.forms[0].timeOut!="undefined"&&"310904"=="NFN005"){
+								
+								//var timeOutValue=window.parent.document.getElementById("timeOut").value;
+								//var timeOutSec=window.parent.document.getElementById("timeOutSec").value;
+								//var timeCount = timeOutSec*1000;//判断获取状态是否超过20秒时间
+								//var sendTime = window.parent.document.getElementById("timeOut");
+								//var date1 = new Date();
+								//if(date1 - Date.parse(new Date(timeOutValue)) > timeCount){
+									//alert("获取流水号超时，请稍后再试!");
+									alert('信息提示：YTMA03216290\n不是交易日不支持交易。\n');	
+									window.parent.frames['result'].document.getElementById('img'+sflag).className = "zhcx_show";
+									window.parent.frames['result'].document.getElementById('acc'+sflag).style.display="none";
+									
+									window.parent.document.getElementById("timeOut").value="";//重置超时时间；
+									window.parent.frames['result'].Load();
+									window.parent.document.forms[0].sflag.value="1";
+									return;
+								//}
+								//window.parent.document.forms[0].sflag.value = "1";
+								//window.parent.frames['result'].document.getElementById('img'+sflag).src="../V5/images5/icon_plus.gif";
+								//window.parent.frames['result'].document.getElementById('acc'+sflag).style.display="none";	
+								//setTimeout("window.parent.frames['result'].document.getElementById('img"+sflag+"').src='../V5/images5/icon_plus.gif';window.parent.frames['result'].document.getElementById('acc"+sflag+"').style.display='none';parent.window.frames['result'].getData(window.parent.document.forms[0].timeOutAccount.value);",3000);
+								//parent.window.frames['result'].getData(window.parent.document.forms[0].timeOutAccount.value);
+								//return;
+						}
+						if(typeof window.parent.frames["result"].document.getElementById("sflagcxk310103")!="undefined"){
+							try{
+							var sflagcxk310103=window.parent.frames["result"].document.getElementById("sflagcxk310103").value;
+								window.parent.frames["result"].document.getElementById("1acc"+sflagcxk310103).style.display="";
+							}catch(e){}	
+						}
+						alert('信息提示：YTMA03216290\n不是交易日不支持交易。\n');
+						
+						if(sflag=="2") {
+							
+							window.parent.frames['result'].Load();
+							var multi=window.parent.document.forms[0].sflagmulti.value;
+							if(multi!="1"){
+								window.parent.frames['result'].document.getElementById(multi).style.display="none";
+							}
+						} else {
+							
+							if(typeof window.parent.document.forms[0].picClickFlag!="undefined") {
+								
+								window.parent.frames['result'].document.getElementById('img'+sflag).className = "zhcx_show";
+								window.parent.frames['result'].document.getElementById('acc'+sflag).style.display="none";
+								
+								window.parent.frames['result'].Load();
+							} else {
+								
+								//window.parent.frames['result'].document.all['img'+sflag].src="../V5/images5/icon_plus.gif";
+								//window.parent.frames['result'].Load();
+							}
+						}
+						
+						window.parent.document.forms[0].sflag.value="1";
+					}
+				}
+			    var txcode_N = 'NFN005';
+			    if(txcode_N == 'N31001' ||txcode_N == 'N31003'||txcode_N == 'N31005'||txcode_N == 'N31007'){
+			    	window.parent.document.getElementById("sub_status").style.display="none";
+			    	window.parent.document.getElementById("result").style.display="block";
+			    }
+			    if(txcode_N == 'N31008'){
+			    	alert('信息提示：YTMA03216290\n不是交易日不支持交易。\n');
+			    	window.parent.document.getElementById("sub_status").style.display="none";
+			    	return;
+			    }
+			}
+			
+			if(typeof window.parent.btnReturn!="undefined"){
+				error.style.display="none";
+			}
+		}
+	}
+	catch(ee){
+		//alert("ee");
+	}
+}
+//end of function Load()
+
+function popparent(){
+	parent.parent.m1('m1_0006');
+	parent.parent.m2('m1_0006','m2_0186');
+	top.submitTX('431901','');
+}
+function toChangeCert(guideUrl){
+	var newwin=window.open(guideUrl,"","top=0,left=0,height=768,width=1024,scrollbars=yes,status=no,resizable=yes");
+}
+
+
+var autheURL = '';
+function turnAuthePage(){
+	window.location=autheURL;
+}
+
+</script>
+</head>
+<body onload="Load();resizeParentsIfrm();" onkeydown="return false;KeyDown(event);">
+	<div id="ccbPage" class="clearfix">
+		
+<form name="selfDefForm" method="POST" action="/CCBIS/B2CMainPlat_05">
+<input type="hidden" name="SERVLET_NAME" value="B2CMainPlat_05"/>
+<input type="hidden" name="CCB_IBSVersion" value="V6"/>
+<input type="hidden" name="PT_STYLE" value="1"/>
+<input type="hidden" name="TXCODE" value="NFN003"/>
+<input type="hidden" name="USERID" value="eNc60517D1C2E822652F30548FE79C508D792768CBC743EDB6CB06DDD55A544F04F"/>
+<input type="hidden" name="BRANCHID" value="330000000"/>
+<input type="hidden" name="SKEY" value="KPeJMJ"/>
+<input type="hidden" name="FUNC_NO" value="2"/>
+<input type="hidden" name="ACCNO" value=""/>
+<input type="hidden" name="CshEx_Cd" value="1"/>
+<input type="hidden" name="Eclsv_Stm_ECD" value=""/>
+<input type="hidden" name="FndCo_Agnc_Sale_InsID" value="005"/>
+<input type="hidden" name="IS_SAVE" value=""/>
+<input type="hidden" name="Ivs_Trm_show" value="按日申赎"/>
+<input type="hidden" name="IvsmPd_ECD" value="JXJXARGS250829041"/>
+<input type="hidden" name="PROVINCE_ID" value="999999999"/>
+<input type="hidden" name="PdOrd_Ddln_Dsc" value=""/>
+<input type="hidden" name="Rlz_Cnd_ID" value="0"/>
+<input type="hidden" name="Txn_Mkt_ID" value="0JH"/>
+<input type="hidden" name="Fnd_Clsd_Opn_TpCd" value="4"/>
+<input type="hidden" name="Rcmm_Txn_TpCd" value=""/>
+</form>
+
+
+		
+		
+		<script>
+			var isCurrIE6=(navigator.userAgent.toLowerCase().indexOf("msie 6.0") != -1);
+			if("310902".indexOf("NFN005")!=-1) {
+				if(isCurrIE6)
+					document.write('<table width="100%"><tr><td><div id="error_main" class="border_box mb_0" style="margin-top:5px;" align="center">');
+				else document.write('<div id="error_main" class="border_box mb_0" style="margin-top:5px;padding-right:1px;padding-top:1px;" align="center">');
+			}else{
+				var error_main=null;
+				try{
+					error_main=parent.document.getElementById('errorpageflag105');
+				}
+				catch(E){}
+				if(error_main != null && typeof error_main != undefined){
+					if(isCurrIE6)
+						document.write('<table width="100%"><tr><td><div id="error_main" class="border_box mb_0" style="margin-top:30px;" align="center">');
+					else document.write('<div id="error_main" class="border_box mb_0" style="margin-top:30px;padding-right:1px;padding-top:1px;" align="center">');
+				}else {
+						if(isCurrIE6)
+							document.write('<table width="100%"><tr><td><div id="error_main" class="border_box mb_0" style="margin-top:15px;" align="center">');
+						else document.write('<div id="error_main" class="border_box mb_0" style="margin-top:15px;padding-right:1px;padding-top:1px;" align="center">');
+					}
+			}
+			
+		</script>
+		<SCRIPT LANGUAGE='JavaScript'> errcode='YTMA03216290'</SCRIPT>
+
+		<div style="display:none">
+			<div class='text_error'></div>
+		</div>
+		<div class='failed_span' style="width:100%;position:relative;display:table;border:0px" align='left'>
+			 <div class='subwrap_fankui'><div class='content_fankui_message'>
+				<div class='text_big text_bold' style='line-height:20px;margin:0 0 1px 125px;'>
+				<p class="fs_16 fw_bold">
+				<script language="javascript">
+				 try{
+					if(parent.location.href.indexOf("TXCODE=310900")>0||parent.location.href.indexOf("TXCODE=310700")>0){
+						document.write("子账户更新失败:");
+					}else{
+						document.write("尊敬的客户：");
+					}
+				 }catch(e){ }
+				</script>
+				<p/>
+				不是交易日不支持交易。
+				<script language="javascript">
+
+					if(window.location.href.indexOf("popError=1")!=-1){
+						popError=popError+"子账户更新失败:";
+						popError=popError+"YTMA03216290"+"\r\n";
+						
+						popError=popError+"不是交易日不支持交易。";
+						
+						alert(popError);
+						parent.disableYN();
+					}
+				</script>
+			
+				</div>
+				<div class='text_big' style="margin:2px 12px 0 125px;">
+					<table width="100%">
+						<tr style="line-height:20px"><td style="line-height:20px">参考代码：YTMA03216290</td><td style="text-align:right;">
+						<script language="javascript">
+							var errorcode="YTMA03216290";
+							if(typeof errorcode!="undefined"&&typeof errorcode!=""&&errorcode.length>=4&&errorcode.substring(0,1)=="8") {
+								//alert(errorcode.substring(1,4));
+								switch(errorcode.substring(1,4))
+							   {
+							   case "110":
+							     document.write("中国建设银行北京市分行");
+							     break
+							   case "120":
+							     document.write("中国建设银行天津市分行");
+							     break
+							   case "130":
+							     document.write("中国建设银行河北省分行");
+							     break
+							   case "140":
+							     document.write("中国建设银行山西省分行");
+							     break
+							   case "150":
+							     document.write("中国建设银行内蒙古区分行");
+							     break
+							   case "210":
+							     document.write("中国建设银行辽宁省分行");
+							     break
+							   case "212":
+							     document.write("中国建设银行大连市分行");
+							     break
+							   case "220":
+							     document.write("中国建设银行吉林省分行");
+							     break
+							   case "230":
+							     document.write("中国建设银行黑龙江省分行");
+							     break
+							   case "310":
+							     document.write("中国建设银行上海市分行");
+							     break
+							   case "320":
+							     document.write("中国建设银行江苏省分行");
+							     break
+							   case "322":
+							     document.write("中国建设银行苏州市分行");
+							     break
+							   case "330":
+							     document.write("中国建设银行浙江省分行");
+							     break
+							   case "331":
+							     document.write("中国建设银行宁波市分行");
+							     break
+							   case "340":
+							     document.write("中国建设银行安徽省分行");
+							     break
+							   case "350":
+							     document.write("中国建设银行福建省分行");
+							     break
+							   case "351":
+							     document.write("中国建设银行厦门市分行");
+							     break
+							   case "360":
+							     document.write("中国建设银行江西省分行");
+							     break
+							   case "370":
+							     document.write("中国建设银行山东省分行");
+							     break
+							   case "371":
+							     document.write("中国建设银行青岛市分行");
+							     break
+							   case "410":
+							     document.write("中国建设银行河南省分行");
+							     break
+							   case "420":
+							     document.write("中国建设银行湖北省分行");
+							     break
+							   case "422":
+							     document.write("中国建设银行三峡分行");
+							     break
+							   case "430":
+							     document.write("中国建设银行湖南省分行");
+							     break
+							   case "440":
+							     document.write("中国建设银行广东省分行");
+							     break
+							   case "442":
+							     document.write("中国建设银行深圳市分行");
+							     break
+							   case "450":
+							     document.write("中国建设银行广西区分行");
+							     break
+							   case "460":
+							     document.write("中国建设银行海南省分行");
+							     break
+							   case "500":
+							     document.write("中国建设银行重庆市分行");
+							     break
+							   case "510":
+							     document.write("中国建设银行四川省分行");
+							     break
+							   case "520":
+							     document.write("中国建设银行贵州省分行");
+							     break
+							   case "530":
+							     document.write("中国建设银行云南省分行");
+							     break
+							   case "540":
+							     document.write("中国建设银行西藏区分行");
+							     break
+							   case "610":
+							     document.write("中国建设银行陕西省分行");
+							     break
+							   case "620":
+							     document.write("中国建设银行甘肃省分行");
+							     break
+							   case "630":
+							     document.write("中国建设银行青海省分行");
+							     break
+							   case "640":
+							     document.write("中国建设银行宁夏区分行");
+							     break
+							   case "650":
+							     document.write("中国建设银行新疆区分行");
+							     break
+							   default:
+							     document.write("中国建设银行");
+							   }
+							}else{
+								document.write("中国建设银行");
+							}								
+						</script>
+						</td></tr>
+					</table>
+					</div>
+				</div>   
+			  </div>   
+			</div>	
+			
+		</div>
+		<script language="javascript">
+			if(isCurrIE6){
+				document.write("</td><td style='width:2px'></td></tr></table>");
+			}
+		</script>
+		
+		
+		
+		<div id="RelatedTxs" style="border:1px solid #ccc;padding-left: 20px;" class=""></div>
+		
+		
+		<div id="errIncludePage">
+		

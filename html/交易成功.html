@@ -1,0 +1,892 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <!-- PAGE INFO -->
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>中国建设银行个人网上银行</title>
+    <!-- CSS -->
+    <link href="/P1StaRes/V6/STY1/CN/css/TZLC/finance.css" rel="stylesheet" type="text/css" />
+    <link type="text/css" rel="stylesheet" href="/P1StaRes/V6/STY1/CN/css/ccb_new.css?ver=20260417" />
+    <!-- Page CSS-->
+    <!-- JavaScript -->
+    <script src="/P1StaRes/V6/STY1/CN/js/jquery.min.js?ver=20260417"></script>
+    <script src="/P1StaRes/V6/STY1/CN/js/widget.js?ver=20260417"></script>
+    <script src="/P1StaRes/V6/STY1/CN/js/udc_header.js?ver=20260417"></script>
+    <script src="/P1StaRes/V6/STY1/CN/js/changeMoney.js" language="javascript"></script>
+    <script src="/P1StaRes/V6/STY1/CN/js/TZLC/F481100.js" language="javascript"></script>
+    <script src="/P1StaRes/V6/STY1/CN/js/TZLC/tjkhjl.js?ver=20260417"></script><!-- 20170808 lixj -->
+    <script type="text/javascript">
+        function doReturn() {
+            document.returnForm.submit();
+        }
+
+        function goto_print() {
+            document.printFrom.submit();
+        }
+        $(function () {
+            //var Cmpn_CstMgr_ID="";
+            //var setUrl = "/CCBIS/B2CMainPlat_05?SERVLET_NAME=B2CMainPlat_05&CCB_IBSVersion=V6&PT_STYLE=1&USERID=eNc60517D1C2E822652F30548FE79C508D792768CBC743EDB6CB06DDD55A544F04F&BRANCHID=330000000&SKEY=719BL2&TXCODE=MNG000&isAjaxRequest=true&Ebnk_MsgRp_Fcn_No=02&Rsrv_TpCd=01&Cmpn_CstMgr_ID="+Cmpn_CstMgr_ID;
+            //ajaxCustMngSetState(setUrl);
+        });
+
+        //20200331 quanzhong 
+        function newformatPeriod(period) {
+            if (period <= 0 || isNaN(period)) {
+                document.write(period);
+            } else if (period > 20000) {
+                document.write('无固定期限');
+            } else {
+                document.write(period + '天');
+            }
+        }
+        //异步POST请求返回指定类型数据 默认json
+        function sendAjaxReturnJsonData(paras) {
+            paras = $.extend({ type: "POST", url: "", dataType: "json", async: "true", data: {}, traditional: false }, paras);
+            $.ajax({
+                type: paras.type,
+                url: paras.url,
+                data: paras.data,
+                dataType: paras.dataType,
+                traditional: paras.traditional,
+                async: paras.async,
+                success: function (data) {
+                    var reg = /<ErrCode>[\s\S]*<\/ErrCode>/;
+                    if (reg.test(data)) {
+                        var regCode = /[\s\S]*<ErrCode>([\s\S]*)<\/ErrCode>[\s\S]*/,
+                            regMsg = /[\s\S]*<ErrMsg>([\s\S]*)<\/ErrMsg>[\s\S]*/;
+                        var errCode = data.replace(regCode, '$1');
+                        var errMsg = data.replace(regMsg, '$1');
+                        errInfo = { code: errCode, msg: errMsg };
+                        if (paras.errCallBack) {
+                            paras.errCallBack(errInfo);
+                        }
+                    } else {
+                        if (paras.successCallBack) {
+                            paras.successCallBack(data);
+                        }
+                    }
+
+                },
+                error: function (XmlHttpRequest, textStatus, errorThrown) {
+                    //					alert("status:"+XmlHttpRequest.status +"\nmessage:"+textStatus);
+                }
+            });
+        }
+        function queryPersonCode(empId) {
+            if (!empId) return false;
+            var url = "/CCBIS/B2CMainPlat_05?SERVLET_NAME=B2CMainPlat_05&CCB_IBSVersion=V6&PT_STYLE=1&isAjaxRequest=true&TXCODE=NFNA04&BRANCHID=330000000&USERID=eNc60517D1C2E822652F30548FE79C508D792768CBC743EDB6CB06DDD55A544F04F&SKEY=719BL2&PAGE_JUMP=1&REC_IN_PAGE=20&CCB_EmpID=" + empId;
+
+            url = getParmJiaMiUrl(url);
+
+            var success = function (data) {
+                var dataJson = $.parseJSON(data);
+                if (dataJson['Bl_Val_Wthr_Ind'] != 1) {
+                    return false;
+                }
+                $("#EMPE_NM").html(dataJson['EMPE_NM']);
+                $("#CCB_EmpID").html(dataJson['CCB_EmpID']);
+                $("#BLNG_INST_NM").html(dataJson['BLNG_INST_NM']);
+                $(".person-code").show();
+            };
+            var err = function (errInfo) {
+                //			alert("错误码:"+errInfo.code+"\n错误信息:"+errInfo.msg);
+            };
+            sendAjaxReturnJsonData({ url: url, dataType: 'text', successCallBack: success, errCallBack: err });
+        }
+    </script>
+</head>
+
+<body>
+    <form id="jhform" name="jhform" method="post"
+        action="/CCBIS/B2CMainPlat_05?SERVLET_NAME=B2CMainPlat_05&CCB_IBSVersion=V6&PT_STYLE=1">
+        <div id="ccbPage">
+            <!--主内容区 START-->
+            <div id="pmain">
+                <div id="psidebar"></div>
+                <div id="pbd">
+                    <div class="border_box">
+                        <i class="border_shadow"></i>
+                        <div class="F_title">
+                            <span>
+
+
+
+                                理财产品交易 - 产品购买
+                            </span>
+                        </div>
+                        <!--流程引导 START-->
+                        <div class="account boxShadow">
+                            <ul class="pbd_step clearfix">
+                                <li class="pbd_step_item pbd_step_1"><em></em><span>填写购买信息 </span><i class="arrow"></i>
+                                </li>
+                                <li class="pbd_step_item pbd_step_2"><em></em><span>确认购买信息 </span><i class="arrow"></i>
+                                </li>
+                                <li class="pbd_step_item pbd_step_3 on"><em></em><span>购买成功 </span></li>
+                            </ul>
+                        </div>
+                        <div class="pResult mt_20">
+                            <div class="succeed_mobileImg" id="succeedTxAd"></div>
+                            <div class="success_icon"></div>
+                            <div class="succeed_span">
+                                <p>尊敬的客户：</p>
+                                <p>产品购买交易成功!</p>
+                            </div>
+                            <div id="RelatedTxs" style="margin-top:10px;margin-left:128px;">
+                            </div>
+                            <div class="share"><img src="/P1StaRes/V6/STY1/CN/images/share1.png">
+                                <ul class="share_select" style="display: none;">
+                                    <li><a style='background: url("/P1StaRes/V6/STY1/CN/images/share1.png") no-repeat 10px -50px;'
+                                            href="javascript:void(0);"><span>QQ空间</span></a></li>
+                                    <li><a style='background: url("/P1StaRes/V6/STY1/CN/images/share.png") no-repeat 10px -102px;'
+                                            href="../SHFW/SHFW_fx_1.html" target="_blank"><span>新浪微博</span></a></li>
+                                    <li><a style='background: url("/P1StaRes/V6/STY1/CN/images/share.png") no-repeat 10px -151px;'
+                                            href="javascript:void(0);"><span>腾讯微博</span></a></li>
+                                    <li><a style='background: url("/P1StaRes/V6/STY1/CN/images/share.png") no-repeat 10px -203px;'
+                                            href="javascript:void(0);"><span>微信</span></a></li>
+                                    <li><a style='background: url("/P1StaRes/V6/STY1/CN/images/share.png") no-repeat 10px 2px;'
+                                            href="javascript:void(0);"><span>更多</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="pbd_table_step_title_no_line">
+                            <h3>以下是您的购买信息</h3>
+                        </div>
+                        <!--步骤标题 END-->
+                        <div class="four_column_table_padLR">
+                            <table border="0" width="100%" height="100%" class="four_column_table">
+                                <tbody>
+                                    <tr>
+                                        <th>产品名称</th>
+                                        <td>嘉鑫稳利固收类按日开放第64期A（代销建信理财）</td>
+                                        <th>产品类型</th>
+                                        <td>
+
+
+
+                                            按日开放式
+
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>投资期限</th>
+                                        <td>
+                                            <script>newformatPeriod("按日申赎")</script>
+                                        </td>
+                                        <th>账户</th>
+                                        <td>
+                                            <script>formatAccount('621700*********3701')</script>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>币种</th>
+                                        <td>人民币</td>
+                                        <th>分红方式</th>
+                                        <td>
+                                            现金分红
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            购买金额
+                                        </th>
+                                        <td>
+                                            <div class="font_money">
+                                                <script>FormatAmt('1.00')</script>
+                                            </div>
+                                        </td>
+                                        <th>委托申请单编号 </th>
+                                        <td>9999999990120000001788470028</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>手续费钞 </th>
+                                        <td>
+                                            <div class="font_money">
+                                                <script type="text/javascript">FormatAmt("0.00")</script>
+                                            </div>
+                                        </td>
+                                        <th>手续费汇</th>
+                                        <td>
+                                            <div class="font_money">
+                                                <script type="text/javascript">FormatAmt("0.00")</script>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pbd_table_step_title_no_line person-code" style="display: none;">
+                            <h3>以下是您的服务人员信息</h3>
+                        </div>
+                        <div class="four_column_table_padLR person-code" style="display: none;">
+                            <table border="0" width="100%" height="100%" class="four_column_table">
+                                <tbody>
+                                    <tr>
+                                        <th>姓名 </th>
+                                        <td id="EMPE_NM"></td>
+                                        <th>员工编号 </th>
+                                        <td id="CCB_EmpID"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>所属公司</th>
+                                        <td id="BLNG_INST_NM"></td>
+                                        <th></th>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pbd_operation_std">
+                            <input type="button" onclick="goSubmit()" class="btn" value="继续购买" />
+
+
+                        </div>
+
+                        <div class="pbd_tips_box">
+                            <p class="pbd_tips_title">温馨提示：</p>
+                            <ul class="pbd_tips_inner">
+                                <li>如有需要您可携带本人有效身份证件到交易账户开户网点打印产品协议书。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--主内容区 END-->
+            <div id="TxAd"></div>
+        </div>
+        <input type="hidden" name="SKEY" value="719BL2" />
+        <input type="hidden" name="USERID"
+            value="eNc60517D1C2E822652F30548FE79C508D792768CBC743EDB6CB06DDD55A544F04F" />
+        <input type="hidden" name="BRANCHID" value="330000000" />
+        <input type="hidden" name="TXCODE" value="NFN000" />
+    </form>
+    <form name="returnForm" id="returnForm" method="post"
+        action="/CCBIS/B2CMainPlat_05?SERVLET_NAME=B2CMainPlat_05&CCB_IBSVersion=V6&PT_STYLE=1">
+        <input type="hidden" name="SKEY" value="719BL2" />
+        <input type="hidden" name="USERID"
+            value="eNc60517D1C2E822652F30548FE79C508D792768CBC743EDB6CB06DDD55A544F04F" />
+        <input type="hidden" name="BRANCHID" value="330000000" />
+        <input type="hidden" name="TXCODE" value="482600" />
+        <input type="hidden" name="SRC_FLAG" value="8">
+    </form>
+    <form name="printFrom" id="printFrom" method="post"
+        action="/CCBIS/B2CMainPlat_05?SERVLET_NAME=B2CMainPlat_05&CCB_IBSVersion=V6&PT_STYLE=1">
+        <input type="hidden" name="SKEY" value="719BL2" />
+        <input type="hidden" name="USERID"
+            value="eNc60517D1C2E822652F30548FE79C508D792768CBC743EDB6CB06DDD55A544F04F" />
+        <input type="hidden" name="BRANCHID" value="330000000" />
+        <input type="hidden" name="TXCODE" id="printTXCODE" value="NFN012" />
+        <input type="hidden" name="FUNC_NO" value="3" />
+        <input type="hidden" name="PD_Tp_ID" value="99" />
+        <input type="hidden" name="Tfr_Sign_AccNo"
+            value="eNc6BFEA3AF37500E3687A6E36F54AA9810511CDA77A76240725E5A85CFDEABFF05" />
+        <input type="hidden" name="CcyCd" value="156" />
+        <input type="hidden" name="Aply_TxnAmt" value="1.00" />
+        <input type="hidden" name="CshEx_Cd" value="1" />
+        <input type="hidden" name="IvsmPd_ECD" value="JXJXARGSWL102164A" />
+        <input type="hidden" name="Fnd_Nm" value="嘉鑫稳利固收类按日开放第64期A（代销建信理财）" />
+        <input type="hidden" name="CtcPsn_Move_TelNo" value="" />
+        <input type="hidden" name="Scr_Ivsr_Comm_Adr" value="" />
+        <input type="hidden" name="Scr_Ivsr_ZipECD" value="" />
+        <input type="hidden" name="Rlv_Evdnc_ECD" value="9999999990120000001788470028" />
+        <input type="hidden" name="Txn_Mkt_ID" value="0JH" />
+
+    </form>
+</body>
+<script type="text/javascript">
+    function bankeBubble() {
+        //0关1开2白名单
+        var bankFlag = "2";
+        //0否 1是
+        var isWhiteUser = "0";
+        if (("2" == bankFlag && "1" == isWhiteUser) || "1" == bankFlag) {
+            if (top.window.callBankeBubble) {
+                var arrScene = [];
+                for (var i = 0; i < arguments.length; i++) {
+                    arrScene[i] = { sceneNo: arguments[i], seats: [""] };
+                }
+                top.window.callBankeBubble(arrScene);
+            }
+        }
+    }
+    $(function () {
+        UDC_COLL_CURPAGE_CTRL = false;
+        queryPersonCode('');
+        try {
+            bankeBubble('10201Y2004002', '10201Y2004003');
+        } catch (e) {
+            //TODO handle the exception
+        }
+    });
+</script>
+<script>
+    function goSubmit() {
+        buyzq_dsbClickEventTrack('继续购买');
+        document.jhform.submit();
+    }
+    var page_title = "理财产品购买结果",
+        txcode = "NFN007";
+    var page_id_title = '新理财产品购买－挂单结果';
+    var lcBuyid = getHsid();
+
+    $(function () {
+        var btn_name = "理财产品购买结果",
+            event_type = "页面浏览",
+            event_name = page_title + "_" + event_type.substr(2),
+            evtParamObj = {
+                "event_type": event_type,
+                "event_id": "CCVEP:" + txcode + "_" + page_title + "_" + event_type.substr(2),
+                "event_name": event_name,
+                "page_id": "CCVEP:" + txcode + "_" + page_id_title,
+                "page_title": page_title,
+                "element_content": ""
+            }
+        if (lcBuyid) {
+            evtParamObj['SCENE'] = 'NFESP';
+            evtParamObj['SCENE_ID'] = lcBuyid;
+        }
+        //浏览
+        top.dsbBrowseEventTrack(event_name, evtParamObj);
+    });
+    //tab 点击事件
+    function buyzq_dsbClickEventTrack(btnName) {
+        var btn_name = btnName,
+            event_type = "按钮点击",
+            event_name = page_title + "_" + btn_name + "_" + event_type.substr(2),
+            evtParamObj = {
+                "event_type": event_type,
+                "event_id": "CCVEP:" + txcode + "_" + btn_name + "_" + event_type.substr(2),
+                "event_name": event_name,
+                "page_id": "CCVEP:" + txcode + "_" + page_id_title,
+                "page_title": page_title,
+                "element_content": btn_name
+            }
+        if (lcBuyid) {
+            evtParamObj['SCENE'] = 'NFESP';
+            evtParamObj['SCENE_ID'] = lcBuyid;
+        }
+        top.dsbClickEventTrack(event_name, evtParamObj);
+    }
+    function getHsid() {
+        var hsid = '';
+        var lcDat = top.DAT_ENVBASE['LC'];
+        if (lcDat) {
+            if (lcDat['lcBuy']) {
+                hsid = lcDat['lcBuy'];
+                $("#Cmnt").val(hsid);
+            }
+        }
+        return hsid;
+    }
+</script>
+<script src="/P1StaRes/V6/STY1/CN/js/udc_footer.js"></script>
+
+</html>
+<script language='javascript'>
+    var guidedata = { 'item': [{ 'pic': '03tzlc_04lccp_01lccpsy.png', 'action': 'action', 'desc': '理财产品超市', 'para': 'NLC002,,投资理财>理财产品>理财产品超市' }, { 'pic': '03tzlc_04lccp_02wdlccp.png', 'action': 'action', 'desc': '持有产品', 'para': 'NLC000,FROM_FLAG=0,投资理财>理财产品>持有理财产品' }, { 'pic': '01wdzh_01zhcx-01zhcx.png', 'action': 'action', 'desc': '账户查询', 'para': '310103,,我的账户>账户查询>账户查询' }] };
+
+    function loadraletionlink() {
+        var strHtml = '<div class="pbd_tle_tx">';
+        strHtml = strHtml + '<span class="aborder_span">猜您想去</span>';
+        strHtml = strHtml + '</div>';
+        strHtml = strHtml + '<div>';
+        strHtml = strHtml + '<ul class="clearfix" style="padding-left:0px;padding-bottom:20px">';
+        $(guidedata.item).each(function (idx) {
+            var tmpstr = '';
+            tmpstr = '<li style="float:left;width:150px;text-align:center;"><a href="javascript:' + this.action;
+            tmpstr = tmpstr + "('" + this.para + "');\"><i class=\"hover icon_65_zhcx\" style=\"background-position-x:-1px;background-image:url(/P1StaRes/V6/STY1/CN/images/layout/" + this.pic + ")\"></i><p>" + this.desc + "</p></a></li>";
+            strHtml = strHtml + tmpstr;
+        })
+        strHtml = strHtml + "</ul></div>";
+        $("#RelatedTxs").html(strHtml);
+    }
+    loadraletionlink();
+    function action(addpara) {
+        var temp = addpara.split(",");
+        if (temp.length == 3)
+            top.submitTX(temp[0], temp[1], temp[2]);
+        if (temp.length == 2)
+            top.submitTX(temp[0], temp[1]);
+        if (temp.length == 1)
+            top.submitTX(temp[0], "");
+    }
+    function submitMenu(menuId) {
+        if (menuId != null && menuId != "") {
+            $(top.document).find("#MENU" + menuId).click();
+        }
+    }
+</script>
+
+
+
+
+<script language="javascript">
+
+
+    var UDC_SRVASSIST_TXDAT = { "PAGEID": "PAGE:CCVEP:NFN007_新理财产品购买－挂单结果", "TXCODE": "NFN007", "PAGE_TITLE": "新理财产品购买－挂单结果", "PAGE_VISIT_TIME": "20260418150753187", "ERR_CODE": "000000000000", "ERR_MSG": "" };
+    var DAT_TXENV = { "USERID": "eNc60517D1C2E822652F30548FE79C508D792768CBC743EDB6CB06DDD55A544F04F", "BRANCHID": "330000000", "TXCODE": "NFN007", "DEVID": "" };</script>
+
+
+<script>
+    var iframeOffset = { top: 0, left: 0 }, crossCurveCtr = 0, textMode = {};
+    $(function () {
+        if (undefined !== top.bfree_fn) {
+            // 语音指读、大字幕、十字线
+            $('body').on('mouseenter', '*', function (event) {
+                if (crossCurveCtr === 0) {
+                    confrimIframeOffset('window');
+                    crossCurveCtr = 1;
+                }
+                var event = event || window.event;
+                throttle(handleMouseEnterEvent(event), 150);
+            }).on('mousemove', function (event) {
+                var event = event || window.event;
+                throttle(handleEvent(event), 150)
+            }).on('mouseleave', function (event) {
+                iframeOffset = { top: 0, left: 0 };
+                crossCurveCtr = 0
+            });
+
+            // 鼠标样式
+            $('body').css({ 'cursor': top.$('body').css('cursor'), 'zoom': top.$('body #ccbPage').css('zoom'), transform: top.$('body #ccbPage').css('transform') });
+
+            // 放大、缩小字体
+            $('body *:not("body #wza *")').each(function () {
+                if ($(this)[0].tagName !== 'SCRIPT') {
+                    $(this).css('font-size', $(this).css('font-size'))
+                }
+            })
+            if (top.changeFont.fontZoom != 1) {
+                if (top.changeFont.fontZoom > 1) {
+                    top.changeFont.change('bigger');
+                } else {
+                    top.changeFont.change('smaller');
+                }
+            }
+
+            // 颜色配比
+            // var iframeBody = $('body')
+            if (self !== top) {
+                $('head').append('<link type="text/css" rel="stylesheet" href="/P1StaRes/V6/STY1/CN/css/bfree.css?ver=20260417" />');
+                top.Observer && top.Observer.regist('changeTheme', changeTheme);
+            }
+            // top.Observer && top.Observer.regist('changeTextMode', changeTextMode);
+            top.Observer && top.Observer.regist('changeZoom', changeZoom);
+            top.Observer && top.Observer.regist('changeArrow', changeArrow);
+
+        }
+    })
+
+    var throttle = function (func, delay) {
+        var timer = null;
+        return function () {
+            var context = this;
+            var args = arguments;
+            if (!timer) {
+                timer = setTimeout(function () {
+                    func.apply(context, args);
+                    timer = null;
+                }, delay);
+            }
+        };
+    };
+    function changeTextMode() {
+        if (top.textMode.status == 'off') {
+            textMode.cloneHeadNode = $('head').eq(0).clone(true);
+            textMode.cloneBodyNode = $('body').eq(0).clone(true);
+            var bfree_tool_iframe = $('body *:not("#wza *")');
+            //$(bfree_tool_iframe).find("style:not(#d-outer,#d-outer *)").remove();
+
+            $(bfree_tool_iframe).find('*:not(#bfree *)').each(function () {
+                if (this.tagName == 'rect' || this.tagName === 'svg') { return }
+                if (this.tagName == 'IMG') {
+                    var imgAlt = '';
+                    if (this.alt != null && this.alt != '' && this.alt != '无意义图片') {
+                        imgAlt = this.alt;
+                    } else {
+                        top.textMode.imgAlt(imgAlt);
+                    }
+                    $(this).replaceWith('<span>' + imgAlt + '</span>');
+                } else if (this.tagName == 'A' && this.innerHTML == '') {
+                    var aText = '';
+                    if (this.title != '' && this.title != null) {
+                        aText = this.title;
+                    } else if (this.alt != '' && this.alt != null) {
+                        aText = this.alt;
+                    }
+                    this.innerHTML = aText;
+                } else {
+                    if ($(this).css('display') === 'none') {
+                        $(this).removeAttr('style').removeAttr('background').removeAttr('valign').removeAttr('align').removeAttr('height').removeAttr('width');
+                        $(this).css('display', 'none');
+                    } else {
+                        $(this).removeAttr('style').removeAttr('background').removeAttr('valign').removeAttr('align').removeAttr('height').removeAttr('width');
+                    }
+                    if (this.tagName != 'A') {
+                        $(this).css('text-decoration', 'none');
+                    }
+                }
+            });
+            $(document.getElementsByTagName('head')).find('link').remove();
+            $(document.getElementsByTagName('head')).find('style').remove();
+            $(bfree_tool_iframe).find('style').remove();
+            $(bfree_tool_iframe).find('link:not(#bfree_css)').remove();
+            var bfreeCss = '<link type="text/css" rel="stylesheet" href="/P1StaRes/V6/STY1/CN/css/bfree.css?ver=' + new Date().getTime() + '">';
+            $('head').eq(0).append(bfreeCss);
+            $(bfree_tool_iframe).find('div.sidebar').remove();
+        } else if (top.textMode.status == 'on') {
+            $('html').empty();
+            $('html').append(textMode.cloneHeadNode).append(textMode.cloneBodyNode);
+        }
+    }
+
+    function changeTheme(modeStyle) {
+        if (null === top) return
+        var bfree_tool_iframe = $('body');
+        var thmeMode = modeStyle.args;
+        try {
+            if (thmeMode != 'highContrast_5') {
+                $(bfree_tool_iframe).removeClass(top.highContrast.pageColor);
+                $(bfree_tool_iframe).addClass(thmeMode);
+                $(bfree_tool_iframe).find('*:not("script")').each(function () {
+                    $(this).removeClass(top.highContrast.pageColor);
+                    $(this).addClass(thmeMode);
+                });
+            } else {
+                $(bfree_tool_iframe).removeClass(top.highContrast.pageColor);
+                $(bfree_tool_iframe).find('*:not("script")').each(function () {
+                    $(this).removeClass(top.highContrast.pageColor);
+                });
+            }
+            $('.logo img').css({ 'background-color': '#fff' });
+        } catch (e) { }
+    };
+
+    function changeZoom(arg) {
+        if (top === self || null === top) return;
+        var nowZoom = arg.args;
+        var bfree_tool_iframe = $('body');
+        if (top.mozilla || top.opera) {
+            bfree_tool_iframe.css({ transform: 'scale(' + nowZoom + ')', 'transform-origin': 'top' });
+        } else {
+            bfree_tool_iframe.css({ zoom: nowZoom.toFixed(2), overflow: 'scroll', 'overflow-x': 'hidden' });
+        }
+    }
+
+    function changeArrow(arg) {
+        if (top === self) return;
+        var ico = arg.args;
+        if (ico === '') {
+            $('body').css('cursor', 'auto');
+            $('body').find('a').css('cursor', 'pointer');
+        } else {
+            $('body').css('cursor', 'url(' + ico + '), auto').find('a').css('cursor', 'url(' + ico + '), auto');
+        }
+    }
+
+    function handleMouseEnterEvent(event) {
+        var target = event.srcElement || event.target;
+        if (target.childNodes.length > 1 || $(target).find('*').length > 1 || $(target).is('SCRIPT')) {
+            return false;
+        }
+        // 大字幕
+        if (!top.bigtext.onoff) {
+            top.bigtext.veiw($(target).text());
+        }
+        // 语音指读
+        if (top.speak.thisdomOnOff) {
+            var id =
+                $(target).attr('id') !== '' && undefined !== $(target).attr('id')
+                    ? $(target).attr('id') + (top.notNameNum++)
+                    : undefined !== $(target).attr('class') && $(target).attr('class') !== ''
+                        ? $(target).attr('class') + (top.notNameNum++)
+                        : 'notName' + (top.notNameNum++);
+
+            if (BROWSER.isCurrIE9() || BROWSER.isCurrIE8()) {
+                if (top.pointerC == 0) {
+                    top.pointerC = 1;
+                    // alert("语音指读暂不支持 IE8、IE9");
+                }
+                return;
+            }
+            if ($(target).text() !== '') {
+                top.getTTSURL($(target).text()).then(function (url) {
+                    top.speak.on(id, url);
+                });
+            }
+        }
+    }
+
+    function handleEvent(event) {
+        // 十字线 start
+        var childHeight = top.document.documentElement.scrollHeight || top.document.body.scrollHeight;
+        if (top.guides.statusguides == 'off') {
+            var pointer = top.getCoordInDocument(event);
+            if (undefined !== iframeOffset && iframeOffset !== '') {
+                top.$('#slideLateral').css('top', (iframeOffset.top + pointer.y) + 10);
+                top.$('#slideLongitudinal').css({ 'left': (pointer.x + iframeOffset.left) + 10, 'height': childHeight + 100 });
+            } else {
+                top.$('#slideLateral').css('top', pointer.y + 10);
+                top.$('#slideLongitudinal').css({ 'left': pointer.x + 10, 'height': childHeight + 100 });
+            }
+        }
+    }
+
+    function confrimIframeOffset(doc) {
+        var targetWin = eval(doc)
+        if (targetWin.frameElement === null) { return; }
+        iframeOffset = {
+            top: iframeOffset.top + top.getElementTop(targetWin.frameElement),
+            left: iframeOffset.left + top.getElementLeft(targetWin.frameElement)
+        }
+        if (parent !== top) {
+            confrimIframeOffset('parent.' + doc)
+        }
+    }
+</script>
+<style>
+    :focus {
+        outline: none;
+    }
+</style>
+
+
+
+<!--SM加密  -->
+<!--
+<script src="/P1StaRes/V6/STY1/CN/js/sm/hex.js?ver=20260417"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/sm/byteUtil.js?ver=20260417"></script> 
+<script src="/P1StaRes/V6/STY1/CN/js/sm/sm3-1.2.js?ver=20260417"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/sm/jsbn.js?ver=20260417"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/sm/jsbn2.js?ver=20260417"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/sm/ec.js?ver=20260417"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/sm/ec-patch.js?ver=20260417"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/sm/prng4.js?ver=20260417"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/sm/rng.js?ver=20260417"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/sm/sm2-1.2.js?ver=20260417"></script>  
+-->
+<!--
+	rsa最少依赖包
+-->
+<script src="/P1StaRes/V6/STY1/CN/js/crypto/jsencrypt.min2.js"></script>
+<!--
+	sm3最少依赖包
+-->
+<script src="/P1StaRes/V6/STY1/CN/js/utils/hex.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/utils/byteUtil.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/crypto/v1/sm3-min.1.0.js"></script>
+
+<script src="/P1StaRes/V6/STY1/CN/js/utils/base64js.min.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/ext/polyfill.js"></script>
+<!--
+	这部分包+sm3最少依赖包=sm2需要包
+-->
+<script src="/P1StaRes/V6/STY1/CN/js/ext/jsbn.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/ext/jsbn2.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/ext/ec.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/ext/ec-patch.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/ext/prng4.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/ext/rng.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/crypto/v1/sm2-min.1.0.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/crypto/v1/sm4-min.1.0.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/utils/json2.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/utils/cycle.js"></script>
+<script src="/P1StaRes/V6/STY1/CN/js/microAppSafetyWY-dev2.4.js"></script>
+
+<script type="text/javascript" defer="defer">
+
+    function SMEncrypt(inputtext) {
+        var publickey = "04786E13A7036AD5B2AE00D84B2AF01075E10A69009EFDB42D503101B2CB2330243DA22A45D6A85239978AD3DF30AA78800424FF25847C7E4CB736EE93C5BCF184";
+        if (inputtext == "") {
+            return "";
+        }
+        //var sm2DataHex = Hex.utf8StrToHex(inputtext);//转成byte数组
+        //这一步是先将输入数据转成utf-8编码的字节流，然后再转成16进制可见字符
+        var dataBy = Hex.utf8StrToBytes(inputtext);
+
+        try {
+            var _topIframe = self;
+            while (_topIframe != _topIframe.parent) {
+                if (typeof (_topIframe.DAT_ENVBASE) != "undefined" && typeof (_topIframe.DAT_ENVBASE.MIC_APP_SAFETY) != "undefined") {
+                    break;
+                }
+                _topIframe = _topIframe.parent;
+            }
+
+
+            if (typeof (_topIframe.DAT_ENVBASE) != "undefined" && typeof (_topIframe.DAT_ENVBASE.MIC_APP_SAFETY) != "undefined" && _topIframe.DAT_ENVBASE.MIC_APP_SAFETY != "") {
+                //从DAT_ENVBASE获取保存的mas
+                var mas = _topIframe.DAT_ENVBASE.MIC_APP_SAFETY;
+                //sm2加密
+                var cipher = mas.encryptData(inputtext, publickey);
+                return cipher;
+            } else {
+
+                var mas = new microAppSafety();
+                if (typeof (_topIframe.DAT_ENVBASE) != "undefined" && typeof (_topIframe.DAT_ENVBASE.MIC_APP_SAFETY) != "undefined") {
+                    _topIframe.DAT_ENVBASE.MIC_APP_SAFETY = mas;
+                }
+                var cipher = mas.encryptData(inputtext, publickey);
+                return cipher;
+            }
+
+        } catch (e) { }
+
+        var mas = new microAppSafety();
+        var cipher = mas.encryptData(inputtext, publickey);
+        return cipher;
+
+    }
+
+    function sm2Check(e) {
+        if ($("#jhform_SM2").length == 1) {
+            $("#jhform_SM2").remove();
+        }
+        var sm2Form = $("<form></form>");//document.createElement("form");
+        var sm2Div = $("<div></div>");//document.createElement("div");
+        $.each(e.attributes, function (index, obj) {
+            sm2Form.attr(obj.name, obj.value);
+        });
+
+        sm2Form.attr("name", "jhform_SM2");
+        sm2Form.attr("id", "jhform_SM2");
+        if (sm2Form.attr("action").indexOf("_EVO") == -1) {
+            sm2Form.attr("action", (sm2Form.attr("action")).replace(new RegExp($(e).attr("action").split("?")[0].split("/")[2], 'g'), $(e).attr("action").split("?")[0].split("/")[2] + "_EVO"));
+        }
+
+        var arrInput = e.elements;//获取jhform表单中所有数据
+        var SM2CcbparamValue = "";
+        for (var i = 0; i < arrInput.length; i++) {
+            if (arrInput[i].value == null || arrInput[i].type == "button" || arrInput[i].name == null || arrInput[i].name == "") {
+                continue;
+            } else if (arrInput[i].type == "radio" || arrInput[i].type == "checkbox") {
+                if (arrInput[i].checked == "checked" || arrInput[i].checked == "true" || arrInput[i].checked == true) {
+                    SM2CcbparamValue = SM2CcbparamValue == "" ? (arrInput[i].name + "=" + encodeURIComponent(arrInput[i].value)) : (SM2CcbparamValue + "&" + arrInput[i].name + "=" + encodeURIComponent(arrInput[i].value));
+                }
+            } else {
+                SM2CcbparamValue = SM2CcbparamValue == "" ? (arrInput[i].name + "=" + encodeURIComponent(arrInput[i].value)) : (SM2CcbparamValue + "&" + arrInput[i].name + "=" + encodeURIComponent(arrInput[i].value));
+            }
+        }
+
+        var SM2_CCB_PARAM = $("<input></input>");//document.createElement("input");
+        SM2_CCB_PARAM.attr("type", "hidden");
+        SM2_CCB_PARAM.attr("name", "ccbParam");
+        SM2_CCB_PARAM.attr("value", SMEncrypt(SM2CcbparamValue));
+
+        sm2Div.append(SM2_CCB_PARAM);
+
+        sm2Form.append(sm2Div);
+        $(e).after(sm2Form);
+        document.getElementById("jhform_SM2").submit();
+    }
+    $(function () {
+        var SM2_forms = document.getElementsByTagName("form");
+        var SM2_forms_all = new Array(SM2_forms.length);
+        for (var i = 0; i < SM2_forms.length; i++) {
+            var vOnSubmit = SM2_forms[i].getAttribute("onsubmit");
+            if (SM2_forms[i].getAttribute("action") != null && SM2_forms[i].getAttribute("action").indexOf("EVO") == -1) {
+                if ((SM2_forms[i].getAttribute("action").split("?")[0].split("/")[2] == "B2CMainPlatP1") || (SM2_forms[i].getAttribute("action").indexOf("B2CMainPlat") != -1 && SM2_forms[i].getAttribute("action").split("?")[0].split("/")[2].length == 14)) {
+                    if (typeof vOnSubmit == "function") {
+                        //do nothing,waiting window.onbeforeunload
+                    } else {
+                        if (vOnSubmit && vOnSubmit.indexOf("sm2Check") == -1) {
+                            vOnSubmit = (vOnSubmit + "").replace(/return/g, "var vRetSM2=");
+                            if (vOnSubmit.indexOf(";") == -1) {
+                                vOnSubmit = vOnSubmit + ";"
+                            }
+                            var vNewOnSubmit = vOnSubmit + "if(vRetSM2!=false){sm2Check(this)};return false;";
+                            SM2_forms[i].setAttribute("onsubmit", vNewOnSubmit);
+                        } else if (vOnSubmit) {
+                        } else {
+                            SM2_forms[i].setAttribute("onsubmit", "sm2Check(this);return false;");
+                        }
+                    }
+
+                    SM2_forms_all[i] = SM2_forms[i];
+                    SM2_forms_all[i].oldsubmit = SM2_forms_all[i].submit;
+                    SM2_forms_all[i].submit = function () {
+                        sm2Check(this);
+                    }
+                }
+            }
+        }
+    })
+</script>
+
+<script>
+    function getParmJiaMiUrl(url) {
+
+        var action_Header = top.DAT_ENVBASE.P1ACTION;
+        if (null != action_Header && ("" != action_Header)) {
+            var actionStartIndex = url.indexOf(action_Header) + action_Header.length + 1;
+            var serverletIndex1 = action_Header.indexOf("?SERVLET_NAME");
+            var actionTmp = action_Header.substring(0, serverletIndex1) + "_EVO" + action_Header.substring(serverletIndex1);
+            var serverletIndex2 = actionTmp.indexOf("&CCB_IBSVersion=");
+            actionTmp = actionTmp.substring(0, serverletIndex2) + "_EVO" + actionTmp.substring(serverletIndex2);
+            url = actionTmp + "&ccbParam=" + SMEncrypt(url.substring(actionStartIndex));
+        }
+        return url;
+
+        return url;
+    }
+    function SM4EncryptUrl(url) {
+
+        var action_Header = "/CCBIS/B2CMainPlat_05?SERVLET_NAME=B2CMainPlat_05&CCB_IBSVersion=V6&PT_STYLE=1";
+        if (null != action_Header && ("" != action_Header)) {
+            var actionStartIndex = url.indexOf(action_Header) + action_Header.length + 1;
+            var serverletIndex1 = action_Header.indexOf("?SERVLET_NAME");
+            var actionTmp = action_Header.substring(0, serverletIndex1) + "_EVO" + action_Header.substring(serverletIndex1);
+            var serverletIndex2 = actionTmp.indexOf("&CCB_IBSVersion=");
+            actionTmp = actionTmp.substring(0, serverletIndex2) + "_EVO" + actionTmp.substring(serverletIndex2);
+            url = actionTmp + "&ccbParam=" + SMEncrypt(url.substring(actionStartIndex));
+        }
+        return url;
+
+        return url;
+    }
+</script>
+
+
+<script>
+    $(function () {
+        try {
+            if (typeof top.DAT_USERBASE === 'undefined') return;
+
+        } catch (error) {
+
+        }
+    })
+</script>
+
+
+
+
+
+
+
+
+
+<script src="/P1StaRes/V6/STY1/CN/js/SPZ/bundle.js?ver=20260417"></script>
+
+
+<link type="text/css" rel="stylesheet" href="/P1StaRes/V6/STY1/CN/css/SPZ/keyboard.css?ver=20260417" />
+
+<script src="/P1StaRes/V6/STY1/CN/js/SPZ/keyboard.js?ver=20260417"></script>
+
+<script>
+    $(function () {
+        try {
+            top.window.fzDomainUrl = 'https://rccis.ccb.com';
+            top.window.fzDomainVer = '20260417';
+        } catch (error) { }
+    })
+</script>
