@@ -16,10 +16,13 @@ API实际返回格式:
 from flask import Flask, request, jsonify, make_response
 import requests
 import json
+import random
+
+from fetch_boc_nav import DEFAULT_COOKIE, DEFAULT_HTML_PATH, refresh_html_data
 
 app = Flask(__name__)
 PORT = 8082
-BOC_URL = "https://ebsnew.boc.cn/BMPS/_bfwajax.do?rnd=7911&_locale=zh_CN"
+BOC_URL_BASE = "https://ebsnew.boc.cn/BMPS/_bfwajax.do"
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 9; 2410DPN6CC Build/PQ3B.190801.03251327; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36',
@@ -32,6 +35,18 @@ HEADERS = {
     'Referer': 'https://ebsnew.boc.cn/preview/bocphone/VueLocalCli4/bocFinanceDetail/index.html',
     'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
 }
+
+
+def build_boc_url():
+    rnd = random.SystemRandom().randint(1000, 99999999)
+    return f"{BOC_URL_BASE}?rnd={rnd}&_locale=zh_CN"
+
+
+def add_cors(resp):
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    resp.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    return resp
 
 
 def fetch_boc(prod_code):
@@ -48,7 +63,7 @@ def fetch_boc(prod_code):
     }
     body = "json=" + requests.utils.quote(json.dumps(payload, ensure_ascii=False))
     print(f"[代理] 请求产品代码: {prod_code}")
-    resp = requests.post(BOC_URL, data=body, headers=HEADERS, timeout=15, verify=True)
+    resp = requests.post(build_boc_url(), data=body, headers=HEADERS, timeout=15, verify=True)
     print(f"[代理] HTTP状态码: {resp.status_code}")
     print(f"[代理] 响应前500字: {resp.text[:500]}")
     data = resp.json()
@@ -63,23 +78,44 @@ def fetch_boc(prod_code):
 @app.route('/nav', methods=['GET', 'OPTIONS'])
 def nav():
     if request.method == 'OPTIONS':
-        resp = make_response()
-        resp.headers['Access-Control-Allow-Origin'] = '*'
-        resp.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
-        resp.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-        return resp, 200
+        return add_cors(make_response()), 200
     code = request.args.get('code', '').strip().upper()
     if not code:
         return jsonify({'success': False, 'error': '缺少产品代码'}), 400
     try:
         nav_list = fetch_boc(code)
         print(f"[代理] 成功获取 {len(nav_list)} 条记录")
-        resp = jsonify({'success': True, 'data': nav_list})
-        resp.headers['Access-Control-Allow-Origin'] = '*'
-        return resp
+        return add_cors(jsonify({'success': True, 'data': nav_list}))
     except Exception as e:
         print(f"[代理] 失败: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return add_cors(jsonify({'success': False, 'error': str(e)})), 500
+
+
+@app.route('/refresh', methods=['GET', 'OPTIONS'])
+def refresh():
+    if request.method == 'OPTIONS':
+        return add_cors(make_response()), 200
+    code = request.args.get('code', '').strip().upper()
+    if not code:
+        return add_cors(jsonify({'success': False, 'error': '缺少产品代码'})), 400
+    try:
+        response_json, nav_list, embedded_data = refresh_html_data(
+            product_id=code,
+            html_path=DEFAULT_HTML_PATH,
+            cookie=DEFAULT_COOKIE,
+            timeout=20,
+            print_response=True,
+        )
+        print(f"[刷新] 已更新 {DEFAULT_HTML_PATH}，产品 {code}，记录 {len(nav_list)} 条")
+        return add_cors(jsonify({
+            'success': True,
+            'data': nav_list,
+            'embedded': embedded_data,
+            'response': response_json,
+        }))
+    except Exception as e:
+        print(f"[刷新] 失败: {e}")
+        return add_cors(jsonify({'success': False, 'error': str(e)})), 500
 
 
 @app.route('/')

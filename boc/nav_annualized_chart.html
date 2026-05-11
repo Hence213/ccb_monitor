@@ -62,8 +62,24 @@
     margin: 0 32px 32px; background: #1a1d2e; border: 1px solid #252840;
     border-radius: 12px; overflow: hidden;
   }
-  .table-section h3 { padding: 14px 20px; font-size: 14px; color: #b0b8cc; border-bottom: 1px solid #252840; }
+  .table-section.expanded {
+    position: fixed; inset: 24px; z-index: 900; margin: 0;
+    display: flex; flex-direction: column;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.48);
+  }
+  .table-section h3 {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px; font-size: 14px; color: #b0b8cc; border-bottom: 1px solid #252840;
+  }
+  .table-title { flex: 1; min-width: 0; }
+  .table-toggle {
+    background: #252840; border: 1px solid #363d5a;
+    color: #b0b8cc; font-size: 12px; padding: 4px 12px;
+    border-radius: 20px; cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .table-toggle:hover { background: #2e3355; border-color: #5b8af0; color: #5b8af0; }
   .table-wrapper { max-height: 320px; overflow-y: auto; }
+  .table-section.expanded .table-wrapper { flex: 1; max-height: none; }
   .table-wrapper::-webkit-scrollbar { width: 5px; }
   .table-wrapper::-webkit-scrollbar-track { background: #1a1d2e; }
   .table-wrapper::-webkit-scrollbar-thumb { background: #363d5a; border-radius: 3px; }
@@ -128,8 +144,11 @@
   <canvas id="navChart"></canvas>
 </div>
 
-<div class="table-section">
-  <h3>完整净值 &amp; 成立年化数据（共 <span id="totalCount">0</span> 条）</h3>
+<div class="table-section" id="tableSection">
+  <h3>
+    <span class="table-title">完整净值 &amp; 成立年化数据（共 <span id="totalCount">0</span> 条）</span>
+    <button class="table-toggle" id="tableToggleBtn" type="button" onclick="toggleTableExpanded()">放大</button>
+  </h3>
   <div class="table-wrapper">
     <table>
       <thead>
@@ -146,33 +165,1721 @@
   </div>
 </div>
 
+<script id="embeddedNavData" type="application/json">
+{
+  "productId": "WFZQQQPZRKA",
+  "circle": "3Y",
+  "subChannelId": "31",
+  "fetchedAt": "2026-05-11T14:50:36.246888+00:00",
+  "data": [
+    {
+      "updateDate": "2025/06/27",
+      "nav": "1.00000000",
+      "accumulativeNav": "1.00000000",
+      "dayIncomeRatio": "0",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/06/30",
+      "nav": "1.00000000",
+      "accumulativeNav": "1.00000000",
+      "dayIncomeRatio": "0",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/01",
+      "nav": "1.00000000",
+      "accumulativeNav": "1.00000000",
+      "dayIncomeRatio": "0",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/02",
+      "nav": "1.00003400",
+      "accumulativeNav": "1.00003400",
+      "dayIncomeRatio": "0.0034",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/03",
+      "nav": "1.00006900",
+      "accumulativeNav": "1.00006900",
+      "dayIncomeRatio": "0.0035",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/04",
+      "nav": "1.00009300",
+      "accumulativeNav": "1.00009300",
+      "dayIncomeRatio": "0.0024",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/07",
+      "nav": "1.00020900",
+      "accumulativeNav": "1.00020900",
+      "dayIncomeRatio": "0.0116",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/08",
+      "nav": "1.00022000",
+      "accumulativeNav": "1.00022000",
+      "dayIncomeRatio": "0.0011",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/09",
+      "nav": "1.00099800",
+      "accumulativeNav": "1.00099800",
+      "dayIncomeRatio": "0.0778",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/10",
+      "nav": "1.00066100",
+      "accumulativeNav": "1.00066100",
+      "dayIncomeRatio": "-0.0337",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/11",
+      "nav": "1.00105800",
+      "accumulativeNav": "1.00105800",
+      "dayIncomeRatio": "0.0397",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/14",
+      "nav": "1.00128500",
+      "accumulativeNav": "1.00128500",
+      "dayIncomeRatio": "0.0227",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/15",
+      "nav": "1.00135100",
+      "accumulativeNav": "1.00135100",
+      "dayIncomeRatio": "0.0066",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/16",
+      "nav": "1.00140900",
+      "accumulativeNav": "1.00140900",
+      "dayIncomeRatio": "0.0058",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/17",
+      "nav": "1.00146700",
+      "accumulativeNav": "1.00146700",
+      "dayIncomeRatio": "0.0058",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/18",
+      "nav": "1.00150800",
+      "accumulativeNav": "1.00150800",
+      "dayIncomeRatio": "0.0041",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/21",
+      "nav": "1.00157300",
+      "accumulativeNav": "1.00157300",
+      "dayIncomeRatio": "0.0065",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/22",
+      "nav": "1.00158100",
+      "accumulativeNav": "1.00158100",
+      "dayIncomeRatio": "0.0008",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/23",
+      "nav": "1.00152800",
+      "accumulativeNav": "1.00152800",
+      "dayIncomeRatio": "-0.0053",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/24",
+      "nav": "1.00143400",
+      "accumulativeNav": "1.00143400",
+      "dayIncomeRatio": "-0.0094",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/25",
+      "nav": "1.00142900",
+      "accumulativeNav": "1.00142900",
+      "dayIncomeRatio": "-0.0005",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/28",
+      "nav": "1.00158700",
+      "accumulativeNav": "1.00158700",
+      "dayIncomeRatio": "0.0158",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/29",
+      "nav": "1.00157700",
+      "accumulativeNav": "1.00157700",
+      "dayIncomeRatio": "-0.001",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/30",
+      "nav": "1.00163200",
+      "accumulativeNav": "1.00163200",
+      "dayIncomeRatio": "0.0055",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/07/31",
+      "nav": "1.00171900",
+      "accumulativeNav": "1.00171900",
+      "dayIncomeRatio": "0.0087",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/01",
+      "nav": "1.00177700",
+      "accumulativeNav": "1.00177700",
+      "dayIncomeRatio": "0.0058",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/04",
+      "nav": "1.00190100",
+      "accumulativeNav": "1.00190100",
+      "dayIncomeRatio": "0.0124",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/05",
+      "nav": "1.00197000",
+      "accumulativeNav": "1.00197000",
+      "dayIncomeRatio": "0.0069",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/06",
+      "nav": "1.00203000",
+      "accumulativeNav": "1.00203000",
+      "dayIncomeRatio": "0.006",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/07",
+      "nav": "1.00208900",
+      "accumulativeNav": "1.00208900",
+      "dayIncomeRatio": "0.0059",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/08",
+      "nav": "1.00214800",
+      "accumulativeNav": "1.00214800",
+      "dayIncomeRatio": "0.0059",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/11",
+      "nav": "1.00219300",
+      "accumulativeNav": "1.00219300",
+      "dayIncomeRatio": "0.0045",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/12",
+      "nav": "1.00221100",
+      "accumulativeNav": "1.00221100",
+      "dayIncomeRatio": "0.0018",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/13",
+      "nav": "1.00224000",
+      "accumulativeNav": "1.00224000",
+      "dayIncomeRatio": "0.0029",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/14",
+      "nav": "1.00227700",
+      "accumulativeNav": "1.00227700",
+      "dayIncomeRatio": "0.0037",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/15",
+      "nav": "1.00229000",
+      "accumulativeNav": "1.00229000",
+      "dayIncomeRatio": "0.0013",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/18",
+      "nav": "1.00292000",
+      "accumulativeNav": "1.00292000",
+      "dayIncomeRatio": "0.0629",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/19",
+      "nav": "1.00343400",
+      "accumulativeNav": "1.00343400",
+      "dayIncomeRatio": "0.0513",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/20",
+      "nav": "1.00351900",
+      "accumulativeNav": "1.00351900",
+      "dayIncomeRatio": "0.0085",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/21",
+      "nav": "1.00379800",
+      "accumulativeNav": "1.00379800",
+      "dayIncomeRatio": "0.0278",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/22",
+      "nav": "1.00396400",
+      "accumulativeNav": "1.00396400",
+      "dayIncomeRatio": "0.0165",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/25",
+      "nav": "1.00460000",
+      "accumulativeNav": "1.00460000",
+      "dayIncomeRatio": "0.0633",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/26",
+      "nav": "1.00503800",
+      "accumulativeNav": "1.00503800",
+      "dayIncomeRatio": "0.0436",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/27",
+      "nav": "1.00502800",
+      "accumulativeNav": "1.00502800",
+      "dayIncomeRatio": "-0.001",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/28",
+      "nav": "1.00505200",
+      "accumulativeNav": "1.00505200",
+      "dayIncomeRatio": "0.0024",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/08/29",
+      "nav": "1.00507500",
+      "accumulativeNav": "1.00507500",
+      "dayIncomeRatio": "0.0023",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/01",
+      "nav": "1.00516600",
+      "accumulativeNav": "1.00516600",
+      "dayIncomeRatio": "0.0091",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/02",
+      "nav": "1.00519000",
+      "accumulativeNav": "1.00519000",
+      "dayIncomeRatio": "0.0024",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/03",
+      "nav": "1.00558300",
+      "accumulativeNav": "1.00558300",
+      "dayIncomeRatio": "0.0391",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/04",
+      "nav": "1.00578400",
+      "accumulativeNav": "1.00578400",
+      "dayIncomeRatio": "0.02",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/05",
+      "nav": "1.00579800",
+      "accumulativeNav": "1.00579800",
+      "dayIncomeRatio": "0.0014",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/08",
+      "nav": "1.00586900",
+      "accumulativeNav": "1.00586900",
+      "dayIncomeRatio": "0.0071",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/09",
+      "nav": "1.00589300",
+      "accumulativeNav": "1.00589300",
+      "dayIncomeRatio": "0.0024",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/10",
+      "nav": "1.00588800",
+      "accumulativeNav": "1.00588800",
+      "dayIncomeRatio": "-0.0005",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/11",
+      "nav": "1.00591200",
+      "accumulativeNav": "1.00591200",
+      "dayIncomeRatio": "0.0024",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/12",
+      "nav": "1.00592600",
+      "accumulativeNav": "1.00592600",
+      "dayIncomeRatio": "0.0014",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/15",
+      "nav": "1.00602600",
+      "accumulativeNav": "1.00602600",
+      "dayIncomeRatio": "0.0099",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/16",
+      "nav": "1.00605900",
+      "accumulativeNav": "1.00605900",
+      "dayIncomeRatio": "0.0033",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/17",
+      "nav": "1.00609200",
+      "accumulativeNav": "1.00609200",
+      "dayIncomeRatio": "0.0033",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/18",
+      "nav": "1.00611600",
+      "accumulativeNav": "1.00611600",
+      "dayIncomeRatio": "0.0024",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/19",
+      "nav": "1.00614000",
+      "accumulativeNav": "1.00614000",
+      "dayIncomeRatio": "0.0024",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/22",
+      "nav": "1.00625300",
+      "accumulativeNav": "1.00625300",
+      "dayIncomeRatio": "0.0112",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/23",
+      "nav": "1.00626000",
+      "accumulativeNav": "1.00626000",
+      "dayIncomeRatio": "0.0007",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/24",
+      "nav": "1.00625600",
+      "accumulativeNav": "1.00625600",
+      "dayIncomeRatio": "-0.0004",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/25",
+      "nav": "1.00626200",
+      "accumulativeNav": "1.00626200",
+      "dayIncomeRatio": "0.0006",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/26",
+      "nav": "1.00629800",
+      "accumulativeNav": "1.00629800",
+      "dayIncomeRatio": "0.0036",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/29",
+      "nav": "1.00640300",
+      "accumulativeNav": "1.00640300",
+      "dayIncomeRatio": "0.0104",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/09/30",
+      "nav": "1.00644800",
+      "accumulativeNav": "1.00644800",
+      "dayIncomeRatio": "0.0045",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/09",
+      "nav": "1.00675000",
+      "accumulativeNav": "1.00675000",
+      "dayIncomeRatio": "0.03",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/10",
+      "nav": "1.00678500",
+      "accumulativeNav": "1.00678500",
+      "dayIncomeRatio": "0.0035",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/13",
+      "nav": "1.00690000",
+      "accumulativeNav": "1.00690000",
+      "dayIncomeRatio": "0.0114",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/14",
+      "nav": "1.00693500",
+      "accumulativeNav": "1.00693500",
+      "dayIncomeRatio": "0.0035",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/15",
+      "nav": "1.00696100",
+      "accumulativeNav": "1.00696100",
+      "dayIncomeRatio": "0.0026",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/16",
+      "nav": "1.00700700",
+      "accumulativeNav": "1.00700700",
+      "dayIncomeRatio": "0.0046",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/17",
+      "nav": "1.00706400",
+      "accumulativeNav": "1.00706400",
+      "dayIncomeRatio": "0.0057",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/20",
+      "nav": "1.00715000",
+      "accumulativeNav": "1.00715000",
+      "dayIncomeRatio": "0.0085",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/21",
+      "nav": "1.00719400",
+      "accumulativeNav": "1.00719400",
+      "dayIncomeRatio": "0.0044",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/22",
+      "nav": "1.00797800",
+      "accumulativeNav": "1.00797800",
+      "dayIncomeRatio": "0.0778",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/23",
+      "nav": "1.00770300",
+      "accumulativeNav": "1.00770300",
+      "dayIncomeRatio": "-0.0273",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/24",
+      "nav": "1.00774300",
+      "accumulativeNav": "1.00774300",
+      "dayIncomeRatio": "0.004",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/27",
+      "nav": "1.00853800",
+      "accumulativeNav": "1.00853800",
+      "dayIncomeRatio": "0.0789",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/28",
+      "nav": "1.00916700",
+      "accumulativeNav": "1.00916700",
+      "dayIncomeRatio": "0.0624",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/29",
+      "nav": "1.00901600",
+      "accumulativeNav": "1.00901600",
+      "dayIncomeRatio": "-0.015",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/30",
+      "nav": "1.00979500",
+      "accumulativeNav": "1.00979500",
+      "dayIncomeRatio": "0.0772",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/10/31",
+      "nav": "1.00984200",
+      "accumulativeNav": "1.00984200",
+      "dayIncomeRatio": "0.0047",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/03",
+      "nav": "1.00994000",
+      "accumulativeNav": "1.00994000",
+      "dayIncomeRatio": "0.0097",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/04",
+      "nav": "1.00996500",
+      "accumulativeNav": "1.00996500",
+      "dayIncomeRatio": "0.0025",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/05",
+      "nav": "1.01000600",
+      "accumulativeNav": "1.01000600",
+      "dayIncomeRatio": "0.0041",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/06",
+      "nav": "1.01003200",
+      "accumulativeNav": "1.01003200",
+      "dayIncomeRatio": "0.0026",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/07",
+      "nav": "1.01004800",
+      "accumulativeNav": "1.01004800",
+      "dayIncomeRatio": "0.0016",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/10",
+      "nav": "1.01014200",
+      "accumulativeNav": "1.01014200",
+      "dayIncomeRatio": "0.0093",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/11",
+      "nav": "1.01017700",
+      "accumulativeNav": "1.01017700",
+      "dayIncomeRatio": "0.0035",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/12",
+      "nav": "1.01021200",
+      "accumulativeNav": "1.01021200",
+      "dayIncomeRatio": "0.0035",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/13",
+      "nav": "1.01024200",
+      "accumulativeNav": "1.01024200",
+      "dayIncomeRatio": "0.003",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/14",
+      "nav": "1.01145500",
+      "accumulativeNav": "1.01145500",
+      "dayIncomeRatio": "0.1201",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/17",
+      "nav": "1.01059100",
+      "accumulativeNav": "1.01059100",
+      "dayIncomeRatio": "-0.0854",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/18",
+      "nav": "1.01061700",
+      "accumulativeNav": "1.01061700",
+      "dayIncomeRatio": "0.0026",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/19",
+      "nav": "1.01065200",
+      "accumulativeNav": "1.01065200",
+      "dayIncomeRatio": "0.0035",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/20",
+      "nav": "1.01068800",
+      "accumulativeNav": "1.01068800",
+      "dayIncomeRatio": "0.0036",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/21",
+      "nav": "1.01071300",
+      "accumulativeNav": "1.01071300",
+      "dayIncomeRatio": "0.0025",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/24",
+      "nav": "1.01080000",
+      "accumulativeNav": "1.01080000",
+      "dayIncomeRatio": "0.0086",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/25",
+      "nav": "1.01082700",
+      "accumulativeNav": "1.01082700",
+      "dayIncomeRatio": "0.0027",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/26",
+      "nav": "1.01084300",
+      "accumulativeNav": "1.01084300",
+      "dayIncomeRatio": "0.0016",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/27",
+      "nav": "1.01087000",
+      "accumulativeNav": "1.01087000",
+      "dayIncomeRatio": "0.0027",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/11/28",
+      "nav": "1.01090500",
+      "accumulativeNav": "1.01090500",
+      "dayIncomeRatio": "0.0035",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/01",
+      "nav": "1.01100200",
+      "accumulativeNav": "1.01100200",
+      "dayIncomeRatio": "0.0096",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/02",
+      "nav": "1.01102700",
+      "accumulativeNav": "1.01102700",
+      "dayIncomeRatio": "0.0025",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/03",
+      "nav": "1.01105400",
+      "accumulativeNav": "1.01105400",
+      "dayIncomeRatio": "0.0027",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/04",
+      "nav": "1.01106000",
+      "accumulativeNav": "1.01106000",
+      "dayIncomeRatio": "0.0006",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/05",
+      "nav": "1.01107200",
+      "accumulativeNav": "1.01107200",
+      "dayIncomeRatio": "0.0012",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/08",
+      "nav": "1.01114300",
+      "accumulativeNav": "1.01114300",
+      "dayIncomeRatio": "0.007",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/09",
+      "nav": "1.01118900",
+      "accumulativeNav": "1.01118900",
+      "dayIncomeRatio": "0.0045",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/10",
+      "nav": "1.01122600",
+      "accumulativeNav": "1.01122600",
+      "dayIncomeRatio": "0.0037",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/11",
+      "nav": "1.01222300",
+      "accumulativeNav": "1.01222300",
+      "dayIncomeRatio": "0.0986",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/12",
+      "nav": "1.01135400",
+      "accumulativeNav": "1.01135400",
+      "dayIncomeRatio": "-0.0859",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/15",
+      "nav": "1.01250500",
+      "accumulativeNav": "1.01250500",
+      "dayIncomeRatio": "0.1138",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/16",
+      "nav": "1.01183200",
+      "accumulativeNav": "1.01183200",
+      "dayIncomeRatio": "-0.0665",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/17",
+      "nav": "1.01187700",
+      "accumulativeNav": "1.01187700",
+      "dayIncomeRatio": "0.0044",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/18",
+      "nav": "1.01192200",
+      "accumulativeNav": "1.01192200",
+      "dayIncomeRatio": "0.0044",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/19",
+      "nav": "1.01196700",
+      "accumulativeNav": "1.01196700",
+      "dayIncomeRatio": "0.0044",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/22",
+      "nav": "1.01207000",
+      "accumulativeNav": "1.01207000",
+      "dayIncomeRatio": "0.0102",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/23",
+      "nav": "1.01208100",
+      "accumulativeNav": "1.01208100",
+      "dayIncomeRatio": "0.0011",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/24",
+      "nav": "1.01211800",
+      "accumulativeNav": "1.01211800",
+      "dayIncomeRatio": "0.0037",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/25",
+      "nav": "1.01377500",
+      "accumulativeNav": "1.01377500",
+      "dayIncomeRatio": "0.1637",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/26",
+      "nav": "1.01507600",
+      "accumulativeNav": "1.01507600",
+      "dayIncomeRatio": "0.1283",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/29",
+      "nav": "1.01495700",
+      "accumulativeNav": "1.01495700",
+      "dayIncomeRatio": "-0.0117",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/30",
+      "nav": "1.01504500",
+      "accumulativeNav": "1.01504500",
+      "dayIncomeRatio": "0.0087",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2025/12/31",
+      "nav": "1.01512500",
+      "accumulativeNav": "1.01512500",
+      "dayIncomeRatio": "0.0079",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/05",
+      "nav": "1.01535000",
+      "accumulativeNav": "1.01535000",
+      "dayIncomeRatio": "0.0222",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/06",
+      "nav": "1.01696700",
+      "accumulativeNav": "1.01696700",
+      "dayIncomeRatio": "0.1593",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/07",
+      "nav": "1.01834400",
+      "accumulativeNav": "1.01834400",
+      "dayIncomeRatio": "0.1354",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/08",
+      "nav": "1.01894900",
+      "accumulativeNav": "1.01894900",
+      "dayIncomeRatio": "0.0594",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/09",
+      "nav": "1.01940300",
+      "accumulativeNav": "1.01940300",
+      "dayIncomeRatio": "0.0446",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/12",
+      "nav": "1.02054000",
+      "accumulativeNav": "1.02054000",
+      "dayIncomeRatio": "0.1115",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/13",
+      "nav": "1.02189500",
+      "accumulativeNav": "1.02189500",
+      "dayIncomeRatio": "0.1328",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/14",
+      "nav": "1.02195200",
+      "accumulativeNav": "1.02195200",
+      "dayIncomeRatio": "0.0056",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/15",
+      "nav": "1.02204300",
+      "accumulativeNav": "1.02204300",
+      "dayIncomeRatio": "0.0089",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/16",
+      "nav": "1.02210100",
+      "accumulativeNav": "1.02210100",
+      "dayIncomeRatio": "0.0057",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/19",
+      "nav": "1.02226400",
+      "accumulativeNav": "1.02226400",
+      "dayIncomeRatio": "0.0159",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/20",
+      "nav": "1.02236800",
+      "accumulativeNav": "1.02236800",
+      "dayIncomeRatio": "0.0102",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/21",
+      "nav": "1.02243500",
+      "accumulativeNav": "1.02243500",
+      "dayIncomeRatio": "0.0066",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/22",
+      "nav": "1.02348100",
+      "accumulativeNav": "1.02348100",
+      "dayIncomeRatio": "0.1023",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/23",
+      "nav": "1.02412800",
+      "accumulativeNav": "1.02412800",
+      "dayIncomeRatio": "0.0632",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/26",
+      "nav": "1.02518700",
+      "accumulativeNav": "1.02518700",
+      "dayIncomeRatio": "0.1034",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/27",
+      "nav": "1.02525200",
+      "accumulativeNav": "1.02525200",
+      "dayIncomeRatio": "0.0063",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/28",
+      "nav": "1.02522500",
+      "accumulativeNav": "1.02522500",
+      "dayIncomeRatio": "-0.0026",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/29",
+      "nav": "1.02520600",
+      "accumulativeNav": "1.02520600",
+      "dayIncomeRatio": "-0.0019",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/01/30",
+      "nav": "1.02532500",
+      "accumulativeNav": "1.02532500",
+      "dayIncomeRatio": "0.0116",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/02",
+      "nav": "1.02544400",
+      "accumulativeNav": "1.02544400",
+      "dayIncomeRatio": "0.0116",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/03",
+      "nav": "1.02546400",
+      "accumulativeNav": "1.02546400",
+      "dayIncomeRatio": "0.002",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/04",
+      "nav": "1.02691700",
+      "accumulativeNav": "1.02691700",
+      "dayIncomeRatio": "0.1417",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/05",
+      "nav": "1.02685600",
+      "accumulativeNav": "1.02685600",
+      "dayIncomeRatio": "-0.0059",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/06",
+      "nav": "1.02692900",
+      "accumulativeNav": "1.02692900",
+      "dayIncomeRatio": "0.0071",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/09",
+      "nav": "1.02711300",
+      "accumulativeNav": "1.02711300",
+      "dayIncomeRatio": "0.0179",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/10",
+      "nav": "1.02718100",
+      "accumulativeNav": "1.02718100",
+      "dayIncomeRatio": "0.0066",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/11",
+      "nav": "1.02729300",
+      "accumulativeNav": "1.02729300",
+      "dayIncomeRatio": "0.0109",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/12",
+      "nav": "1.02741500",
+      "accumulativeNav": "1.02741500",
+      "dayIncomeRatio": "0.0119",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/13",
+      "nav": "1.02842000",
+      "accumulativeNav": "1.02842000",
+      "dayIncomeRatio": "0.0978",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/24",
+      "nav": "1.02792600",
+      "accumulativeNav": "1.02792600",
+      "dayIncomeRatio": "-0.048",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/25",
+      "nav": "1.02880100",
+      "accumulativeNav": "1.02880100",
+      "dayIncomeRatio": "0.0851",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/26",
+      "nav": "1.02917500",
+      "accumulativeNav": "1.02917500",
+      "dayIncomeRatio": "0.0364",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/02/27",
+      "nav": "1.02914800",
+      "accumulativeNav": "1.02914800",
+      "dayIncomeRatio": "-0.0026",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/02",
+      "nav": "1.02930500",
+      "accumulativeNav": "1.02930500",
+      "dayIncomeRatio": "0.0153",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/03",
+      "nav": "1.02934600",
+      "accumulativeNav": "1.02934600",
+      "dayIncomeRatio": "0.004",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/04",
+      "nav": "1.02924800",
+      "accumulativeNav": "1.02924800",
+      "dayIncomeRatio": "-0.0095",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/05",
+      "nav": "1.02932700",
+      "accumulativeNav": "1.02932700",
+      "dayIncomeRatio": "0.0077",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/06",
+      "nav": "1.02937700",
+      "accumulativeNav": "1.02937700",
+      "dayIncomeRatio": "0.0049",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/09",
+      "nav": "1.02943300",
+      "accumulativeNav": "1.02943300",
+      "dayIncomeRatio": "0.0054",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/10",
+      "nav": "1.02941800",
+      "accumulativeNav": "1.02941800",
+      "dayIncomeRatio": "-0.0015",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/11",
+      "nav": "1.03178300",
+      "accumulativeNav": "1.03178300",
+      "dayIncomeRatio": "0.2297",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/12",
+      "nav": "1.03185100",
+      "accumulativeNav": "1.03185100",
+      "dayIncomeRatio": "0.0066",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/13",
+      "nav": "1.03191700",
+      "accumulativeNav": "1.03191700",
+      "dayIncomeRatio": "0.0064",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/16",
+      "nav": "1.03195900",
+      "accumulativeNav": "1.03195900",
+      "dayIncomeRatio": "0.0041",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/17",
+      "nav": "1.03200800",
+      "accumulativeNav": "1.03200800",
+      "dayIncomeRatio": "0.0047",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/18",
+      "nav": "1.03203000",
+      "accumulativeNav": "1.03203000",
+      "dayIncomeRatio": "0.0021",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/19",
+      "nav": "1.03557000",
+      "accumulativeNav": "1.03557000",
+      "dayIncomeRatio": "0.343",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/20",
+      "nav": "1.03548700",
+      "accumulativeNav": "1.03548700",
+      "dayIncomeRatio": "-0.008",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/23",
+      "nav": "1.03557800",
+      "accumulativeNav": "1.03557800",
+      "dayIncomeRatio": "0.0088",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/24",
+      "nav": "1.03558100",
+      "accumulativeNav": "1.03558100",
+      "dayIncomeRatio": "0.0003",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/25",
+      "nav": "1.04535500",
+      "accumulativeNav": "1.04535500",
+      "dayIncomeRatio": "0.9438",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/26",
+      "nav": "1.04543500",
+      "accumulativeNav": "1.04543500",
+      "dayIncomeRatio": "0.0077",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/27",
+      "nav": "1.04442800",
+      "accumulativeNav": "1.04442800",
+      "dayIncomeRatio": "-0.0963",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/30",
+      "nav": "1.04464600",
+      "accumulativeNav": "1.04464600",
+      "dayIncomeRatio": "0.0209",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/31",
+      "nav": "1.04469400",
+      "accumulativeNav": "1.04469400",
+      "dayIncomeRatio": "0.0046",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/01",
+      "nav": "1.04472100",
+      "accumulativeNav": "1.04472100",
+      "dayIncomeRatio": "0.0026",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/02",
+      "nav": "1.04488200",
+      "accumulativeNav": "1.04488200",
+      "dayIncomeRatio": "0.0154",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/03",
+      "nav": "1.04486000",
+      "accumulativeNav": "1.04486000",
+      "dayIncomeRatio": "-0.0021",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/07",
+      "nav": "1.04510300",
+      "accumulativeNav": "1.04510300",
+      "dayIncomeRatio": "0.0233",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/08",
+      "nav": "1.04519900",
+      "accumulativeNav": "1.04519900",
+      "dayIncomeRatio": "0.0092",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/09",
+      "nav": "1.04534700",
+      "accumulativeNav": "1.04534700",
+      "dayIncomeRatio": "0.0142",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/10",
+      "nav": "1.04540600",
+      "accumulativeNav": "1.04540600",
+      "dayIncomeRatio": "0.0056",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/13",
+      "nav": "1.04553900",
+      "accumulativeNav": "1.04553900",
+      "dayIncomeRatio": "0.0127",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/14",
+      "nav": "1.04561700",
+      "accumulativeNav": "1.04561700",
+      "dayIncomeRatio": "0.0075",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/15",
+      "nav": "1.04570000",
+      "accumulativeNav": "1.04570000",
+      "dayIncomeRatio": "0.0079",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/16",
+      "nav": "1.04576700",
+      "accumulativeNav": "1.04576700",
+      "dayIncomeRatio": "0.0064",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/17",
+      "nav": "1.04590000",
+      "accumulativeNav": "1.04590000",
+      "dayIncomeRatio": "0.0127",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/20",
+      "nav": "1.04606500",
+      "accumulativeNav": "1.04606500",
+      "dayIncomeRatio": "0.0158",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/21",
+      "nav": "1.04619900",
+      "accumulativeNav": "1.04619900",
+      "dayIncomeRatio": "0.0128",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/22",
+      "nav": "1.04631500",
+      "accumulativeNav": "1.04631500",
+      "dayIncomeRatio": "0.0111",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/23",
+      "nav": "1.04635900",
+      "accumulativeNav": "1.04635900",
+      "dayIncomeRatio": "0.0042",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/24",
+      "nav": "1.04634200",
+      "accumulativeNav": "1.04634200",
+      "dayIncomeRatio": "-0.0016",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/27",
+      "nav": "1.04634500",
+      "accumulativeNav": "1.04634500",
+      "dayIncomeRatio": "0.0003",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/28",
+      "nav": "1.04642000",
+      "accumulativeNav": "1.04642000",
+      "dayIncomeRatio": "0.0072",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/29",
+      "nav": "1.04654500",
+      "accumulativeNav": "1.04654500",
+      "dayIncomeRatio": "0.0119",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/30",
+      "nav": "1.04658200",
+      "accumulativeNav": "1.04658200",
+      "dayIncomeRatio": "0.0035",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/05/06",
+      "nav": "1.04669800",
+      "accumulativeNav": "1.04669800",
+      "dayIncomeRatio": "0.0111",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/05/07",
+      "nav": "1.04674200",
+      "accumulativeNav": "1.04674200",
+      "dayIncomeRatio": "0.0042",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/05/08",
+      "nav": "1.04682200",
+      "accumulativeNav": "1.04682200",
+      "dayIncomeRatio": "0.0076",
+      "fundIncome": "0",
+      "yield": "0"
+    }
+  ]
+}
+</script>
+
 <script>
 var processed = [];
 var chartObj = null;
 var currentRange = "all";
+
+function calculateAnnualized(navVal, days) {
+  return days > 0 ? (navVal - 1) * 100 / days * 365 : 0;
+}
+
+function formatPercent(value) {
+  var num = Number(value);
+  if (!isFinite(num)) return "0.00%";
+  return num.toFixed(2) + "%";
+}
 
 /* 回车触发搜索 */
 document.getElementById("prodInput").addEventListener("keydown", function(e) {
   if (e.key === "Enter") searchProduct();
 });
 
-/* 搜索主函数 - 先尝试直连中银API，失败后fallback到本地代理 */
+function randomRnd() {
+  return Math.floor(1000 + Math.random() * 99999000);
+}
+
+/* 搜索主函数 - 优先调用本地刷新脚本，失败后fallback到直连/代理 */
 function searchProduct() {
   var code = document.getElementById("prodInput").value.trim().toUpperCase();
   if (!code) { alert("请输入产品代码"); return; }
   document.getElementById("loadingMask").classList.add("show");
   document.getElementById("searchBtn").disabled = true;
-  document.getElementById("subtitle").textContent = "正在请求中银API（直连）...";
+  document.getElementById("subtitle").textContent = "正在调用本地脚本刷新数据...";
 
-  // 先尝试直连，失败则走本地代理
-  tryFetch(code, false).then(function(data) {
-    if (!data || data.length === 0) throw new Error("返回数据为空");
-    var pdata = processRawData(data);
-    renderAll(code, pdata);
-  }).catch(function(e) {
-    console.warn("直连失败:", e.message, "尝试本地代理...");
-    document.getElementById("subtitle").textContent = "直连失败，尝试本地代理 (localhost:8080)...";
-    return tryFetch(code, true);
+  tryRefreshScript(code).catch(function(e) {
+    console.warn("本地脚本刷新失败:", e.message, "尝试直连/代理查询...");
+    document.getElementById("subtitle").textContent = "本地脚本不可用，尝试中银API直连...";
+    return tryFetch(code, false).catch(function(e2) {
+      console.warn("直连失败:", e2.message, "尝试本地代理...");
+      document.getElementById("subtitle").textContent = "直连失败，尝试本地代理 (localhost:8082)...";
+      return tryFetch(code, true);
+    });
   }).then(function(data) {
     if (!data || data.length === 0) throw new Error("未获取到数据，请检查产品代码");
     var pdata = processRawData(data);
@@ -183,8 +1890,16 @@ function searchProduct() {
   }).finally(function() {
     document.getElementById("loadingMask").classList.remove("show");
     document.getElementById("searchBtn").disabled = false;
-    document.getElementById("subtitle").textContent = "输入产品代码后点击「查询」加载数据";
   });
+}
+
+function tryRefreshScript(prodCode) {
+  return fetch("http://127.0.0.1:8082/refresh?code=" + encodeURIComponent(prodCode))
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.success) return result.data || [];
+      throw new Error(result.error || "本地脚本刷新失败");
+    });
 }
 
 /* 统一请求入口：isProxy=true 时走本地代理 */
@@ -227,7 +1942,7 @@ function fetchNavData(prodCode) {
     params: { productId: prodCode, subChannelId: "31", circle: "3Y" }
   };
   var body = "json=" + encodeURIComponent(JSON.stringify(payload));
-  return fetch("https://ebsnew.boc.cn/BMPS/_bfwajax.do?rnd=" + Date.now() + "&_locale=zh_CN", {
+  return fetch("https://ebsnew.boc.cn/BMPS/_bfwajax.do?rnd=" + randomRnd() + "&_locale=zh_CN", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -270,7 +1985,7 @@ function processRawData(rawList) {
     var navVal = parseFloat(item.nav || item.NAV || item.netValue || 0);
     var dObj = new Date(dateStr);
     var days = Math.round((dObj - startDate) / 86400000) + 1;
-    var annualized = days > 0 ? (navVal - 1) * 100 / days * 365 : 0;
+    var annualized = calculateAnnualized(navVal, days);
     var prevItem = idx > 0 ? sorted[idx - 1] : item;
     var prevNav = parseFloat(prevItem.nav || prevItem.NAV || prevItem.netValue || navVal);
     var wan = (navVal - prevNav) * 10000;
@@ -297,9 +2012,9 @@ function renderAll(prodCode, data) {
 function renderStats(latest, maxAnn) {
   var cards = [
     { label: "最新净值", value: latest.nav.toFixed(6), cls: "neu" },
-    { label: "当前成立年化", value: latest.annualized.toFixed(2) + "%", cls: latest.annualized >= 0 ? "pos" : "neg" },
+    { label: "当前成立年化", value: formatPercent(latest.annualized), cls: latest.annualized >= 0 ? "pos" : "neg" },
     { label: "成立天数", value: latest.days + " 天", cls: "neu" },
-    { label: "最高成立年化", value:   maxAnn.toFixed(2) + "%", cls: "pos" }
+    { label: "最高成立年化", value: formatPercent(maxAnn), cls: "pos" }
   ];
   var html = "";
   for (var i = 0; i < cards.length; i++) {
@@ -337,12 +2052,26 @@ function parseResponse(text) {
   }
 }
 
+function registerFixedTooltipPositioner() {
+  if (!window.Chart || !Chart.Tooltip || Chart.Tooltip.positioners.fixedChartInfo) return;
+  Chart.Tooltip.positioners.fixedChartInfo = function() {
+    var area = this.chart.chartArea;
+    return {
+      x: area.left + 150,
+      y: area.top + 24,
+      xAlign: "left",
+      yAlign: "top"
+    };
+  };
+}
+
 /* 图表 */
 function renderChart() {
   var ctx = document.getElementById("navChart").getContext("2d");
   if (chartObj) chartObj.destroy();
   var filtered = getFiltered(currentRange);
   if (filtered.length === 0) return;
+  registerFixedTooltipPositioner();
   var gradAnn = ctx.createLinearGradient(0, 0, 0, 320);
   gradAnn.addColorStop(0, "rgba(240,76,68,0.22)");
   gradAnn.addColorStop(1, "rgba(240,76,68,0.01)");
@@ -393,6 +2122,7 @@ function renderChart() {
       plugins: {
         legend: { display: false },
         tooltip: {
+          position: "fixedChartInfo",
           backgroundColor: "#1e2338",
           borderColor: "#363d5a",
           borderWidth: 1,
@@ -407,7 +2137,7 @@ function renderChart() {
             label: function(item) {
               var d = filtered[item.dataIndex];
               if (item.datasetIndex === 0) {
-                return "  成立年化：" + d.annualized.toFixed(2) + "%";
+                return "  成立年化：" + formatPercent(d.annualized);
               } else {
                 var wanStr = (d.wan >= 0 ? "+" : "") + d.wan.toFixed(2);
                 return "  单位净值：" + d.nav.toFixed(6) + "    当日万收：" + wanStr + " 元";
@@ -424,7 +2154,7 @@ function renderChart() {
         y: {
           position: "left",
           title: { display: true, text: "成立年化(%)", color: "#f04c44" },
-          ticks: { color: "#f04c44", callback: function(v) { return v.toFixed(2) + "%"; } },
+          ticks: { color: "#f04c44", callback: function(v) { return formatPercent(v); } },
           grid: { color: "#1e2240" }
         },
         y2: {
@@ -462,6 +2192,29 @@ document.querySelectorAll(".range-btn").forEach(function(btn) {
   });
 });
 
+function toggleTableExpanded() {
+  var section = document.getElementById("tableSection");
+  var button = document.getElementById("tableToggleBtn");
+  var expanded = section.classList.toggle("expanded");
+  button.textContent = expanded ? "还原" : "放大";
+}
+
+/* 载入 Python 脚本预先嵌入的数据 */
+function loadEmbeddedData() {
+  var node = document.getElementById("embeddedNavData");
+  if (!node || !node.textContent.trim()) return;
+  try {
+    var embedded = JSON.parse(node.textContent);
+    var data = embedded && Array.isArray(embedded.data) ? embedded.data : [];
+    var productId = embedded && embedded.productId ? embedded.productId : "";
+    if (!productId || data.length === 0) return;
+    document.getElementById("prodInput").value = productId;
+    renderAll(productId, processRawData(data));
+  } catch (e) {
+    console.error("读取嵌入数据失败:", e);
+  }
+}
+
 /* 表格 */
 function renderTable(data) {
   var tbody = document.getElementById("tableBody");
@@ -474,13 +2227,15 @@ function renderTable(data) {
     rows.push("<tr>" +
       "<td>" + d.date + "</td>" +
       "<td>" + d.nav.toFixed(6) + "</td>" +
-      "<td class="" + wanCls + "">" + wanStr + "</td>" +
-      "<td class="" + annCls + "">" + d.annualized.toFixed(2) + "%</td>" +
+      '<td class="' + wanCls + '">' + wanStr + "</td>" +
+      '<td class="' + annCls + '">' + formatPercent(d.annualized) + "</td>" +
       "<td>" + d.days + "</td>" +
       "</tr>");
   }
   tbody.innerHTML = rows.join("");
 }
+
+loadEmbeddedData();
 </script>
 </body>
 </html>
