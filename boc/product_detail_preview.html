@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中银理财产品详情预览</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #e9edf3;
+    color: #1f2430;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  }
+  .page {
+    width: min(1144px, 100%);
+    margin: 0 auto;
+    background: #fff;
+    min-height: 100vh;
+    box-shadow: 0 18px 70px rgba(38, 47, 70, 0.16);
+  }
+  .browser-strip {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 16px;
+    background: #f4f5f7;
+    border-bottom: 1px solid #e5e5e5;
+    color: #6b7280;
+    font-size: 18px;
+  }
+  .browser-title {
+    width: 330px;
+    max-width: 48vw;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    background: #fff;
+    color: #555;
+    font-size: 16px;
+  }
+  .bank-bar {
+    min-height: 96px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 18px 32px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+  .bank-logo {
+    width: 58px;
+    height: 58px;
+    border-radius: 8px;
+    background: #c00018;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .bank-name { font-size: 24px; font-weight: 750; }
+  .bank-sub { margin-top: 4px; color: #5a6472; font-size: 17px; }
+  .register-btn {
+    margin-left: auto;
+    border: 1px solid #ff3045;
+    background: #fff;
+    color: #ff3045;
+    border-radius: 6px;
+    padding: 15px 22px;
+    font-size: 19px;
+    font-weight: 700;
+  }
+  .provider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 18px 32px;
+    color: #556170;
+    font-size: 18px;
+    border-bottom: 1px solid #f2f2f2;
+  }
+  .provider-mark {
+    width: 22px;
+    height: 22px;
+    border: 3px solid #d4002a;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #d4002a;
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .agency {
+    border: 1px solid #9aa3b2;
+    border-radius: 3px;
+    padding: 2px 4px;
+    color: #606b7b;
+  }
+  .detail-toggle { margin-left: auto; color: #3f4652; }
+  .hero {
+    padding: 22px 32px 30px;
+  }
+  .search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .search-row input {
+    width: 240px;
+    max-width: 54vw;
+    height: 36px;
+    border: 1px solid #d6dbe3;
+    border-radius: 4px;
+    padding: 0 10px;
+    font-size: 15px;
+    outline: none;
+  }
+  .search-row input:focus { border-color: #c40028; }
+  .search-row button {
+    height: 36px;
+    border: 0;
+    border-radius: 4px;
+    background: #d4002a;
+    color: #fff;
+    padding: 0 18px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .status { align-self: center; color: #7a8491; font-size: 13px; }
+  .product-title {
+    margin: 0 0 22px;
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1.35;
+  }
+  .metrics {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+  .yield-value {
+    color: #e0003b;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 47px;
+    line-height: 1;
+    font-weight: 800;
+  }
+  .yield-label, .period-label { margin-top: 12px; color: #6b4f44; font-size: 16px; }
+  .period-value {
+    margin-top: 4px;
+    font-size: 41px;
+    line-height: 1;
+    font-weight: 850;
+  }
+  .cycle {
+    margin-top: 28px;
+    color: #5e6775;
+    font-size: 17px;
+  }
+  .notice {
+    margin-top: 30px;
+    padding: 10px 14px;
+    background: #fafafa;
+    color: #536171;
+    font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: 4px;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+    margin-top: 34px;
+    color: #576171;
+    font-size: 19px;
+    font-weight: 750;
+  }
+  .tags span {
+    padding: 0 16px;
+    border-right: 1px solid #cfd4dc;
+  }
+  .tags span:first-child { padding-left: 0; }
+  .tags span:last-child { border-right: 0; }
+  .tags .risk { color: #e0003b; }
+  .trade-card {
+    display: grid;
+    grid-template-columns: 48px auto;
+    gap: 16px;
+    padding: 28px 32px;
+    border-top: 10px solid #f4f4f4;
+    border-bottom: 10px solid #f4f4f4;
+    font-size: 19px;
+  }
+  .clock {
+    width: 25px;
+    height: 25px;
+    border: 2px solid #262b34;
+    border-radius: 50%;
+    position: relative;
+    margin-top: 2px;
+  }
+  .clock::before, .clock::after {
+    content: "";
+    position: absolute;
+    background: #262b34;
+    left: 11px;
+    top: 5px;
+    width: 2px;
+    height: 8px;
+  }
+  .clock::after {
+    top: 11px;
+    width: 7px;
+    height: 2px;
+  }
+  .time-grid {
+    display: grid;
+    grid-template-columns: 90px auto;
+    gap: 16px 18px;
+  }
+  .chart-section {
+    padding: 22px 0 0;
+    background: #fff;
+  }
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 34px;
+    color: #606b7b;
+    font-size: 20px;
+    font-weight: 750;
+  }
+  .tab-active {
+    color: #e0003b;
+    padding-bottom: 18px;
+    border-bottom: 3px solid #e0003b;
+  }
+  .chart-meta {
+    display: flex;
+    gap: 28px;
+    padding: 22px 32px 6px;
+    font-size: 16px;
+  }
+  .chart-meta strong { color: #e0003b; font-weight: 500; }
+  .chart-wrap {
+    height: 220px;
+    padding: 0 32px 18px;
+  }
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .bottom-cta {
+    position: sticky;
+    bottom: 0;
+    height: 76px;
+    display: grid;
+    place-items: center;
+    background: #e42648;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 850;
+  }
+  @media (max-width: 720px) {
+    .browser-strip { display: none; }
+    .bank-bar { padding: 16px 14px; gap: 12px; }
+    .bank-logo { width: 48px; height: 48px; font-size: 34px; }
+    .bank-name { font-size: 20px; }
+    .bank-sub { font-size: 14px; }
+    .register-btn { padding: 10px 12px; font-size: 16px; }
+    .provider, .hero, .trade-card { padding-left: 14px; padding-right: 14px; }
+    .metrics { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .yield-value { font-size: 39px; }
+    .period-value { font-size: 31px; }
+    .tags { font-size: 16px; row-gap: 10px; }
+    .chart-wrap { padding-left: 14px; padding-right: 14px; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="browser-strip">
+    <span>&lt;</span><span>&gt;</span><span>↻</span>
+    <div class="browser-title">理财</div>
+    <span>⌕</span>
+    <span style="margin-left:auto">◎</span><span>⋯</span><span>−</span><span>□</span><span>×</span>
+  </div>
+
+  <section class="bank-bar">
+    <div class="bank-logo">中</div>
+    <div>
+      <div class="bank-name">中国银行手机银行</div>
+      <div class="bank-sub">话费充值随机立减最高20元</div>
+    </div>
+    <button class="register-btn">新客注册</button>
+  </section>
+
+  <section class="provider">
+    <span class="provider-mark">中</span>
+    <span>由中银理财有限责任公司提供</span>
+    <span class="agency">代销</span>
+    <span class="detail-toggle">详情⌄</span>
+  </section>
+
+  <section class="hero">
+    <div class="search-row">
+      <input id="productInput" value="WFXYJXRK06A" aria-label="产品代码">
+      <button id="loadBtn" type="button">查询</button>
+      <span class="status" id="statusText">准备加载</span>
+    </div>
+
+    <h1 class="product-title" id="productName">稳富信用精选日开6号A(WFXYJXRK06A)</h1>
+    <div class="metrics">
+      <div>
+        <div class="yield-value" id="annualYield">--</div>
+        <div class="yield-label">成立以来年化 ⓘ</div>
+      </div>
+      <div>
+        <div class="period-value" id="periodWord">每日可赎</div>
+        <div class="period-label">投资期限</div>
+      </div>
+    </div>
+    <div class="cycle" id="cycleText">业绩周期：--</div>
+    <div class="notice" id="noticeText">产品业绩比较基准不是预期收益率，不代表产品的未来表现和实际收益，不构成对产品收益的承诺...</div>
+    <div class="tags">
+      <span id="productType">固定收益类</span>
+      <span id="openRule">每日开放</span>
+      <span class="risk" id="riskLevel">R2中低风险 ⓘ</span>
+      <span id="startAmount">1.00元起购</span>
+      <span id="remainingAmount">剩余额度--</span>
+    </div>
+  </section>
+
+  <section class="trade-card">
+    <div class="clock"></div>
+    <div class="time-grid">
+      <div>交易时间</div><div id="tradeTime">09:00:00-15:30:00</div>
+      <div>挂单时间</div><div id="bookTime">00:00:00-08:59:59<br>15:30:01-23:59:59</div>
+    </div>
+  </section>
+
+  <section class="chart-section">
+    <div class="tabs">
+      <div class="tab-active">单位净值</div>
+      <div>累计净值</div>
+      <div>历史涨跌</div>
+    </div>
+    <div class="chart-meta">
+      <span id="latestDate">--</span>
+      <span>单位净值 <strong id="latestNav">--</strong></span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="navCanvas"></canvas>
+    </div>
+  </section>
+
+  <div class="bottom-cta">老客户，打开APP</div>
+</main>
+
+<script>
+const fallbackData = {
+  success: true,
+  productId: "WFXYJXRK06A",
+  detail: {
+    productId: "WFXYJXRK06A",
+    productName: "稳富信用精选日开6号A",
+    nav: "1.00134300",
+    updateDate: "2026/05/11",
+    anuualYield: "1.26",
+    performBench: "1.4",
+    performBenchUp: "2.4",
+    riskLevel: "R2",
+    riskLevelDisplay: "R2中低风险",
+    subFirstLow: "1.00",
+    indiAmtRem: "10396766.00",
+    tradeTime: "09:00:00-15:30:00",
+    bookTime: "00:00:00-08:59:59,15:30:01-23:59:59",
+    establishDate: "2026/04/03",
+    dayPerPeriodWord: "每日可赎",
+    productTypeName: "固定收益类",
+    buyOpenRule: "产品每日开放申购"
+  },
+  summary: {
+    productShortName: "稳富信用精选日开6号A",
+    productLongName: "中银理财-稳富信用精选日开6号",
+    productId: "WFXYJXRK06A",
+    performanceBenchmarkExplain: "以产品投资货币市场工具仓位0%-10%，银行存款仓位0%-70%，信用债仓位0%-50%，组合杠杆率110%为例测算，详见产品说明书。",
+    riskWarning: "业绩比较基准不是预期收益率，不代表产品的未来表现和实际收益，不构成对产品收益的承诺。"
+  },
+  navList: [
+    {updateDate:"2026/04/02",nav:"1.00000000"},
+    {updateDate:"2026/04/03",nav:"1.00003700"},
+    {updateDate:"2026/04/07",nav:"1.00019100"},
+    {updateDate:"2026/04/08",nav:"1.00023000"},
+    {updateDate:"2026/04/09",nav:"1.00026800"},
+    {updateDate:"2026/04/10",nav:"1.00030600"},
+    {updateDate:"2026/04/13",nav:"1.00042200"},
+    {updateDate:"2026/04/14",nav:"1.00046000"},
+    {updateDate:"2026/04/15",nav:"1.00049800"},
+    {updateDate:"2026/04/16",nav:"1.00053600"},
+    {updateDate:"2026/04/17",nav:"1.00057400"},
+    {updateDate:"2026/04/18",nav:"1.00068900"},
+    {updateDate:"2026/04/21",nav:"1.00080500"},
+    {updateDate:"2026/04/22",nav:"1.00084300"},
+    {updateDate:"2026/04/23",nav:"1.00088200"},
+    {updateDate:"2026/04/24",nav:"1.00092100"},
+    {updateDate:"2026/04/25",nav:"1.00096000"},
+    {updateDate:"2026/04/28",nav:"1.00118700"},
+    {updateDate:"2026/04/29",nav:"1.00122100"},
+    {updateDate:"2026/04/30",nav:"1.00124500"},
+    {updateDate:"2026/05/06",nav:"1.00128100"},
+    {updateDate:"2026/05/07",nav:"1.00129900"},
+    {updateDate:"2026/05/08",nav:"1.00131800"},
+    {updateDate:"2026/05/11",nav:"1.00134300"}
+  ]
+};
+
+const riskLabels = {
+  R1: "R1低风险",
+  R2: "R2中低风险",
+  R3: "R3中风险",
+  R4: "R4中高风险",
+  R5: "R5高风险"
+};
+
+const productTypeMap = {
+  "01": "现金管理类",
+  "02": "权益类",
+  "03": "固定收益类",
+  "04": "混合类",
+  "05": "商品及金融衍生品类"
+};
+
+function formatAmount(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return "--";
+  if (num >= 10000) return `${(num / 10000).toFixed(2)}万`;
+  return num.toFixed(2);
+}
+
+function formatPercent(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return "--";
+  return `${num.toFixed(2)}%`;
+}
+
+function byId(id) {
+  return document.getElementById(id);
+}
+
+function getApiBases() {
+  const bases = [];
+  if (location.protocol.startsWith("http")) bases.push(location.origin);
+  bases.push("http://127.0.0.1:8082", "http://127.0.0.1:8083");
+  return [...new Set(bases)];
+}
+
+async function fetchBundle(productId) {
+  const errors = [];
+  for (const base of getApiBases()) {
+    try {
+      const res = await fetch(`${base}/product-detail?code=${encodeURIComponent(productId)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || "接口返回失败");
+      return { data, source: base };
+    } catch (err) {
+      errors.push(`${base}: ${err.message}`);
+    }
+  }
+  console.warn("本地代理不可用，使用内置示例数据。", errors);
+  return { data: fallbackData, source: "内置示例" };
+}
+
+function render(bundle, source) {
+  const detail = bundle.detail || {};
+  const summary = bundle.summary || {};
+  const navList = Array.isArray(bundle.navList) ? bundle.navList : [];
+  const productId = bundle.productId || detail.productId || summary.productId || byId("productInput").value.trim().toUpperCase();
+  const productName = detail.productName || summary.productShortName || summary.productLongName || productId;
+  const latest = navList.length ? navList[navList.length - 1] : {};
+  const latestDate = latest.updateDate || detail.updateDate || "--";
+  const latestNav = latest.nav || detail.nav || "--";
+  const annualYield = detail.anuualYield || detail.annualYield || "1.26";
+  const performBench = detail.performBench || (Number(summary.performanceBenchmark) * 100).toFixed(1);
+  const performBenchUp = detail.performBenchUp || "";
+  const establishDate = detail.establishDate || summary.productEstablishDate || "";
+  const periodEnd = latestDate !== "--" ? latestDate : "";
+  const risk = detail.riskLevelDisplay || riskLabels[detail.riskLevel] || detail.riskLevel || "R2中低风险";
+  const productType = detail.productTypeName || productTypeMap[detail.productType] || "固定收益类";
+  const openRule = (detail.dayPerPeriodWord || summary.dayPerPeriodWord || "每日开放").replace("产品", "");
+
+  byId("statusText").textContent = `数据来源：${source}`;
+  byId("productName").textContent = `${productName}(${productId})`;
+  byId("annualYield").textContent = formatPercent(annualYield);
+  byId("periodWord").textContent = detail.dayPerPeriodWord || summary.dayPerPeriodWord || "每日可赎";
+  byId("cycleText").textContent = `业绩周期： ${establishDate || "--"}-${periodEnd || "--"}`;
+  byId("noticeText").textContent = `产品业绩比较基准为: ${performBench || "--"}%${performBenchUp ? `~${performBenchUp}%` : ""}，${summary.riskWarning || detail.riskWarning || "业绩比较基准不是预期收益率，不代表产品的未来表现和实际收益，不构成对产品收益的承诺。"}`;
+  byId("productType").textContent = productType;
+  byId("openRule").textContent = openRule.includes("开放") ? openRule : "每日开放";
+  byId("riskLevel").textContent = `${risk} ⓘ`;
+  byId("startAmount").textContent = `${Number(detail.subFirstLow || summary.indSubStartAmount || 1).toFixed(2)}元起购`;
+  byId("remainingAmount").textContent = `剩余额度${formatAmount(detail.indiAmtRem)}`;
+  byId("tradeTime").textContent = detail.tradeTime || `${summary.buyStartTime || "09:00:00"}-${summary.buyEndTime || "15:30:00"}`;
+  byId("bookTime").innerHTML = (detail.bookTime || "00:00:00-08:59:59,15:30:01-23:59:59").split(",").join("<br>");
+  byId("latestDate").textContent = latestDate;
+  byId("latestNav").textContent = Number(latestNav).toFixed(4);
+  drawChart(navList);
+}
+
+function drawChart(navList) {
+  const canvas = byId("navCanvas");
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(320, rect.width * dpr);
+  canvas.height = Math.max(180, rect.height * dpr);
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  const width = rect.width;
+  const height = rect.height;
+  ctx.clearRect(0, 0, width, height);
+
+  const points = navList
+    .map(item => ({ date: item.updateDate, nav: Number(item.nav) }))
+    .filter(item => Number.isFinite(item.nav));
+  if (points.length < 2) return;
+
+  const pad = { left: 38, right: 22, top: 18, bottom: 30 };
+  const values = points.map(p => p.nav);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 0.0001;
+  const yMin = min - span * 0.18;
+  const yMax = max + span * 0.18;
+  const innerW = width - pad.left - pad.right;
+  const innerH = height - pad.top - pad.bottom;
+
+  function xAt(index) {
+    return pad.left + innerW * index / (points.length - 1);
+  }
+  function yAt(value) {
+    return pad.top + innerH * (1 - (value - yMin) / (yMax - yMin));
+  }
+
+  ctx.strokeStyle = "#e7e7e7";
+  ctx.lineWidth = 1;
+  ctx.font = "13px Georgia, serif";
+  ctx.fillStyle = "#333";
+  for (let i = 0; i < 4; i++) {
+    const y = pad.top + innerH * i / 3;
+    ctx.beginPath();
+    ctx.setLineDash([2, 3]);
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(width - pad.right, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    const label = (yMax - (yMax - yMin) * i / 3).toFixed(4);
+    ctx.fillText(label, 2, y + 4);
+  }
+
+  const area = ctx.createLinearGradient(0, pad.top, 0, height - pad.bottom);
+  area.addColorStop(0, "rgba(229, 0, 57, 0.15)");
+  area.addColorStop(1, "rgba(229, 0, 57, 0.02)");
+  ctx.beginPath();
+  points.forEach((point, index) => {
+    const x = xAt(index);
+    const y = yAt(point.nav);
+    if (index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.lineTo(xAt(points.length - 1), height - pad.bottom);
+  ctx.lineTo(xAt(0), height - pad.bottom);
+  ctx.closePath();
+  ctx.fillStyle = area;
+  ctx.fill();
+
+  ctx.beginPath();
+  points.forEach((point, index) => {
+    const x = xAt(index);
+    const y = yAt(point.nav);
+    if (index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = "#e6003c";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+async function loadProduct() {
+  const input = byId("productInput");
+  const productId = input.value.trim().toUpperCase() || "WFXYJXRK06A";
+  input.value = productId;
+  byId("statusText").textContent = "正在请求接口...";
+  byId("loadBtn").disabled = true;
+  try {
+    const { data, source } = await fetchBundle(productId);
+    render(data, source);
+  } finally {
+    byId("loadBtn").disabled = false;
+  }
+}
+
+byId("loadBtn").addEventListener("click", loadProduct);
+byId("productInput").addEventListener("keydown", event => {
+  if (event.key === "Enter") loadProduct();
+});
+window.addEventListener("resize", () => drawChart(window.__lastNavList || []));
+const originalDrawChart = drawChart;
+drawChart = function(navList) {
+  window.__lastNavList = navList;
+  originalDrawChart(navList);
+};
+loadProduct();
+</script>
+</body>
+</html>
