@@ -77,7 +77,7 @@ def fetch_boc(prod_code):
         "method": "PsnxWmpHistoryNavQueryOutlay",
         "params": {"productId": prod_code, "subChannelId": "31", "circle": "3Y"}
     }
-    body = "json=" + requests.utils.quote(json.dumps(payload, ensure_ascii=False))
+    body = "json=" + requests.utils.quote(json.dumps(payload, ensure_ascii=False)) # type: ignore
     print(f"[代理] 请求产品代码: {prod_code}")
     resp = requests.post(build_boc_url(), data=body, headers=HEADERS, timeout=15, verify=True)
     print(f"[代理] HTTP状态码: {resp.status_code}")
