@@ -18,6 +18,8 @@ import requests
 import json
 import os
 import random
+import sqlite3
+from datetime import datetime
 
 from fetch_boc_nav import DEFAULT_COOKIE, DEFAULT_HTML_PATH, refresh_html_data
 
@@ -27,6 +29,11 @@ BOC_URL_BASE = "https://ebsnew.boc.cn/BMPS/_bfwajax.do"
 DEFAULT_DETAIL_URL = (
     "https://ebsnew.boc.cn/preview/bocphone/VueLocalCli4/bocFinanceDetail/index.html"
     "#/productDetail?functionCode=bocFinanceProductDetail&productId=YIXTT076B"
+)
+DEFAULT_PRODUCT_DETAIL_DB = os.path.join(
+    os.path.dirname(__file__),
+    'data',
+    'boc_product_detail.db',
 )
 
 HEADERS = {
@@ -121,6 +128,143 @@ def result_or_none(response_json):
     if isinstance(response_json, dict):
         return response_json.get("result")
     return None
+
+
+def load_product_detail_rows(db_path=DEFAULT_PRODUCT_DETAIL_DB):
+    if not os.path.exists(db_path):
+        raise FileNotFoundError(f"数据库不存在: {db_path}")
+
+    with sqlite3.connect(db_path) as conn:
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            """
+            SELECT
+                productId,
+                productName,
+                riskLevel,
+                productSize_list,
+                indiAmt_list,
+                indiAmtRem_list,
+                establishDate,
+                periodTerm,
+                nav_list,
+                fetchedAt
+            FROM product_details
+            ORDER BY fetchedAt DESC, productId ASC
+            """
+        ).fetchall()
+
+    return [build_product_detail_view_row(dict(row)) for row in rows]
+
+
+def parse_json_list(value):
+    if not value:
+        return []
+    try:
+        rows = json.loads(value)
+    except (TypeError, json.JSONDecodeError):
+        return []
+    if not isinstance(rows, list):
+        return []
+    rows = [row for row in rows if isinstance(row, dict)]
+    return sorted(rows, key=lambda row: parse_date(row.get('updateDate')))
+
+
+def parse_date(value):
+    if not value:
+        return datetime.min
+    text = str(value).replace('/', '-')
+    try:
+        return datetime.fromisoformat(text)
+    except ValueError:
+        return datetime.min
+
+
+def latest_entry(value, value_key):
+    rows = parse_json_list(value)
+    if not rows:
+        return {'value': '', 'updateDate': ''}
+    row = rows[-1]
+    return {
+        'value': str(row.get(value_key) or ''),
+        'updateDate': str(row.get('updateDate') or ''),
+    }
+
+
+def nav_view(value):
+    rows = parse_json_list(value)
+    latest = rows[-1] if rows else {}
+    previous = rows[-2] if len(rows) > 1 else {}
+    latest_nav = str(latest.get('nav') or '')
+    previous_nav = str(previous.get('nav') or '')
+    nav_dif = ''
+    try:
+        nav_dif = f"{(float(latest_nav) - float(previous_nav)) * 10000:.2f}"
+    except (TypeError, ValueError):
+        pass
+    return {
+        'nav': latest_nav,
+        'navDate': str(latest.get('updateDate') or ''),
+        'navDif': nav_dif,
+    }
+
+
+def days_between(start, end):
+    start_date = parse_date(start)
+    end_date = parse_date(end)
+    if start_date == datetime.min or end_date == datetime.min:
+        return ''
+    return str(max(0, (end_date - start_date).days) + 1)
+
+
+def annualized_yield(nav, establish_days):
+    try:
+        days = float(establish_days)
+        if days <= 0:
+            return ''
+        return f"{(float(nav) - 1) * 100 / days * 365:.2f}%"
+    except (TypeError, ValueError):
+        return ''
+
+
+def build_product_detail_view_row(row):
+    nav = nav_view(row.get('nav_list'))
+    product_size = latest_entry(row.get('productSize_list'), 'productSize')
+    indi_amt = latest_entry(row.get('indiAmt_list'), 'indiAmt')
+    indi_amt_rem = latest_entry(row.get('indiAmtRem_list'), 'indiAmtRem')
+    establish_days = days_between(row.get('establishDate'), nav['navDate'])
+    return {
+        'productId': row.get('productId') or '',
+        'productName': row.get('productName') or '',
+        'nav': nav['nav'],
+        'navDate': nav['navDate'],
+        'navDif': nav['navDif'],
+        'productSize': product_size['value'],
+        'productSizeDate': product_size['updateDate'],
+        'indiAmt': indi_amt['value'],
+        'indiAmtDate': indi_amt['updateDate'],
+        'indiAmtRem': indi_amt_rem['value'],
+        'indiAmtRemDate': indi_amt_rem['updateDate'],
+        'establishDate': row.get('establishDate') or '',
+        'establishDays': establish_days,
+        'annualizedYield': annualized_yield(nav['nav'], establish_days),
+        'periodTerm': row.get('periodTerm') or '',
+        'riskLevel': row.get('riskLevel') or '',
+        'fetchedAt': row.get('fetchedAt') or '',
+    }
+
+
+def load_product_raw_json(product_id, db_path=DEFAULT_PRODUCT_DETAIL_DB):
+    if not os.path.exists(db_path):
+        raise FileNotFoundError(f"数据库不存在: {db_path}")
+    with sqlite3.connect(db_path) as conn:
+        row = conn.execute(
+            "SELECT rawJson FROM product_details WHERE productId = ?",
+            (product_id,),
+        ).fetchone()
+    if not row:
+        return None
+    return row[0]
 
 
 def fetch_product_detail_bundle(product_id, sub_channel_id="31"):
@@ -258,10 +402,67 @@ def preview_detail():
     )
 
 
+@app.route('/nav-chart')
+def nav_chart():
+    return send_file(
+        os.path.join(os.path.dirname(__file__), 'nav_annualized_chart.html'),
+        mimetype='text/html; charset=utf-8',
+    )
+
+
+@app.route('/db-viewer')
+def db_viewer():
+    return send_file(
+        os.path.join(os.path.dirname(__file__), 'product_detail_db_viewer.html'),
+        mimetype='text/html; charset=utf-8',
+    )
+
+
+@app.route('/db-product-details', methods=['GET', 'OPTIONS'])
+def db_product_details():
+    if request.method == 'OPTIONS':
+        return add_cors(make_response()), 200
+    try:
+        products = load_product_detail_rows()
+        return add_cors(jsonify({
+            'success': True,
+            'database': DEFAULT_PRODUCT_DETAIL_DB,
+            'count': len(products),
+            'products': products,
+        }))
+    except Exception as e:
+        print(f"[数据库查看] 失败: {e}")
+        return add_cors(jsonify({'success': False, 'error': str(e)})), 500
+
+
+@app.route('/db-product-raw-json', methods=['GET', 'OPTIONS'])
+def db_product_raw_json():
+    if request.method == 'OPTIONS':
+        return add_cors(make_response()), 200
+    product_id = request.args.get('productId', '').strip().upper()
+    if not product_id:
+        return add_cors(jsonify({'success': False, 'error': '缺少 productId'})), 400
+    try:
+        raw_json = load_product_raw_json(product_id)
+        if raw_json is None:
+            return add_cors(jsonify({'success': False, 'error': '产品不存在'})), 404
+        return add_cors(jsonify({
+            'success': True,
+            'productId': product_id,
+            'rawJson': raw_json,
+        }))
+    except Exception as e:
+        print(f"[数据库rawJson] 失败: {e}")
+        return add_cors(jsonify({'success': False, 'error': str(e)})), 500
+
+
 if __name__ == '__main__':
     print(f"代理服务器运行在 http://127.0.0.1:{PORT}")
     print(f"测试: http://127.0.0.1:{PORT}/nav?code=WFZQQQPZRKA")
     print(f"详情页: http://127.0.0.1:{PORT}/detail-page")
     print(f"产品详情聚合: http://127.0.0.1:{PORT}/product-detail?code=WFXYJXRK06A")
+    # html
     print(f"桌面预览页: http://127.0.0.1:{PORT}/preview-detail")
+    print(f"年化净值图: http://127.0.0.1:{PORT}/nav-chart")
+    print(f"数据库查看器: http://127.0.0.1:{PORT}/db-viewer")
     app.run(host='127.0.0.1', port=PORT, debug=False)

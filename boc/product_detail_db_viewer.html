@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品详情数据库</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f6f7f9;
+    color: #1f2933;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    font-size: 14px;
+  }
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #fff;
+    border-bottom: 1px solid #dde3ea;
+  }
+  h1 {
+    margin: 0;
+    font-size: 18px;
+    white-space: nowrap;
+  }
+  .meta {
+    flex: 1;
+    min-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #6b7280;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  input {
+    flex: 0 0 min(520px, 34vw);
+    width: min(420px, 42vw);
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid #cfd7e2;
+    border-radius: 4px;
+    outline: none;
+  }
+  input:focus { border-color: #b4002a; }
+  button {
+    flex: 0 0 auto;
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid #cfd7e2;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+  }
+  button:hover { border-color: #b4002a; color: #b4002a; }
+  main { padding: 14px 16px 24px; }
+  .table-wrap {
+    max-height: calc(100vh - 98px);
+    overflow: auto;
+    background: #fff;
+    border: 1px solid #dde3ea;
+  }
+  table {
+    width: 100%;
+    min-width: 1580px;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  th, td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e8edf3;
+    border-right: 1px solid #eef2f6;
+    text-align: left;
+    vertical-align: top;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f1f4f8;
+    color: #4b5563;
+    font-weight: 700;
+  }
+  .th-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .sort-btn {
+    height: 24px;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-weight: 700;
+  }
+  .sort-btn:hover { color: #b4002a; }
+  .filter-btn {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    color: #6b7280;
+    line-height: 1;
+  }
+  .filter-btn.active {
+    border-color: #b4002a;
+    color: #b4002a;
+    background: #fff7f8;
+  }
+  .filter-panel {
+    position: fixed;
+    z-index: 10;
+    width: 260px;
+    max-height: 380px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #cfd7e2;
+    box-shadow: 0 16px 40px rgba(31, 41, 51, 0.18);
+  }
+  .filter-panel[hidden] { display: none; }
+  .filter-panel-head {
+    padding: 10px;
+    border-bottom: 1px solid #e8edf3;
+  }
+  .filter-panel-title {
+    margin-bottom: 8px;
+    color: #374151;
+    font-weight: 700;
+  }
+  .filter-search {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 30px;
+    padding: 0 8px;
+    border: 1px solid #cfd7e2;
+    border-radius: 4px;
+    outline: none;
+  }
+  .filter-actions {
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #e8edf3;
+  }
+  .filter-actions button,
+  .filter-panel-foot button {
+    height: 28px;
+    padding: 0 9px;
+    font-size: 12px;
+  }
+  .filter-values {
+    max-height: 220px;
+    overflow: auto;
+    padding: 6px 10px;
+  }
+  .filter-option {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 0;
+    color: #1f2933;
+    font-size: 12px;
+  }
+  .filter-option input {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+  }
+  .filter-option span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .filter-panel-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 9px 10px;
+    border-top: 1px solid #e8edf3;
+  }
+  tbody tr:hover { background: #fff7f8; }
+  td.name {
+    white-space: normal;
+    line-height: 1.35;
+  }
+  td.num { text-align: left; font-variant-numeric: tabular-nums; }
+  td.nav-dif {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  th.nav-dif .th-inner { justify-content: center; }
+  .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .risk { color: #b4002a; font-weight: 700; }
+  .nav-red { color: #b4002a; font-weight: 700; }
+  .nav-green { color: #087f5b; font-weight: 700; }
+  .nav-gray { color: #7b8794; font-weight: 700; }
+  .raw-cell { text-align: center; }
+  .list-cell {
+    min-width: 150px;
+    max-width: 220px;
+    white-space: normal;
+  }
+  .cell-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .amount-low { color: #b4002a; font-weight: 700; }
+  .empty {
+    padding: 30px;
+    color: #6b7280;
+    text-align: center;
+    background: #fff;
+    border: 1px solid #dde3ea;
+  }
+  .json-row td {
+    padding: 0;
+    background: #111827;
+    border-right: 0;
+  }
+  pre {
+    margin: 0;
+    max-height: 420px;
+    overflow: auto;
+    padding: 12px 14px;
+    color: #d6deeb;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre;
+  }
+  @media (max-width: 760px) {
+    header { flex-wrap: wrap; }
+    h1 { width: 100%; }
+    .meta { flex-basis: 100%; }
+    input { flex-basis: calc(100% - 70px); width: auto; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>产品详情数据库</h1>
+    <span class="meta" id="meta">读取中...</span>
+    <input id="search" type="search" placeholder="搜索产品代码、名称或任意字段">
+    <button id="reload" type="button">刷新</button>
+  </header>
+
+  <main id="app">
+    <div class="empty">正在读取数据库...</div>
+  </main>
+
+<script>
+  const state = {
+    rows: [],
+    filtered: [],
+    openedId: "",
+    openedField: "",
+    columnFilters: {},
+    activeFilterColumn: "",
+    filterSearch: "",
+    filterSearchCaret: 0,
+    pendingFilterValues: null,
+    sortKey: "",
+    sortDir: "asc",
+    rawJsonCache: {},
+  };
+
+  const app = document.getElementById("app");
+  const meta = document.getElementById("meta");
+  const search = document.getElementById("search");
+  const reload = document.getElementById("reload");
+
+  const columns = [
+    { key: "productName", label: "productName", width: "320px" },
+    {
+      key: "nav_dif",
+      label: "nav_dif",
+      className: "nav-dif",
+      width: "130px",
+      display: (row) => safe(row.navDif),
+      filterValue: (row) => safe(row.navDate),
+      sortValue: (row) => numberOrNull(row.navDif),
+    },
+    { key: "riskLevel", label: "riskLevel", sortable: false, width: "86px" },
+    { key: "periodTerm", label: "periodTerm", numericFilter: true, sortValue: (row) => numberOrNull(row.periodTerm), width: "96px" },
+    { key: "establishDate", label: "establishDate", filterable: false, width: "118px" },
+    { key: "establishDays", label: "成立天数", sortValue: (row) => numberOrNull(row.establishDays), filterable: false, width: "92px" },
+    { key: "annualizedYield", label: "成立年化", sortValue: (row) => numberOrNull(String(row.annualizedYield).replace("%", "")), filterable: false, width: "96px" },
+    { key: "productId", label: "productId", filterable: false, sortable: false, width: "150px" },
+    {
+      key: "indiAmtRem",
+      label: "indiAmtRem",
+      width: "128px",
+      display: (row) => compactAmount(row.indiAmtRem),
+      filterValue: (row) => safe(row.indiAmtRemDate),
+      sortValue: (row) => numberOrNull(row.indiAmtRem),
+      filterable: false,
+    },
+    {
+      key: "productSize",
+      label: "productSize",
+      width: "128px",
+      display: (row) => compactAmount(row.productSize),
+      filterValue: (row) => safe(row.productSizeDate),
+      sortValue: (row) => numberOrNull(row.productSize),
+      filterable: false,
+    },
+    {
+      key: "indiAmt",
+      label: "indiAmt",
+      width: "128px",
+      display: (row) => compactAmount(row.indiAmt),
+      filterValue: (row) => safe(row.indiAmtDate),
+      sortValue: (row) => numberOrNull(row.indiAmt),
+      filterable: false,
+    },
+    { key: "fetchedAt", label: "fetchedAt", filterable: false, sortable: false, width: "170px" },
+    { key: "rawJson", label: "rawJson", filterable: false, sortable: false, width: "78px" },
+  ];
+
+  function filterStateFor(key) {
+    if (!state.columnFilters[key]) {
+      state.columnFilters[key] = { selected: null, expr: "" };
+    }
+    return state.columnFilters[key];
+  }
+
+  function valuesForFilterPanel(key) {
+    const selected = filterStateFor(key).selected;
+    return selected === null ? new Set(uniqueValuesForColumn(key)) : new Set(selected);
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    }[char]));
+  }
+
+  function safe(value) {
+    return value === null || value === undefined || value === "" ? "-" : String(value);
+  }
+
+  function compactAmount(value) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return "-";
+    const tenThousand = parsed / 10000;
+    const amount = tenThousand > 100 ? parsed / 100000000 : tenThousand;
+    const unit = tenThousand > 100 ? "亿" : "万";
+    return `${amount.toLocaleString("zh-CN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}${unit}`;
+  }
+
+  function parseDate(value) {
+    const text = safe(value).replaceAll("/", "-");
+    const time = Date.parse(text);
+    return Number.isFinite(time) ? time : 0;
+  }
+
+  function amountClassFromValue(value) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed <= 100000000 ? "amount-low" : "";
+  }
+
+  function navDifClass(value) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return "";
+    if (parsed > 3) return "nav-red";
+    if (parsed < 0) return "nav-green";
+    if (parsed >= 0.2 && parsed <= 0.4) return "nav-gray";
+    return "";
+  }
+
+  function numberOrNull(value) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  function parseNumericExpr(expr) {
+    const match = String(expr || "").trim().match(/^(>=|<=|>|<|=)\s*(-?\d+(?:\.\d+)?)$/);
+    if (!match) return null;
+    return { op: match[1], value: Number(match[2]) };
+  }
+
+  function matchesNumericExpr(rawValue, expr) {
+    const parsed = parseNumericExpr(expr);
+    if (!parsed) return true;
+    const value = Number(rawValue);
+    if (!Number.isFinite(value)) return false;
+    if (parsed.op === ">") return value > parsed.value;
+    if (parsed.op === "<") return value < parsed.value;
+    if (parsed.op === ">=") return value >= parsed.value;
+    if (parsed.op === "<=") return value <= parsed.value;
+    return value === parsed.value;
+  }
+
+  async function load() {
+    reload.disabled = true;
+    reload.textContent = "读取中";
+    app.innerHTML = '<div class="empty">正在读取数据库...</div>';
+    try {
+      const response = await fetch("/db-product-details");
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || "读取失败");
+      state.rows = (data.products || []).map((row) => ({
+        ...row,
+        text: JSON.stringify(row).toLowerCase(),
+      }));
+      applyFilter();
+      updateMeta(data.database);
+    } catch (error) {
+      app.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
+      meta.textContent = "读取失败";
+    } finally {
+      reload.disabled = false;
+      reload.textContent = "刷新";
+    }
+  }
+
+  function applyFilter() {
+    const keyword = search.value.trim().toLowerCase();
+    state.filtered = state.rows.filter((row) => {
+      if (keyword && !row.text.includes(keyword)) return false;
+      return columns.every((column) => {
+        if (column.filterable === false) return true;
+        const filterState = filterStateFor(column.key);
+        if (column.numericFilter && filterState.expr && !matchesNumericExpr(filterValue(row, column.key), filterState.expr)) {
+          return false;
+        }
+        const selected = filterState.selected;
+        if (!selected) return true;
+        return selected.has(filterValue(row, column.key));
+      });
+    });
+    applySort();
+    render();
+    updateMeta();
+  }
+
+  function filterValue(row, key) {
+    const column = columns.find((item) => item.key === key);
+    if (column?.filterValue) return column.filterValue(row);
+    if (column?.display) return column.display(row);
+    return safe(row[key]);
+  }
+
+  function sortValue(row, key) {
+    const column = columns.find((item) => item.key === key);
+    if (column?.sortValue) return column.sortValue(row);
+    if (column?.display) return column.display(row);
+    return row[key];
+  }
+
+  function applySort() {
+    if (!state.sortKey) return;
+    const direction = state.sortDir === "desc" ? -1 : 1;
+    state.filtered.sort((left, right) => compareValues(sortValue(left, state.sortKey), sortValue(right, state.sortKey)) * direction);
+  }
+
+  function compareValues(left, right) {
+    if (left === null || left === undefined || left === "-") return 1;
+    if (right === null || right === undefined || right === "-") return -1;
+    const leftNumber = Number(left);
+    const rightNumber = Number(right);
+    if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber)) return leftNumber - rightNumber;
+    const leftDate = parseDate(left);
+    const rightDate = parseDate(right);
+    if (leftDate && rightDate) return leftDate - rightDate;
+    return String(left).localeCompare(String(right), "zh-CN");
+  }
+
+  function updateMeta(database) {
+    const dbText = database || meta.dataset.database || "";
+    if (database) meta.dataset.database = database;
+    const activeCount = columns.filter((column) => column.filterable !== false && isColumnFiltered(column.key)).length;
+    const filterText = activeCount ? ` | 已筛选 ${activeCount} 列` : "";
+    meta.textContent = `显示 ${state.filtered.length} / ${state.rows.length} 条${filterText}${dbText ? ` | ${dbText}` : ""}`;
+  }
+
+  function uniqueValuesForColumn(key) {
+    return [...new Set(state.rows.map((row) => filterValue(row, key)))].sort((a, b) => {
+      const na = Number(a);
+      const nb = Number(b);
+      if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+      return a.localeCompare(b, "zh-CN");
+    });
+  }
+
+  function isColumnFiltered(key) {
+    const filterState = filterStateFor(key);
+    return filterState.selected !== null || Boolean(filterState.expr);
+  }
+
+  function renderHeadCell(column) {
+    const canSort = column.sortable !== false;
+    const canFilter = column.filterable !== false;
+    return `
+      <th class="${escapeHtml(column.className || "")}">
+        <div class="th-inner">
+          ${canSort ? `
+            <button class="sort-btn" data-sort-column="${escapeHtml(column.key)}" type="button">
+              ${escapeHtml(column.label)}${sortMark(column.key)}
+            </button>
+          ` : `<span>${escapeHtml(column.label)}</span>`}
+          ${canFilter ? `
+            <button
+              class="filter-btn ${isColumnFiltered(column.key) ? "active" : ""}"
+              data-filter-column="${escapeHtml(column.key)}"
+              type="button"
+              title="筛选"
+            >▾</button>
+          ` : ""}
+        </div>
+      </th>
+    `;
+  }
+
+  function sortMark(key) {
+    if (state.sortKey !== key) return "";
+    return state.sortDir === "asc" ? " ▲" : " ▼";
+  }
+
+  function render() {
+    app.innerHTML = `
+      ${renderFilterPanel()}
+      <div class="table-wrap">
+        <table>
+          <colgroup>
+            ${columns.map((column) => `<col style="width:${escapeHtml(column.width || "auto")}">`).join("")}
+          </colgroup>
+          <thead>
+            <tr>${columns.map(renderHeadCell).join("")}</tr>
+          </thead>
+          <tbody>
+            ${state.filtered.length
+              ? state.filtered.map(renderRow).join("")
+              : `<tr><td colspan="${columns.length}" class="empty">没有匹配的数据。</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    `;
+    positionFilterPanel();
+  }
+
+  function renderFilterPanel() {
+    const column = columns.find((item) => item.key === state.activeFilterColumn);
+    if (!column || column.filterable === false) {
+      return '<div class="filter-panel" id="filterPanel" hidden></div>';
+    }
+    const values = uniqueValuesForColumn(column.key);
+    const selected = state.pendingFilterValues || valuesForFilterPanel(column.key);
+    const numericExpr = column.numericFilter && parseNumericExpr(state.filterSearch);
+    const visibleValues = numericExpr
+      ? values
+      : values.filter((value) => value.toLowerCase().includes(state.filterSearch.toLowerCase()));
+    return `
+      <div class="filter-panel" id="filterPanel" data-column="${escapeHtml(column.key)}">
+        <div class="filter-panel-head">
+          <div class="filter-panel-title">${escapeHtml(column.label)}</div>
+          <input class="filter-search" id="filterSearchInput" type="search" value="${escapeHtml(state.filterSearch)}" placeholder="${column.numericFilter ? "搜索值，或输入 >7 / <30" : "搜索值"}">
+        </div>
+        <div class="filter-actions">
+          <button type="button" data-filter-action="select-visible">全选当前</button>
+          <button type="button" data-filter-action="clear">清空</button>
+        </div>
+        <div class="filter-values">
+          ${visibleValues.length ? visibleValues.map((value) => `
+            <label class="filter-option">
+              <input type="checkbox" data-filter-value="${escapeHtml(value)}" ${selected.has(value) ? "checked" : ""}>
+              <span title="${escapeHtml(value)}">${escapeHtml(value)}</span>
+            </label>
+          `).join("") : '<div class="empty" style="border:0;padding:12px;">无匹配值</div>'}
+        </div>
+        <div class="filter-panel-foot">
+          <button type="button" data-filter-action="cancel">取消</button>
+          <button type="button" data-filter-action="apply">确定</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function positionFilterPanel() {
+    const panel = document.getElementById("filterPanel");
+    if (!panel || panel.hidden || !state.activeFilterColumn) return;
+    const button = document.querySelector(`[data-filter-column="${CSS.escape(state.activeFilterColumn)}"]`);
+    if (!button) return;
+    const rect = button.getBoundingClientRect();
+    const left = Math.min(rect.left, window.innerWidth - 276);
+    panel.style.left = `${Math.max(8, left)}px`;
+    panel.style.top = `${rect.bottom + 4}px`;
+    const input = document.getElementById("filterSearchInput");
+    if (input) {
+      input.focus();
+      const cursor = Math.min(state.filterSearchCaret ?? input.value.length, input.value.length);
+      input.setSelectionRange(cursor, cursor);
+    }
+  }
+
+  function renderRow(row) {
+    const openedField = row.productId === state.openedId ? state.openedField : "";
+    return `
+      <tr>
+        <td class="name">${escapeHtml(row.productName)}</td>
+        <td class="num nav-dif ${navDifClass(row.navDif)}">${escapeHtml(safe(row.navDif))}</td>
+        <td class="risk">${escapeHtml(safe(row.riskLevel))}</td>
+        <td>${escapeHtml(safe(row.periodTerm))}</td>
+        <td>${escapeHtml(safe(row.establishDate))}</td>
+        <td class="num">${escapeHtml(safe(row.establishDays))}</td>
+        <td class="num">${escapeHtml(safe(row.annualizedYield))}</td>
+        <td class="code">${escapeHtml(row.productId)}</td>
+        <td class="num ${amountClassFromValue(row.indiAmtRem)}">${escapeHtml(compactAmount(row.indiAmtRem))}</td>
+        <td class="num ${amountClassFromValue(row.productSize)}">${escapeHtml(compactAmount(row.productSize))}</td>
+        <td class="num ${amountClassFromValue(row.indiAmt)}">${escapeHtml(compactAmount(row.indiAmt))}</td>
+        <td>${escapeHtml(safe(row.fetchedAt))}</td>
+        <td class="raw-cell"><button type="button" data-id="${escapeHtml(row.productId)}" data-field="rawJson">${openedField === "rawJson" ? "收起" : "查看"}</button></td>
+      </tr>
+      ${openedField ? `
+        <tr class="json-row">
+          <td colspan="${columns.length}"><pre>${escapeHtml(rawJsonText(row.productId))}</pre></td>
+        </tr>
+      ` : ""}
+    `;
+  }
+
+  function formatRawJson(rawJson) {
+    try {
+      return JSON.stringify(JSON.parse(rawJson), null, 2);
+    } catch (error) {
+      return safe(rawJson);
+    }
+  }
+
+  function rawJsonText(productId) {
+    const cached = state.rawJsonCache[productId];
+    if (!cached) return "正在加载 rawJson...";
+    if (cached.error) return cached.error;
+    return formatRawJson(cached.rawJson);
+  }
+
+  async function ensureRawJson(productId) {
+    if (state.rawJsonCache[productId]) return;
+    state.rawJsonCache[productId] = { rawJson: "" };
+    render();
+    try {
+      const response = await fetch(`/db-product-raw-json?productId=${encodeURIComponent(productId)}`);
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || "读取 rawJson 失败");
+      state.rawJsonCache[productId] = { rawJson: data.rawJson || "{}" };
+    } catch (error) {
+      state.rawJsonCache[productId] = { error: error.message };
+    }
+    render();
+  }
+
+  search.addEventListener("input", applyFilter);
+  reload.addEventListener("click", load);
+  app.addEventListener("click", (event) => {
+    const sortButton = event.target.closest("[data-sort-column]");
+    if (sortButton) {
+      const column = sortButton.dataset.sortColumn;
+      if (columns.find((item) => item.key === column)?.sortable === false) return;
+      if (state.sortKey === column) {
+        state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+      } else {
+        state.sortKey = column;
+        state.sortDir = "asc";
+      }
+      applyFilter();
+      return;
+    }
+
+    const filterButton = event.target.closest("[data-filter-column]");
+    if (filterButton) {
+      const column = filterButton.dataset.filterColumn;
+      if (columns.find((item) => item.key === column)?.filterable === false) return;
+      if (state.activeFilterColumn === column) {
+        state.activeFilterColumn = "";
+        state.pendingFilterValues = null;
+        state.filterSearch = "";
+        state.filterSearchCaret = 0;
+      } else {
+        state.activeFilterColumn = column;
+        state.pendingFilterValues = valuesForFilterPanel(column);
+        const activeColumn = columns.find((item) => item.key === column);
+        state.filterSearch = activeColumn?.numericFilter ? filterStateFor(column).expr : "";
+        state.filterSearchCaret = 0;
+      }
+      render();
+      return;
+    }
+
+    const actionButton = event.target.closest("[data-filter-action]");
+    if (actionButton) {
+      handleFilterAction(actionButton.dataset.filterAction);
+      return;
+    }
+
+    const button = event.target.closest("button[data-id]");
+    if (!button) return;
+    const id = button.dataset.id;
+    const field = button.dataset.field || "";
+    const sameCell = state.openedId === id && state.openedField === field;
+    state.openedId = sameCell ? "" : id;
+    state.openedField = sameCell ? "" : field;
+    render();
+    if (!sameCell && field === "rawJson") {
+      ensureRawJson(id);
+    }
+  });
+  app.addEventListener("input", (event) => {
+    const searchInput = event.target.closest(".filter-search");
+    if (searchInput) {
+      if (event.isComposing) return;
+      state.filterSearch = searchInput.value;
+      state.filterSearchCaret = searchInput.selectionStart ?? searchInput.value.length;
+      render();
+      return;
+    }
+  });
+  app.addEventListener("compositionend", (event) => {
+    const searchInput = event.target.closest(".filter-search");
+    if (!searchInput) return;
+    state.filterSearch = searchInput.value;
+    state.filterSearchCaret = searchInput.selectionStart ?? searchInput.value.length;
+    render();
+  });
+  app.addEventListener("change", (event) => {
+    const checkbox = event.target.closest("[data-filter-value]");
+    if (!checkbox || !state.activeFilterColumn) return;
+    const selected = new Set(
+      [...app.querySelectorAll("[data-filter-value]:checked")].map((item) => item.dataset.filterValue)
+    );
+    state.pendingFilterValues = selected;
+  });
+  document.addEventListener("click", (event) => {
+    if (!state.activeFilterColumn) return;
+    if (event.target.closest(".filter-panel") || event.target.closest("[data-filter-column]")) return;
+    state.activeFilterColumn = "";
+    state.filterSearch = "";
+    state.filterSearchCaret = 0;
+    state.pendingFilterValues = null;
+    render();
+  });
+  window.addEventListener("resize", positionFilterPanel);
+
+  function handleFilterAction(action) {
+    const column = state.activeFilterColumn;
+    if (!column) return;
+    if (action === "cancel") {
+      state.activeFilterColumn = "";
+      state.filterSearch = "";
+      state.filterSearchCaret = 0;
+      state.pendingFilterValues = null;
+      render();
+      return;
+    }
+    if (action === "clear") {
+      state.pendingFilterValues = new Set();
+      state.filterSearch = "";
+      state.filterSearchCaret = 0;
+      render();
+      return;
+    }
+    if (action === "select-visible") {
+      const visible = [...app.querySelectorAll("[data-filter-value]")].map((item) => item.dataset.filterValue);
+      state.pendingFilterValues = new Set(visible);
+      render();
+      return;
+    }
+    if (action === "apply") {
+      const columnConfig = columns.find((item) => item.key === column);
+      const filterState = filterStateFor(column);
+      if (columnConfig?.numericFilter && parseNumericExpr(state.filterSearch)) {
+        filterState.expr = state.filterSearch.trim();
+        filterState.selected = null;
+        state.activeFilterColumn = "";
+        state.filterSearch = "";
+        state.filterSearchCaret = 0;
+        state.pendingFilterValues = null;
+        applyFilter();
+        return;
+      }
+      filterState.expr = "";
+      const values = uniqueValuesForColumn(column);
+      const selected = state.pendingFilterValues || valuesForFilterPanel(column);
+      if (selected && selected.size === values.length) {
+        filterState.selected = null;
+      } else {
+        filterState.selected = new Set(selected);
+      }
+      state.activeFilterColumn = "";
+      state.filterSearch = "";
+      state.filterSearchCaret = 0;
+      state.pendingFilterValues = null;
+      applyFilter();
+    }
+  }
+
+  load();
+</script>
+</body>
+</html>
