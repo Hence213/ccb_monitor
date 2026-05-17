@@ -17,36 +17,31 @@ from flask import Flask, request, jsonify, make_response, send_file
 import requests
 import json
 import os
-import random
 import sqlite3
+import sys
 from datetime import datetime
+from pathlib import Path
 
-from fetch_boc_nav import DEFAULT_COOKIE, DEFAULT_HTML_PATH, refresh_html_data
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from boc.common import (
+    DEFAULT_DB_PATH,
+    DEFAULT_NAV_COOKIE as DEFAULT_COOKIE,
+    MOBILE_HEADERS,
+    extract_nav_list,
+    post_boc_method,
+)
+from boc.fetch_boc_nav import DEFAULT_HTML_PATH, refresh_html_data
 
 app = Flask(__name__)
 PORT = int(os.environ.get('BOC_PROXY_PORT', '8082'))
-BOC_URL_BASE = "https://ebsnew.boc.cn/BMPS/_bfwajax.do"
 DEFAULT_DETAIL_URL = (
     "https://ebsnew.boc.cn/preview/bocphone/VueLocalCli4/bocFinanceDetail/index.html"
     "#/productDetail?functionCode=bocFinanceProductDetail&productId=YIXTT076B"
 )
-DEFAULT_PRODUCT_DETAIL_DB = os.path.join(
-    os.path.dirname(__file__),
-    'data',
-    'boc_product_detail.db',
-)
-
-HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Linux; Android 9; 2410DPN6CC Build/PQ3B.190801.03251327; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36',
-    'Accept': 'application/json',
-    # 不发送 Accept-Encoding，让服务器返回明文；requests 会自动处理 gzip
-    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    'bfw-ctrl': 'json',
-    'Origin': 'https://ebsnew.boc.cn',
-    'X-Requested-With': 'com.android.browser',
-    'Referer': 'https://ebsnew.boc.cn/preview/bocphone/VueLocalCli4/bocFinanceDetail/index.html',
-    'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
-}
+DEFAULT_PRODUCT_DETAIL_DB = str(DEFAULT_DB_PATH)
+HEADERS = MOBILE_HEADERS
 
 MOBILE_PAGE_HEADERS = {
     'User-Agent': HEADERS['User-Agent'],
@@ -60,11 +55,6 @@ MOBILE_PAGE_HEADERS = {
 }
 
 
-def build_boc_url():
-    rnd = random.SystemRandom().randint(1000, 99999999)
-    return f"{BOC_URL_BASE}?rnd={rnd}&_locale=zh_CN"
-
-
 def add_cors(resp):
     resp.headers['Access-Control-Allow-Origin'] = '*'
     resp.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
@@ -74,52 +64,15 @@ def add_cors(resp):
 
 def fetch_boc(prod_code):
     """请求中银API，返回解析后的数据列表"""
-    payload = {
-        "header": {
-            "agent": "X-ANDR", "version": "3.1.9", "device": "android",
-            "platform": "android", "plugins": "5", "page": "6",
-            "local": "zh_CN", "uuid": "177842367864015718698",
-            "ext": "8", "cipherType": "0", "appSequence": ""
-        },
-        "method": "PsnxWmpHistoryNavQueryOutlay",
-        "params": {"productId": prod_code, "subChannelId": "31", "circle": "3Y"}
-    }
-    body = "json=" + requests.utils.quote(json.dumps(payload, ensure_ascii=False)) # type: ignore
     print(f"[代理] 请求产品代码: {prod_code}")
-    resp = requests.post(build_boc_url(), data=body, headers=HEADERS, timeout=15, verify=True)
-    print(f"[代理] HTTP状态码: {resp.status_code}")
-    data = resp.json()
-    # 实际格式: {"result": {"list": [...]}}
-    if data and 'result' in data and 'list' in data['result']:
-        return data['result']['list']
-    if data and 'response' in data and 'data' in data['response']:
-        return data['response']['data'].get('navList', [])
-    return []
-
-
-def build_mobile_payload(method, params):
-    return {
-        "header": {
-            "agent": "X-ANDR", "version": "3.1.9", "device": "android",
-            "platform": "android", "plugins": "5", "page": "6",
-            "local": "zh_CN", "uuid": "177842367864015718698",
-            "ext": "8", "cipherType": "0", "appSequence": ""
-        },
-        "method": method,
-        "params": params,
-    }
-
-
-def post_boc_method(method, params, timeout=20):
-    payload = build_mobile_payload(method, params)
-    resp = requests.post(
-        build_boc_url(),
+    data = post_boc_method(
+        "PsnxWmpHistoryNavQueryOutlay",
+        {"productId": prod_code, "subChannelId": "31", "circle": "3Y"},
+        timeout=15,
         headers=HEADERS,
-        data={"json": json.dumps(payload, ensure_ascii=False, separators=(",", ":"))},
-        timeout=timeout,
+        uuid="177842367864015718698",
     )
-    resp.raise_for_status()
-    return resp.json()
+    return extract_nav_list(data)
 
 
 def result_or_none(response_json):

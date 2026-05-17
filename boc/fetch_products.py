@@ -53,7 +53,8 @@ DEFAULT_EXCLUDE_KEYWORDS = ["封闭", "对公专属", "机构专属",
                             ]
 
 DEFAULT_ROWS_PER_PAGE = 2000
-DEFAULT_OUTPUT_PATH = "./boc_products.csv"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_OUTPUT_PATH = os.path.join(SCRIPT_DIR, "database", "boc_products.csv")
 
 def fetch_page(url, headers, query_filters, start, rows):
     payload = json.dumps({

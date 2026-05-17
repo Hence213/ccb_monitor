@@ -58,6 +58,10 @@
     cursor: pointer;
   }
   button:hover { border-color: #b4002a; color: #b4002a; }
+  .path-toggle {
+    padding: 0 9px;
+    font-size: 12px;
+  }
   main { padding: 14px 16px 24px; }
   .table-wrap {
     max-height: calc(100vh - 98px);
@@ -94,10 +98,19 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+    min-width: 0;
+  }
+  .th-inner > span,
+  .sort-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
   }
   .sort-btn {
     height: 24px;
-    min-width: 0;
     padding: 0;
     border: 0;
     background: transparent;
@@ -106,6 +119,7 @@
   }
   .sort-btn:hover { color: #b4002a; }
   .filter-btn {
+    flex: 0 0 24px;
     width: 24px;
     height: 24px;
     padding: 0;
@@ -205,7 +219,6 @@
   }
   th.nav-dif .th-inner { justify-content: center; }
   .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-  .risk { color: #b4002a; font-weight: 700; }
   .nav-red { color: #b4002a; font-weight: 700; }
   .nav-green { color: #087f5b; font-weight: 700; }
   .nav-gray { color: #7b8794; font-weight: 700; }
@@ -222,6 +235,7 @@
     gap: 8px;
   }
   .amount-low { color: #b4002a; font-weight: 700; }
+  .amount-zero { color: #087f5b; font-weight: 700; }
   .empty {
     padding: 30px;
     color: #6b7280;
@@ -256,6 +270,7 @@
   <header>
     <h1>产品详情数据库</h1>
     <span class="meta" id="meta">读取中...</span>
+    <button class="path-toggle" id="togglePath" type="button" hidden>隐藏路径</button>
     <input id="search" type="search" placeholder="搜索产品代码、名称或任意字段">
     <button id="reload" type="button">刷新</button>
   </header>
@@ -275,8 +290,9 @@
     filterSearch: "",
     filterSearchCaret: 0,
     pendingFilterValues: null,
-    sortKey: "",
-    sortDir: "asc",
+    sortKey: "nav_dif",
+    sortDir: "desc",
+    showDatabasePath: true,
     rawJsonCache: {},
   };
 
@@ -284,6 +300,7 @@
   const meta = document.getElementById("meta");
   const search = document.getElementById("search");
   const reload = document.getElementById("reload");
+  const togglePath = document.getElementById("togglePath");
 
   const columns = [
     { key: "productName", label: "productName", width: "320px" },
@@ -296,8 +313,8 @@
       filterValue: (row) => safe(row.navDate),
       sortValue: (row) => numberOrNull(row.navDif),
     },
-    { key: "riskLevel", label: "riskLevel", sortable: false, width: "86px" },
-    { key: "periodTerm", label: "periodTerm", numericFilter: true, sortValue: (row) => numberOrNull(row.periodTerm), width: "96px" },
+    { key: "riskLevel", label: "riskLevel", sortable: false, width: "132px" },
+    { key: "periodTerm", label: "periodTerm", numericFilter: true, sortValue: (row) => numberOrNull(row.periodTerm), width: "140px" },
     { key: "establishDate", label: "establishDate", filterable: false, width: "118px" },
     { key: "establishDays", label: "成立天数", sortValue: (row) => numberOrNull(row.establishDays), filterable: false, width: "92px" },
     { key: "annualizedYield", label: "成立年化", sortValue: (row) => numberOrNull(String(row.annualizedYield).replace("%", "")), filterable: false, width: "96px" },
@@ -378,6 +395,7 @@
   }
 
   function amountClassFromValue(value) {
+    if (compactAmount(value) === "0.00万") return "amount-zero";
     const parsed = Number(value);
     return Number.isFinite(parsed) && parsed <= 100000000 ? "amount-low" : "";
   }
@@ -494,7 +512,10 @@
     if (database) meta.dataset.database = database;
     const activeCount = columns.filter((column) => column.filterable !== false && isColumnFiltered(column.key)).length;
     const filterText = activeCount ? ` | 已筛选 ${activeCount} 列` : "";
-    meta.textContent = `显示 ${state.filtered.length} / ${state.rows.length} 条${filterText}${dbText ? ` | ${dbText}` : ""}`;
+    const pathText = state.showDatabasePath && dbText ? ` | ${dbText}` : "";
+    meta.textContent = `显示 ${state.filtered.length} / ${state.rows.length} 条${filterText}${pathText}`;
+    togglePath.hidden = !dbText;
+    togglePath.textContent = state.showDatabasePath ? "隐藏路径" : "显示路径";
   }
 
   function uniqueValuesForColumn(key) {
@@ -622,7 +643,7 @@
       <tr>
         <td class="name">${escapeHtml(row.productName)}</td>
         <td class="num nav-dif ${navDifClass(row.navDif)}">${escapeHtml(safe(row.navDif))}</td>
-        <td class="risk">${escapeHtml(safe(row.riskLevel))}</td>
+        <td>${escapeHtml(safe(row.riskLevel))}</td>
         <td>${escapeHtml(safe(row.periodTerm))}</td>
         <td>${escapeHtml(safe(row.establishDate))}</td>
         <td class="num">${escapeHtml(safe(row.establishDays))}</td>
@@ -674,6 +695,10 @@
 
   search.addEventListener("input", applyFilter);
   reload.addEventListener("click", load);
+  togglePath.addEventListener("click", () => {
+    state.showDatabasePath = !state.showDatabasePath;
+    updateMeta();
+  });
   app.addEventListener("click", (event) => {
     const sortButton = event.target.closest("[data-sort-column]");
     if (sortButton) {

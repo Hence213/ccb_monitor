@@ -12,126 +12,46 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import os
-import random
 import sqlite3
+import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import requests
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from boc.common import (
+    DEFAULT_DB_PATH,
+    DEFAULT_NAV_COOKIE as DEFAULT_COOKIE,
+    DEFAULT_PRODUCTS_CSV,
+    MOBILE_HEADERS,
+    connect_product_detail_db,
+    extract_nav_list,
+    merge_keyed_list,
+    post_boc_method,
+    read_products_csv,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_HTML_PATH = SCRIPT_DIR / "nav_annualized_chart.html"
-DEFAULT_PRODUCTS_CSV = SCRIPT_DIR / "data" / "boc_products.csv"
-DEFAULT_DB_PATH = SCRIPT_DIR / "data" / "boc_product_detail.db"
-BOC_URL_BASE = "https://ebsnew.boc.cn/BMPS/_bfwajax.do"
 EMBED_START = '<script id="embeddedNavData" type="application/json">'
 EMBED_END = "</script>"
 
-DEFAULT_COOKIE = (
-    "webcluster=244689a35eac10439a78a059ba4ab8c3; "
-    "webcluster=d27f814012c5239d99b97a5ffd5c47a1; "
-    "JSESSIONID=06A1DFA101685221D36018CC470D05EF"
-)
-
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Linux; Android 9; 2410DPN6CC Build/PQ3B.190801.03251327; wv) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 "
-        "Mobile Safari/537.36"
-    ),
-    "Accept": "application/json",
-    "Accept-Encoding": "gzip, deflate",
-    "Content-Type": "application/x-www-form-urlencoded",
-    "bfw-ctrl": "json",
-    "Origin": "https://ebsnew.boc.cn",
-    "X-Requested-With": "com.android.browser",
-    "Sec-Fetch-Site": "same-origin",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Dest": "empty",
-    "Referer": "https://ebsnew.boc.cn/preview/bocphone/VueLocalCli4/bocFinanceDetail/index.html",
-    "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-}
-
-
-def build_boc_url() -> str:
-    rnd = random.SystemRandom().randint(1000, 99999999)
-    return f"{BOC_URL_BASE}?rnd={rnd}&_locale=zh_CN"
-
-
-def build_payload(product_id: str, circle: str, sub_channel_id: str) -> dict[str, Any]:
-    return {
-        "header": {
-            "agent": "X-ANDR",
-            "version": "3.1.9",
-            "device": "android",
-            "platform": "android",
-            "plugins": "5",
-            "page": "6",
-            "local": "zh_CN",
-            "uuid": "177842367864015718698",
-            "ext": "8",
-            "cipherType": "0",
-            "appSequence": "",
-        },
-        "method": "PsnxWmpHistoryNavQueryOutlay",
-        "params": {
-            "productId": product_id,
-            "subChannelId": sub_channel_id,
-            "circle": circle,
-        },
-    }
-
-
-def extract_nav_list(response_json: Any) -> list[dict[str, Any]]:
-    if isinstance(response_json, list):
-        return response_json
-
-    if not isinstance(response_json, dict):
-        return []
-
-    result = response_json.get("result")
-    if isinstance(result, dict) and isinstance(result.get("list"), list):
-        return result["list"]
-    if isinstance(result, list):
-        return result
-
-    response = response_json.get("response")
-    if isinstance(response, dict):
-        data = response.get("data")
-        if isinstance(data, dict) and isinstance(data.get("navList"), list):
-            return data["navList"]
-        if isinstance(data, list):
-            return data
-
-    data = response_json.get("data")
-    if isinstance(data, list):
-        return data
-    if isinstance(data, dict) and isinstance(data.get("navList"), list):
-        return data["navList"]
-
-    return []
-
 
 def fetch_nav(product_id: str, circle: str, sub_channel_id: str, cookie: str, timeout: int) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    headers = dict(HEADERS)
-    if cookie:
-        headers["Cookie"] = cookie
-
-    payload = build_payload(product_id, circle, sub_channel_id)
-    resp = requests.post(
-        build_boc_url(),
-        headers=headers,
-        data={"json": json.dumps(payload, ensure_ascii=False, separators=(",", ":"))},
+    response_json = post_boc_method(
+        "PsnxWmpHistoryNavQueryOutlay",
+        {"productId": product_id, "subChannelId": sub_channel_id, "circle": circle},
+        cookie=cookie,
         timeout=timeout,
+        headers=MOBILE_HEADERS,
+        uuid="177842367864015718698",
     )
-    resp.raise_for_status()
-    response_json = resp.json()
     nav_list = extract_nav_list(response_json)
     return response_json, nav_list
 
@@ -162,56 +82,6 @@ def embed_data(html_path: Path, embedded_data: dict[str, Any]) -> None:
     html_path.write_text(html, encoding="utf-8")
 
 
-def ensure_db_schema(conn: sqlite3.Connection) -> None:
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS product_details (
-            productId TEXT PRIMARY KEY,
-            productName TEXT,
-            riskLevel TEXT,
-            productSize_list TEXT NOT NULL DEFAULT '[]',
-            indiAmt_list TEXT NOT NULL DEFAULT '[]',
-            indiAmtRem_list TEXT NOT NULL DEFAULT '[]',
-            establishDate TEXT,
-            periodTerm TEXT NOT NULL DEFAULT '1',
-            nav_list TEXT NOT NULL DEFAULT '[]',
-            fetchedAt TEXT NOT NULL,
-            rawJson TEXT NOT NULL
-        )
-        """
-    )
-
-
-def read_products_csv(products_csv: Path) -> list[dict[str, str]]:
-    with products_csv.open("r", encoding="utf-8-sig", newline="") as handle:
-        reader = csv.DictReader(handle)
-        products: list[dict[str, str]] = []
-        seen: set[str] = set()
-        for row in reader:
-            product_id = (row.get("产品代码") or "").strip().upper()
-            if not product_id or product_id in seen:
-                continue
-            seen.add(product_id)
-            products.append(
-                {
-                    "productId": product_id,
-                    "productName": (row.get("产品名称") or "").strip(),
-                    "riskLevel": (row.get("风险等级") or "").strip(),
-                }
-            )
-        return products
-
-
-def read_json_list(value: Any) -> list[dict[str, str]]:
-    if not value:
-        return []
-    try:
-        rows = json.loads(str(value))
-    except json.JSONDecodeError:
-        return []
-    return [row for row in rows if isinstance(row, dict)] if isinstance(rows, list) else []
-
-
 def normalize_nav_rows(nav_list: list[dict[str, Any]]) -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
     for row in nav_list:
@@ -223,14 +93,7 @@ def normalize_nav_rows(nav_list: list[dict[str, Any]]) -> list[dict[str, str]]:
 
 
 def merge_nav_list(existing: Any, additions: list[dict[str, str]]) -> str:
-    merged: dict[str, dict[str, str]] = {}
-    for row in [*read_json_list(existing), *additions]:
-        update_date = str(row.get("updateDate", "")).strip()
-        nav = row.get("nav")
-        if not update_date or nav is None or str(nav).strip() == "":
-            continue
-        merged[update_date] = {"updateDate": update_date, "nav": str(nav).strip()}
-    return json.dumps([merged[key] for key in sorted(merged)], ensure_ascii=False, separators=(",", ":"))
+    return merge_keyed_list(existing, additions, value_key="nav")
 
 
 def upsert_product_shells(conn: sqlite3.Connection, products: list[dict[str, str]], fetched_at: str) -> None:
@@ -255,10 +118,8 @@ def save_nav_to_db(
     nav_by_product: dict[str, list[dict[str, str]]],
 ) -> None:
     fetched_at = datetime.now().isoformat(timespec="seconds")
-    db_path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(db_path)
+    conn = connect_product_detail_db(db_path)
     try:
-        ensure_db_schema(conn)
         upsert_product_shells(conn, products, fetched_at)
         for product_id, nav_rows in nav_by_product.items():
             existing = conn.execute(
