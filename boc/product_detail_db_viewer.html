@@ -86,6 +86,71 @@
     height: 13px;
     stroke: currentColor;
   }
+  .note-toggle.has-note {
+    border-color: #b4002a;
+    color: #b4002a;
+    background: #fff7f8;
+  }
+  .note-popover {
+    position: fixed;
+    top: 58px;
+    right: 16px;
+    z-index: 20;
+    width: min(360px, calc(100vw - 32px));
+    background: #fff;
+    border: 1px solid #cfd7e2;
+    box-shadow: 0 18px 42px rgba(31, 41, 51, 0.2);
+  }
+  .note-popover[hidden] { display: none; }
+  .note-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 10px;
+    border-bottom: 1px solid #e8edf3;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: move;
+    user-select: none;
+  }
+  .note-close {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .note-body {
+    padding: 10px;
+  }
+  .note-text {
+    display: block;
+    width: 100%;
+    min-height: 150px;
+    resize: vertical;
+    padding: 9px 10px;
+    border: 1px solid #cfd7e2;
+    border-radius: 4px;
+    outline: none;
+    color: #1f2933;
+    font: inherit;
+    line-height: 1.5;
+  }
+  .note-text:focus { border-color: #b4002a; }
+  .note-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 9px;
+  }
+  .note-status {
+    min-width: 0;
+    color: #6b7280;
+    font-size: 12px;
+  }
   .view-toggle {
     font-size: 12px;
   }
@@ -98,7 +163,7 @@
   }
   table {
     width: 100%;
-    min-width: 1580px;
+    min-width: 1460px;
     border-collapse: collapse;
     table-layout: fixed;
   }
@@ -235,8 +300,8 @@
   tbody tr:hover { background: #fff7f8; }
   th.row-index,
   td.row-index {
-    width: 56px;
-    min-width: 56px;
+    width: 44px;
+    min-width: 44px;
     text-align: center;
     color: #6b7280;
     font-variant-numeric: tabular-nums;
@@ -245,7 +310,51 @@
     white-space: normal;
     line-height: 1.35;
   }
+  .product-name-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+  }
+  .product-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .product-id-sub,
+  .cell-sub {
+    display: block;
+    margin-top: 3px;
+    color: #8a94a3;
+    font-size: 11px;
+    line-height: 1.2;
+  }
+  .establish-days-main {
+    display: block;
+    text-align: center;
+  }
+  .risk-pill {
+    flex: 0 0 auto;
+    min-width: 24px;
+    max-width: 54px;
+    padding: 1px 7px;
+    border: 1px solid #d6dde6;
+    border-radius: 999px;
+    color: #5b6573;
+    background: #f8fafc;
+    font-size: 11px;
+    line-height: 1.45;
+    text-align: center;
+    white-space: nowrap;
+  }
   td.num { text-align: left; font-variant-numeric: tabular-nums; }
+  .amount-pair {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .amount-sep { color: #a8b0bb; }
   td.nav-dif {
     text-align: center;
     line-height: 1.18;
@@ -255,29 +364,16 @@
   .detail-table td {
     height: 45px;
   }
-  .detail-table th:nth-child(1),
-  .detail-table td:nth-child(1),
-  .detail-table th:nth-child(2),
-  .detail-table td:nth-child(2) {
+  .detail-table .fixed-col {
     position: sticky;
-    z-index: 1;
+    z-index: 2;
     background: #fff;
   }
-  .detail-table th:nth-child(1),
-  .detail-table td:nth-child(1) {
-    left: 0;
-  }
-  .detail-table th:nth-child(2),
-  .detail-table td:nth-child(2) {
-    left: 56px;
-  }
-  .detail-table th:nth-child(1),
-  .detail-table th:nth-child(2) {
-    z-index: 3;
+  .detail-table th.fixed-col {
+    z-index: 4;
     background: #f1f4f8;
   }
-  .detail-table tbody tr:hover td:nth-child(1),
-  .detail-table tbody tr:hover td:nth-child(2) { background: #fff7f8; }
+  .detail-table tbody tr:hover .fixed-col { background: #fff7f8; }
   .nav-dif-value {
     display: block;
     font-size: 18px;
@@ -294,7 +390,6 @@
   .nav-red { color: #b4002a; font-weight: 700; }
   .nav-green { color: #087f5b; font-weight: 700; }
   .nav-gray { color: #7b8794; font-weight: 700; }
-  .raw-cell { text-align: center; }
   .list-cell {
     min-width: 150px;
     max-width: 220px;
@@ -332,6 +427,11 @@
     white-space: nowrap;
   }
   .nav-diff-sort-btn:hover { color: #b4002a; }
+  .nav-diff-inline-head {
+    text-align: center;
+    color: #4b5563;
+    font-size: 12px;
+  }
   .nav-diff-stat,
   .nav-diff-page-btn {
     height: 26px;
@@ -375,38 +475,6 @@
     padding: 6px 8px;
     font-size: 12px;
   }
-  .nav-diff-table {
-    min-width: max(100%, 960px);
-    table-layout: fixed;
-  }
-  .nav-diff-table th:nth-child(1),
-  .nav-diff-table td:nth-child(1),
-  .nav-diff-table th:nth-child(2),
-  .nav-diff-table td:nth-child(2) {
-    position: sticky;
-    z-index: 1;
-    background: #fff;
-  }
-  .nav-diff-table th:nth-child(1),
-  .nav-diff-table td:nth-child(1) {
-    left: 0;
-  }
-  .nav-diff-table th:nth-child(2),
-  .nav-diff-table td:nth-child(2) {
-    left: 56px;
-  }
-  .nav-diff-table th:nth-child(1),
-  .nav-diff-table th:nth-child(2) {
-    z-index: 3;
-    background: #f1f4f8;
-  }
-  .nav-diff-table tbody tr:hover td:nth-child(1),
-  .nav-diff-table tbody tr:hover td:nth-child(2) { background: #fff7f8; }
-  .nav-diff-date {
-    width: 82px;
-    text-align: center;
-    font-size: 12px;
-  }
   td.nav-diff-cell {
     text-align: center;
     font-variant-numeric: tabular-nums;
@@ -429,26 +497,12 @@
     background: #fff;
     border: 1px solid #dde3ea;
   }
-  .json-row td {
-    padding: 0;
-    background: #111827;
-    border-right: 0;
-  }
-  pre {
-    margin: 0;
-    max-height: 420px;
-    overflow: auto;
-    padding: 12px 14px;
-    color: #d6deeb;
-    font-size: 12px;
-    line-height: 1.5;
-    white-space: pre;
-  }
   @media (max-width: 760px) {
     header { flex-wrap: wrap; }
     h1 { width: 100%; }
     .meta-group { flex-basis: 100%; }
     input { flex-basis: calc(100% - 70px); width: auto; }
+    .note-popover { top: 106px; }
   }
 </style>
 </head>
@@ -459,10 +513,24 @@
       <span class="meta" id="meta">读取中...</span>
       <button class="path-toggle" id="togglePath" type="button" title="显示路径" aria-label="显示路径" hidden></button>
     </span>
-    <button class="view-toggle" id="toggleView" type="button">近一年净值变化</button>
+    <button class="note-toggle" id="noteToggle" type="button">笔记</button>
     <input id="search" type="search" placeholder="搜索产品代码、名称或任意字段">
     <button id="reload" type="button">刷新</button>
   </header>
+
+  <div class="note-popover" id="notePopover" hidden>
+    <div class="note-head" id="noteHead">
+      <span>便笺</span>
+      <button class="note-close" id="noteClose" type="button" aria-label="关闭笔记">×</button>
+    </div>
+    <div class="note-body">
+      <textarea class="note-text" id="noteText" placeholder="输入笔记内容"></textarea>
+      <div class="note-foot">
+        <span class="note-status" id="noteStatus"></span>
+        <button id="noteSave" type="button">保存</button>
+      </div>
+    </div>
+  </div>
 
   <main id="app">
     <div class="empty">正在读取数据库...</div>
@@ -472,8 +540,6 @@
   const state = {
     rows: [],
     filtered: [],
-    openedId: "",
-    openedField: "",
     columnFilters: {},
     activeFilterColumn: "",
     filterSearch: "",
@@ -482,15 +548,11 @@
     sortKey: "nav_dif",
     sortDir: "desc",
     showDatabasePath: false,
-    rawJsonCache: {},
-    viewMode: "details",
     navDiffData: null,
-    navDiffLoading: false,
     navDiffPage: 0,
-    navDiffPageSize: 14,
+    navDiffPageSize: 7,
     navDiffDetailThreshold: "",
     navDiffScrollTop: 0,
-    navDiffNameSortDir: "asc",
     navDiffValueSortDate: "",
     navDiffValueSortDir: "desc",
     productOrderIds: [],
@@ -502,29 +564,42 @@
   const search = document.getElementById("search");
   const reload = document.getElementById("reload");
   const togglePath = document.getElementById("togglePath");
-  const toggleView = document.getElementById("toggleView");
+  const noteToggle = document.getElementById("noteToggle");
+  const notePopover = document.getElementById("notePopover");
+  const noteHead = document.getElementById("noteHead");
+  const noteClose = document.getElementById("noteClose");
+  const noteText = document.getElementById("noteText");
+  const noteSave = document.getElementById("noteSave");
+  const noteStatus = document.getElementById("noteStatus");
+  const noteState = {
+    content: "",
+    left: null,
+    top: null,
+    dragging: false,
+    dragOffsetX: 0,
+    dragOffsetY: 0,
+  };
 
   const columns = [
-    { key: "productName", label: "productName", width: "320px" },
+    { key: "productName", label: "productName", width: "260px", fixedLeft: 44 },
     {
       key: "nav_dif",
       label: "nav_dif",
       className: "nav-dif",
-      width: "130px",
+      width: "106px",
+      fixedLeft: 304,
       display: (row) => safe(row.navDif),
       filterValue: (row) => safe(row.navDate),
       sortValue: (row) => numberOrNull(row.navDif),
     },
-    { key: "riskLevel", label: "riskLevel", sortable: false, width: "132px" },
-    { key: "periodTerm", label: "periodTerm", numericFilter: true, sortValue: (row) => numberOrNull(row.periodTerm), width: "140px" },
-    { key: "establishDate", label: "establishDate", filterable: false, width: "118px" },
-    { key: "establishDays", label: "成立天数", sortValue: (row) => numberOrNull(row.establishDays), filterable: false, width: "92px" },
-    { key: "annualizedYield", label: "成立年化", sortValue: (row) => numberOrNull(String(row.annualizedYield).replace("%", "")), filterable: false, width: "96px" },
-    { key: "productId", label: "productId", filterable: false, sortable: false, width: "150px" },
+    { key: "periodTerm", label: "期限", numericFilter: true, sortValue: (row) => numberOrNull(row.periodTerm), width: "68px", fixedLeft: 410 },
+    { key: "establishDays", label: "成立天数", sortValue: (row) => numberOrNull(row.establishDays), filterable: false, width: "72px", fixedLeft: 478 },
+    { key: "annualizedYield", label: "成立年化", sortValue: (row) => numberOrNull(String(row.annualizedYield).replace("%", "")), filterable: false, width: "76px", fixedLeft: 550 },
     {
       key: "indiAmtRem",
       label: "indiAmtRem",
-      width: "128px",
+      width: "96px",
+      fixedLeft: 626,
       display: (row) => compactAmount(row.indiAmtRem),
       filterValue: (row) => safe(row.indiAmtRemDate),
       sortValue: (row) => numberOrNull(row.indiAmtRem),
@@ -532,24 +607,14 @@
     },
     {
       key: "productSize",
-      label: "productSize",
-      width: "128px",
+      label: "productSize / indiAmt",
+      width: "138px",
+      fixedLeft: 722,
       display: (row) => compactAmount(row.productSize),
       filterValue: (row) => safe(row.productSizeDate),
       sortValue: (row) => numberOrNull(row.productSize),
       filterable: false,
     },
-    {
-      key: "indiAmt",
-      label: "indiAmt",
-      width: "128px",
-      display: (row) => compactAmount(row.indiAmt),
-      filterValue: (row) => safe(row.indiAmtDate),
-      sortValue: (row) => numberOrNull(row.indiAmt),
-      filterable: false,
-    },
-    { key: "fetchedAt", label: "fetchedAt", filterable: false, sortable: false, width: "170px" },
-    { key: "rawJson", label: "rawJson", filterable: false, sortable: false, width: "78px" },
   ];
 
   function filterStateFor(key) {
@@ -642,12 +707,21 @@
   async function load() {
     reload.disabled = true;
     reload.textContent = "读取中";
-    toggleView.disabled = true;
     app.innerHTML = '<div class="empty">正在读取数据库...</div>';
     try {
-      const response = await fetch("/db-product-details");
-      const data = await response.json();
+      const [detailResponse, navDiffResponse] = await Promise.all([
+        fetch("/db-product-details"),
+        fetch("/db-product-nav-diffs"),
+      ]);
+      const data = await detailResponse.json();
       if (!data.success) throw new Error(data.error || "读取失败");
+      const navDiffData = await navDiffResponse.json();
+      if (!navDiffData.success) throw new Error(navDiffData.error || "读取近一年净值变化失败");
+      state.navDiffData = navDiffData;
+      state.navDiffPage = 0;
+      state.navDiffDetailThreshold = "";
+      state.navDiffScrollTop = 0;
+      if (navDiffData.database) meta.dataset.database = navDiffData.database;
       state.rows = (data.products || []).map((row) => ({
         ...row,
         text: JSON.stringify(row).toLowerCase(),
@@ -659,39 +733,6 @@
       meta.textContent = "读取失败";
     } finally {
       reload.disabled = false;
-      toggleView.disabled = false;
-      reload.textContent = "刷新";
-    }
-  }
-
-  async function loadNavDiffs(force = false) {
-    if (state.navDiffData && !force) {
-      renderNavDiffView();
-      updateMeta();
-      return;
-    }
-    state.navDiffLoading = true;
-    reload.disabled = true;
-    toggleView.disabled = true;
-    app.innerHTML = '<div class="empty">正在读取近一年净值变化...</div>';
-    try {
-      const response = await fetch("/db-product-nav-diffs");
-      const data = await response.json();
-      if (!data.success) throw new Error(data.error || "读取失败");
-      state.navDiffData = data;
-      state.navDiffPage = 0;
-      state.navDiffDetailThreshold = "";
-      state.navDiffScrollTop = 0;
-      if (data.database) meta.dataset.database = data.database;
-      renderNavDiffView();
-      updateMeta();
-    } catch (error) {
-      app.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
-      meta.textContent = "读取失败";
-    } finally {
-      state.navDiffLoading = false;
-      reload.disabled = false;
-      toggleView.disabled = false;
       reload.textContent = "刷新";
     }
   }
@@ -776,22 +817,16 @@
     const dbText = database || meta.dataset.database || "";
     if (database) meta.dataset.database = database;
     const activeCount = columns.filter((column) => column.filterable !== false && isColumnFiltered(column.key)).length;
-    const filterText = state.viewMode === "details" && activeCount ? ` | 已筛选 ${activeCount} 列` : "";
+    const filterText = activeCount ? ` | 已筛选 ${activeCount} 列` : "";
     const pathText = state.showDatabasePath && dbText ? ` | ${dbText}` : "";
-    if (state.viewMode === "navDiffs" && state.navDiffData) {
-      const visibleRows = navDiffRows().length;
-      const totalRows = state.navDiffData.products.length;
-      const dateCount = pagedNavDiffDates().length;
-      const totalDates = state.navDiffData.dates.length;
-      meta.textContent = `显示 ${visibleRows} / ${totalRows} 条 | 当前 ${dateCount} / 全年 ${totalDates} 个日期${pathText}`;
-    } else {
-      meta.textContent = `显示 ${state.filtered.length} / ${state.rows.length} 条${filterText}${pathText}`;
-    }
+    const dateText = state.navDiffData
+      ? ` | 当前 ${pagedNavDiffDates().length} / 全年 ${state.navDiffData.dates.length} 个日期`
+      : "";
+    meta.textContent = `显示 ${state.filtered.length} / ${state.rows.length} 条${dateText}${filterText}${pathText}`;
     togglePath.hidden = !dbText;
     togglePath.title = state.showDatabasePath ? "隐藏路径" : "显示路径";
     togglePath.setAttribute("aria-label", togglePath.title);
     togglePath.innerHTML = pathToggleIcon(state.showDatabasePath);
-    toggleView.textContent = state.viewMode === "details" ? "近一年净值变化" : "产品详情";
   }
 
   function pathToggleIcon(isVisible) {
@@ -811,19 +846,13 @@
   }
 
   function uniqueValuesForColumn(key) {
-    const rows = state.viewMode === "navDiffs" && key === "productName" && state.navDiffData
-      ? state.navDiffData.products.map(navDiffProductFilterValue)
-      : state.rows.map((row) => filterValue(row, key));
+    const rows = state.rows.map((row) => filterValue(row, key));
     return [...new Set(rows)].sort((a, b) => {
       const na = Number(a);
       const nb = Number(b);
       if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
       return a.localeCompare(b, "zh-CN");
     });
-  }
-
-  function navDiffProductFilterValue(row) {
-    return row.productName || row.productId || "-";
   }
 
   function isColumnFiltered(key) {
@@ -834,8 +863,10 @@
   function renderHeadCell(column) {
     const canSort = column.sortable !== false;
     const canFilter = column.filterable !== false;
+    const fixedClass = column.fixedLeft !== undefined ? "fixed-col" : "";
+    const fixedStyle = column.fixedLeft !== undefined ? ` style="left:${column.fixedLeft}px"` : "";
     return `
-      <th class="${escapeHtml(column.className || "")}">
+      <th class="${escapeHtml(`${column.className || ""} ${fixedClass}`.trim())}"${fixedStyle}>
         <div class="th-inner">
           ${canSort ? `
             <button class="sort-btn" data-sort-column="${escapeHtml(column.key)}" type="button">
@@ -856,7 +887,7 @@
   }
 
   function renderRowIndexHeadCell() {
-    return '<th class="row-index">#</th>';
+    return '<th class="row-index fixed-col" style="left:0">#</th>';
   }
 
   function sortMark(key) {
@@ -866,21 +897,34 @@
   }
 
   function render() {
+    const dates = pagedNavDiffDates();
     app.innerHTML = `
       ${renderFilterPanel()}
+      ${renderNavDiffSummary()}
+      ${renderNavDiffDetail()}
       <div class="table-wrap">
         <table class="detail-table">
           <colgroup>
-            <col style="width:56px">
+            <col style="width:44px">
             ${columns.map((column) => `<col style="width:${escapeHtml(column.width || "auto")}">`).join("")}
+            ${dates.map(() => '<col style="width:76px">').join("")}
           </colgroup>
           <thead>
-            <tr>${renderRowIndexHeadCell()}${columns.map(renderHeadCell).join("")}</tr>
+            <tr>
+              ${renderRowIndexHeadCell()}${columns.map(renderHeadCell).join("")}
+              ${dates.map((date) => `
+                <th class="nav-diff-inline-head">
+                  <button class="nav-diff-sort-btn" type="button" data-nav-diff-sort-date="${escapeHtml(date)}">
+                    ${escapeHtml(date)}${state.productOrderSource === "navDiffs" && state.navDiffValueSortDate === date ? (state.navDiffValueSortDir === "asc" ? " ▲" : " ▼") : ""}
+                  </button>
+                </th>
+              `).join("")}
+            </tr>
           </thead>
           <tbody>
             ${state.filtered.length
-              ? state.filtered.map((row, index) => renderRow(row, index)).join("")
-              : `<tr><td colspan="${columns.length + 1}" class="empty">没有匹配的数据。</td></tr>`}
+              ? state.filtered.map((row, index) => renderRow(row, index, dates)).join("")
+              : `<tr><td colspan="${columns.length + dates.length + 1}" class="empty">没有匹配的数据。</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -888,39 +932,13 @@
     positionFilterPanel();
   }
 
-  function navDiffRows() {
-    if (!state.navDiffData) return [];
-    const keyword = search.value.trim().toLowerCase();
-    const selectedNames = filterStateFor("productName").selected;
-    const rows = state.navDiffData.products.filter((row) => {
-      if (selectedNames && !selectedNames.has(navDiffProductFilterValue(row))) {
-        return false;
-      }
-      if (!keyword) return true;
-      return `${row.productName || ""} ${row.productId || ""} ${JSON.stringify(row.diffs || {})}`.toLowerCase().includes(keyword);
-    });
-    if (state.productOrderSource === "details" && state.productOrderIds.length) {
-      applyProductOrder(rows);
-      return rows;
-    }
-    applyNavDiffSort(rows);
-    setProductOrder(rows, "navDiffs");
-    return rows;
-  }
-
-  function applyNavDiffSort(rows) {
+  function applyNavDiffValueSortToDetails(rows) {
+    if (!state.navDiffValueSortDate) return;
+    const direction = state.navDiffValueSortDir === "desc" ? -1 : 1;
     rows.sort((left, right) => {
-      if (state.navDiffValueSortDate) {
-        const direction = state.navDiffValueSortDir === "desc" ? -1 : 1;
-        return compareValues(
-          numberOrNull(left.diffs?.[state.navDiffValueSortDate]),
-          numberOrNull(right.diffs?.[state.navDiffValueSortDate])
-        ) * direction;
-      }
-      const direction = state.navDiffNameSortDir === "desc" ? -1 : 1;
-      const leftName = left.productName || left.productId || "";
-      const rightName = right.productName || right.productId || "";
-      return leftName.localeCompare(rightName, "zh-CN") * direction;
+      const leftDiff = navDiffByProductId(left.productId)?.diffs?.[state.navDiffValueSortDate];
+      const rightDiff = navDiffByProductId(right.productId)?.diffs?.[state.navDiffValueSortDate];
+      return compareValues(numberOrNull(leftDiff), numberOrNull(rightDiff)) * direction;
     });
   }
 
@@ -949,22 +967,19 @@
     return navDifClass(value);
   }
 
-  function renderNavDiffView() {
-    if (!state.navDiffData) {
-      app.innerHTML = '<div class="empty">暂无近一年净值变化数据。</div>';
-      return;
-    }
-    const previousWrap = app.querySelector(".table-wrap");
-    if (previousWrap) state.navDiffScrollTop = previousWrap.scrollTop;
-    const dates = pagedNavDiffDates();
-    const rows = navDiffRows();
+  function navDiffByProductId(productId) {
+    if (!state.navDiffData) return null;
+    return (state.navDiffData.products || []).find((row) => row.productId === productId) || null;
+  }
+
+  function renderNavDiffSummary() {
+    if (!state.navDiffData) return "";
     const stats = state.navDiffData.stats || {};
     const pageCount = navDiffPageCount();
     const dateRange = state.navDiffData.startDate && state.navDiffData.endDate
       ? `${state.navDiffData.startDate} 至 ${state.navDiffData.endDate}`
       : "-";
-    app.innerHTML = `
-      ${renderFilterPanel()}
+    return `
       <div class="nav-diff-summary">
         <div>
           日期范围：${escapeHtml(dateRange)} | 每页 ${state.navDiffPageSize} 个日期
@@ -982,50 +997,7 @@
           <button class="nav-diff-page-btn" type="button" data-nav-diff-page="last" ${state.navDiffPage >= pageCount - 1 ? "disabled" : ""}>最早</button>
         </div>
       </div>
-      ${renderNavDiffDetail()}
-      <div class="table-wrap">
-        <table class="nav-diff-table">
-          <colgroup>
-            <col style="width:56px">
-            <col style="width:320px">
-            ${dates.map(() => '<col style="width:82px">').join("")}
-          </colgroup>
-          <thead>
-            <tr>
-              <th class="row-index">#</th>
-              <th>
-                <div class="th-inner">
-                  <button class="nav-diff-sort-btn" type="button" data-nav-diff-sort="productName">
-                    productName${state.productOrderSource === "navDiffs" && !state.navDiffValueSortDate ? (state.navDiffNameSortDir === "asc" ? " ▲" : " ▼") : ""}
-                  </button>
-                  <button
-                    class="filter-btn ${isColumnFiltered("productName") ? "active" : ""}"
-                    type="button"
-                    data-filter-column="productName"
-                    title="筛选"
-                  >▾</button>
-                </div>
-              </th>
-              ${dates.map((date) => `
-                <th class="nav-diff-date">
-                  <button class="nav-diff-sort-btn" type="button" data-nav-diff-sort-date="${escapeHtml(date)}">
-                    ${escapeHtml(date)}${state.productOrderSource === "navDiffs" && state.navDiffValueSortDate === date ? (state.navDiffValueSortDir === "asc" ? " ▲" : " ▼") : ""}
-                  </button>
-                </th>
-              `).join("")}
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.length
-              ? rows.map((row, index) => renderNavDiffRow(row, dates, index)).join("")
-              : `<tr><td colspan="${dates.length + 2}" class="empty">没有匹配的数据。</td></tr>`}
-          </tbody>
-        </table>
-      </div>
     `;
-    const nextWrap = app.querySelector(".table-wrap");
-    if (nextWrap) nextWrap.scrollTop = state.navDiffScrollTop;
-    positionFilterPanel();
   }
 
   function renderNavDiffStatButton(threshold, count) {
@@ -1089,19 +1061,6 @@
     `;
   }
 
-  function renderNavDiffRow(row, dates, index) {
-    return `
-      <tr>
-        <td class="row-index">${index + 1}</td>
-        <td class="name" title="${escapeHtml(row.productId || "")}">${escapeHtml(row.productName || row.productId || "-")}</td>
-        ${dates.map((date) => {
-          const value = row.diffs?.[date] || "";
-          return `<td class="nav-diff-cell ${navDiffClass(value)}">${escapeHtml(value || "-")}</td>`;
-        }).join("")}
-      </tr>
-    `;
-  }
-
   function renderFilterPanel() {
     const column = columns.find((item) => item.key === state.activeFilterColumn);
     if (!column || column.filterable === false) {
@@ -1156,191 +1115,240 @@
     }
   }
 
-  function renderRow(row, index) {
-    const openedField = row.productId === state.openedId ? state.openedField : "";
+  function renderRow(row, index, dates = []) {
+    const productName = row.productName || row.productId || "-";
+    const riskLevel = safe(row.riskLevel);
+    const productId = safe(row.productId);
+    const establishDate = safe(row.establishDate);
+    const productSize = compactAmount(row.productSize);
+    const indiAmt = compactAmount(row.indiAmt);
+    const navDiffRow = navDiffByProductId(row.productId);
     return `
       <tr>
-        <td class="row-index">${index + 1}</td>
-        <td class="name">${escapeHtml(row.productName)}</td>
-        <td class="num nav-dif ${navDifClass(row.navDif)}">
+        <td class="row-index fixed-col" style="left:0">${index + 1}</td>
+        <td class="name fixed-col" style="left:44px">
+          <div class="product-name-main">
+            <span class="product-title">${escapeHtml(productName)}</span>
+            ${riskLevel && riskLevel !== "-" ? `<span class="risk-pill">${escapeHtml(riskLevel)}</span>` : ""}
+          </div>
+          ${productId && productId !== "-" ? `<span class="product-id-sub code">${escapeHtml(productId)}</span>` : ""}
+        </td>
+        <td class="num nav-dif fixed-col ${navDifClass(row.navDif)}" style="left:304px">
           <span class="nav-dif-value">${escapeHtml(safe(row.navDif))}</span>
           <span class="nav-dif-date">${escapeHtml(safe(row.navDate))}</span>
         </td>
-        <td>${escapeHtml(safe(row.riskLevel))}</td>
-        <td>${escapeHtml(safe(row.periodTerm))}</td>
-        <td>${escapeHtml(safe(row.establishDate))}</td>
-        <td class="num">${escapeHtml(safe(row.establishDays))}</td>
-        <td class="num">${escapeHtml(safe(row.annualizedYield))}</td>
-        <td class="code">${escapeHtml(row.productId)}</td>
-        <td class="num ${amountClassFromValue(row.indiAmtRem)}">${escapeHtml(compactAmount(row.indiAmtRem))}</td>
-        <td class="num ${amountClassFromValue(row.productSize)}">${escapeHtml(compactAmount(row.productSize))}</td>
-        <td class="num ${amountClassFromValue(row.indiAmt)}">${escapeHtml(compactAmount(row.indiAmt))}</td>
-        <td>${escapeHtml(safe(row.fetchedAt))}</td>
-        <td class="raw-cell"><button type="button" data-id="${escapeHtml(row.productId)}" data-field="rawJson">${openedField === "rawJson" ? "收起" : "查看"}</button></td>
+        <td class="fixed-col" style="left:400px">${escapeHtml(safe(row.periodTerm))}</td>
+        <td class="num fixed-col" style="left:478px">
+          <span class="establish-days-main">${escapeHtml(safe(row.establishDays))}</span>
+          ${establishDate && establishDate !== "-" ? `<span class="cell-sub">${escapeHtml(establishDate)}</span>` : ""}
+        </td>
+        <td class="num fixed-col" style="left:550px">${escapeHtml(safe(row.annualizedYield))}</td>
+        <td class="num fixed-col ${amountClassFromValue(row.indiAmtRem)}" style="left:626px">${escapeHtml(compactAmount(row.indiAmtRem))}</td>
+        <td class="num fixed-col" style="left:722px">
+          <span class="amount-pair">
+            <span class="${amountClassFromValue(row.productSize)}">${escapeHtml(productSize)}</span>
+            <span class="amount-sep">/</span>
+            <span class="${amountClassFromValue(row.indiAmt)}">${escapeHtml(indiAmt)}</span>
+          </span>
+        </td>
+        ${dates.map((date) => {
+          const value = navDiffRow?.diffs?.[date] || "";
+          return `<td class="nav-diff-cell ${navDiffClass(value)}">${escapeHtml(value || "-")}</td>`;
+        }).join("")}
       </tr>
-      ${openedField ? `
-        <tr class="json-row">
-          <td colspan="${columns.length + 1}"><pre>${escapeHtml(rawJsonText(row.productId))}</pre></td>
-        </tr>
-      ` : ""}
     `;
   }
 
-  function formatRawJson(rawJson) {
-    try {
-      return JSON.stringify(JSON.parse(rawJson), null, 2);
-    } catch (error) {
-      return safe(rawJson);
-    }
-  }
-
-  function rawJsonText(productId) {
-    const cached = state.rawJsonCache[productId];
-    if (!cached) return "正在加载 rawJson...";
-    if (cached.error) return cached.error;
-    return formatRawJson(cached.rawJson);
-  }
-
   function refreshCurrentView() {
-    if (state.viewMode === "navDiffs") {
-      renderNavDiffView();
-      updateMeta();
-      return;
-    }
     render();
   }
 
-  async function ensureRawJson(productId) {
-    if (state.rawJsonCache[productId]) return;
-    state.rawJsonCache[productId] = { rawJson: "" };
-    render();
+  function updateNoteState(statusText = "") {
+    noteToggle.classList.toggle("has-note", Boolean(noteState.content.trim()));
+    noteStatus.textContent = statusText || (noteState.content.trim() ? "已保存" : "");
+  }
+
+  function clampNotePosition(left, top) {
+    const rect = notePopover.getBoundingClientRect();
+    const maxLeft = Math.max(8, window.innerWidth - rect.width - 8);
+    const maxTop = Math.max(8, window.innerHeight - rect.height - 8);
+    return {
+      left: Math.min(Math.max(8, left), maxLeft),
+      top: Math.min(Math.max(8, top), maxTop),
+    };
+  }
+
+  function applyNotePosition() {
+    if (!Number.isFinite(noteState.left) || !Number.isFinite(noteState.top)) return;
+    const position = clampNotePosition(noteState.left, noteState.top);
+    noteState.left = position.left;
+    noteState.top = position.top;
+    notePopover.style.left = `${position.left}px`;
+    notePopover.style.top = `${position.top}px`;
+    notePopover.style.right = "auto";
+  }
+
+  async function loadNote() {
     try {
-      const response = await fetch(`/db-product-raw-json?productId=${encodeURIComponent(productId)}`);
+      const response = await fetch("/db-viewer-note");
       const data = await response.json();
-      if (!data.success) throw new Error(data.error || "读取 rawJson 失败");
-      state.rawJsonCache[productId] = { rawJson: data.rawJson || "{}" };
+      if (!data.success) throw new Error(data.error || "读取笔记失败");
+      noteState.content = data.content || "";
+      noteState.left = Number.isFinite(Number(data.left)) ? Number(data.left) : null;
+      noteState.top = Number.isFinite(Number(data.top)) ? Number(data.top) : null;
+      noteText.value = noteState.content;
+      applyNotePosition();
+      updateNoteState();
     } catch (error) {
-      state.rawJsonCache[productId] = { error: error.message };
+      noteStatus.textContent = "笔记读取失败";
     }
-    render();
+  }
+
+  function openNote() {
+    noteText.value = noteState.content;
+    notePopover.hidden = false;
+    applyNotePosition();
+    updateNoteState();
+    noteText.focus();
+  }
+
+  function closeNote() {
+    notePopover.hidden = true;
+  }
+
+  async function saveNote(statusText = "已保存") {
+    noteState.content = noteText.value;
+    try {
+      const response = await fetch("/db-viewer-note", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: noteState.content,
+          left: noteState.left,
+          top: noteState.top,
+        }),
+      });
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || "保存笔记失败");
+      noteState.content = data.content || "";
+      noteState.left = Number.isFinite(Number(data.left)) ? Number(data.left) : noteState.left;
+      noteState.top = Number.isFinite(Number(data.top)) ? Number(data.top) : noteState.top;
+      updateNoteState(statusText);
+    } catch (error) {
+      noteStatus.textContent = "保存失败";
+    }
   }
 
   search.addEventListener("input", () => {
-    if (state.viewMode === "navDiffs") {
-      renderNavDiffView();
-      updateMeta();
-      return;
-    }
     applyFilter();
   });
   reload.addEventListener("click", () => {
-    if (state.viewMode === "navDiffs") {
-      loadNavDiffs(true);
-      return;
-    }
     load();
   });
   togglePath.addEventListener("click", () => {
     state.showDatabasePath = !state.showDatabasePath;
     updateMeta();
   });
-  toggleView.addEventListener("click", () => {
-    state.activeFilterColumn = "";
-    state.pendingFilterValues = null;
-    state.filterSearch = "";
-    state.filterSearchCaret = 0;
-    if (state.viewMode === "details") {
-      state.viewMode = "navDiffs";
-      loadNavDiffs();
+  noteToggle.addEventListener("click", () => {
+    if (notePopover.hidden) {
+      openNote();
     } else {
-      state.viewMode = "details";
-      applyFilter();
+      closeNote();
     }
-    updateMeta();
+  });
+  noteClose.addEventListener("click", closeNote);
+  noteSave.addEventListener("click", () => saveNote());
+  noteText.addEventListener("input", () => {
+    noteStatus.textContent = "未保存";
+  });
+  noteText.addEventListener("keydown", (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+      event.preventDefault();
+      saveNote();
+    }
+    if (event.key === "Escape") {
+      closeNote();
+    }
+  });
+  noteHead.addEventListener("pointerdown", (event) => {
+    if (event.target.closest("button")) return;
+    notePopover.hidden = false;
+    const rect = notePopover.getBoundingClientRect();
+    noteState.dragging = true;
+    noteState.dragOffsetX = event.clientX - rect.left;
+    noteState.dragOffsetY = event.clientY - rect.top;
+    notePopover.setPointerCapture(event.pointerId);
+  });
+  notePopover.addEventListener("pointermove", (event) => {
+    if (!noteState.dragging) return;
+    const position = clampNotePosition(
+      event.clientX - noteState.dragOffsetX,
+      event.clientY - noteState.dragOffsetY
+    );
+    noteState.left = position.left;
+    noteState.top = position.top;
+    notePopover.style.left = `${position.left}px`;
+    notePopover.style.top = `${position.top}px`;
+    notePopover.style.right = "auto";
+  });
+  notePopover.addEventListener("pointerup", (event) => {
+    if (!noteState.dragging) return;
+    noteState.dragging = false;
+    notePopover.releasePointerCapture(event.pointerId);
+    saveNote("位置已保存");
+  });
+  notePopover.addEventListener("pointercancel", () => {
+    noteState.dragging = false;
   });
   app.addEventListener("click", (event) => {
-    if (state.viewMode === "navDiffs") {
-      const filterButton = event.target.closest("[data-filter-column]");
-      if (filterButton) {
-        const column = filterButton.dataset.filterColumn;
-        if (columns.find((item) => item.key === column)?.filterable === false) return;
-        if (state.activeFilterColumn === column) {
-          state.activeFilterColumn = "";
-          state.pendingFilterValues = null;
-          state.filterSearch = "";
-          state.filterSearchCaret = 0;
-        } else {
-          state.activeFilterColumn = column;
-          state.pendingFilterValues = initialFilterPanelValues(column);
-          const activeColumn = columns.find((item) => item.key === column);
-          state.filterSearch = activeColumn?.numericFilter ? filterStateFor(column).expr : "";
-          state.filterSearchCaret = 0;
-        }
-        renderNavDiffView();
-        return;
-      }
-
-      const actionButton = event.target.closest("[data-filter-action]");
-      if (actionButton) {
-        handleFilterAction(actionButton.dataset.filterAction);
-        return;
-      }
-
-      const pageButton = event.target.closest("[data-nav-diff-page]");
-      if (pageButton) {
-        const wrap = app.querySelector(".table-wrap");
-        if (wrap) state.navDiffScrollTop = wrap.scrollTop;
-        const action = pageButton.dataset.navDiffPage;
-        if (action === "first") state.navDiffPage = 0;
-        if (action === "prev") state.navDiffPage -= 1;
-        if (action === "next") state.navDiffPage += 1;
-        if (action === "last") state.navDiffPage = navDiffPageCount() - 1;
-        clampNavDiffPage();
-        renderNavDiffView();
-        updateMeta();
-        return;
-      }
-
-      if (event.target.closest("[data-nav-diff-sort='productName']")) {
-        state.navDiffNameSortDir = state.navDiffValueSortDate
-          ? "asc"
-          : (state.navDiffNameSortDir === "asc" ? "desc" : "asc");
-        state.navDiffValueSortDate = "";
-        state.productOrderSource = "navDiffs";
-        renderNavDiffView();
-        return;
-      }
-
-      const dateSortButton = event.target.closest("[data-nav-diff-sort-date]");
-      if (dateSortButton) {
-        const date = dateSortButton.dataset.navDiffSortDate;
-        if (state.navDiffValueSortDate === date) {
-          state.navDiffValueSortDir = state.navDiffValueSortDir === "desc" ? "asc" : "desc";
-        } else {
-          state.navDiffValueSortDate = date;
-          state.navDiffValueSortDir = "asc";
-        }
-        state.productOrderSource = "navDiffs";
-        renderNavDiffView();
-        updateMeta();
-        return;
-      }
-
-      const statButton = event.target.closest("[data-nav-diff-threshold]");
-      if (statButton) {
-        const threshold = statButton.dataset.navDiffThreshold;
-        state.navDiffDetailThreshold = state.navDiffDetailThreshold === threshold ? "" : threshold;
-        renderNavDiffView();
-        return;
-      }
-
-      if (event.target.closest("[data-nav-diff-detail-close]")) {
-        state.navDiffDetailThreshold = "";
-        renderNavDiffView();
-        return;
-      }
+    const pageButton = event.target.closest("[data-nav-diff-page]");
+    if (pageButton) {
+      const wrap = app.querySelector(".table-wrap");
+      if (wrap) state.navDiffScrollTop = wrap.scrollTop;
+      const action = pageButton.dataset.navDiffPage;
+      if (action === "first") state.navDiffPage = 0;
+      if (action === "prev") state.navDiffPage -= 1;
+      if (action === "next") state.navDiffPage += 1;
+      if (action === "last") state.navDiffPage = navDiffPageCount() - 1;
+      clampNavDiffPage();
+      render();
+      updateMeta();
+      const nextWrap = app.querySelector(".table-wrap");
+      if (nextWrap) nextWrap.scrollTop = state.navDiffScrollTop;
       return;
     }
+
+    const dateSortButton = event.target.closest("[data-nav-diff-sort-date]");
+    if (dateSortButton) {
+      const date = dateSortButton.dataset.navDiffSortDate;
+      if (state.navDiffValueSortDate === date) {
+        state.navDiffValueSortDir = state.navDiffValueSortDir === "desc" ? "asc" : "desc";
+      } else {
+        state.navDiffValueSortDate = date;
+        state.navDiffValueSortDir = "asc";
+      }
+      state.productOrderSource = "navDiffs";
+      applyNavDiffValueSortToDetails(state.filtered);
+      setProductOrder(state.filtered, "navDiffs");
+      render();
+      updateMeta();
+      return;
+    }
+
+    const statButton = event.target.closest("[data-nav-diff-threshold]");
+    if (statButton) {
+      const threshold = statButton.dataset.navDiffThreshold;
+      state.navDiffDetailThreshold = state.navDiffDetailThreshold === threshold ? "" : threshold;
+      render();
+      return;
+    }
+
+    if (event.target.closest("[data-nav-diff-detail-close]")) {
+      state.navDiffDetailThreshold = "";
+      render();
+      return;
+    }
+
     const sortButton = event.target.closest("[data-sort-column]");
     if (sortButton) {
       const column = sortButton.dataset.sortColumn;
@@ -1382,17 +1390,6 @@
       return;
     }
 
-    const button = event.target.closest("button[data-id]");
-    if (!button) return;
-    const id = button.dataset.id;
-    const field = button.dataset.field || "";
-    const sameCell = state.openedId === id && state.openedField === field;
-    state.openedId = sameCell ? "" : id;
-    state.openedField = sameCell ? "" : field;
-    render();
-    if (!sameCell && field === "rawJson") {
-      ensureRawJson(id);
-    }
   });
   app.addEventListener("input", (event) => {
     const searchInput = event.target.closest(".filter-search");
@@ -1428,7 +1425,10 @@
     state.pendingFilterValues = null;
     refreshCurrentView();
   });
-  window.addEventListener("resize", positionFilterPanel);
+  window.addEventListener("resize", () => {
+    positionFilterPanel();
+    applyNotePosition();
+  });
 
   function handleFilterAction(action) {
     const column = state.activeFilterColumn;
@@ -1464,12 +1464,7 @@
         state.filterSearch = "";
         state.filterSearchCaret = 0;
         state.pendingFilterValues = null;
-        if (state.viewMode === "navDiffs") {
-          renderNavDiffView();
-          updateMeta();
-        } else {
-          applyFilter();
-        }
+        applyFilter();
         return;
       }
       filterState.expr = "";
@@ -1484,15 +1479,11 @@
       state.filterSearch = "";
       state.filterSearchCaret = 0;
       state.pendingFilterValues = null;
-      if (state.viewMode === "navDiffs") {
-        renderNavDiffView();
-        updateMeta();
-      } else {
-        applyFilter();
-      }
+      applyFilter();
     }
   }
 
+  loadNote();
   load();
 </script>
 </body>

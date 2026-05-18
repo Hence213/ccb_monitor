@@ -41,6 +41,7 @@ DEFAULT_DETAIL_URL = (
     "#/productDetail?functionCode=bocFinanceProductDetail&productId=YIXTT076B"
 )
 DEFAULT_PRODUCT_DETAIL_DB = str(DEFAULT_DB_PATH)
+VIEWER_NOTE_PATH = Path(__file__).with_name("product_detail_db_viewer_note.json")
 HEADERS = MOBILE_HEADERS
 
 MOBILE_PAGE_HEADERS = {
@@ -100,14 +101,42 @@ def load_product_detail_rows(db_path=DEFAULT_PRODUCT_DETAIL_DB):
                 indiAmtRem_list,
                 establishDate,
                 periodTerm,
-                nav_list,
-                fetchedAt
+                nav_list
             FROM product_details
             ORDER BY fetchedAt DESC, productId ASC
             """
         ).fetchall()
 
     return [build_product_detail_view_row(dict(row)) for row in rows]
+
+
+def load_viewer_note():
+    if not VIEWER_NOTE_PATH.exists():
+        return {"content": "", "left": None, "top": None}
+    try:
+        data = json.loads(VIEWER_NOTE_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {"content": "", "left": None, "top": None}
+    if not isinstance(data, dict):
+        return {"content": "", "left": None, "top": None}
+    return {
+        "content": str(data.get("content") or ""),
+        "left": data.get("left") if isinstance(data.get("left"), (int, float)) else None,
+        "top": data.get("top") if isinstance(data.get("top"), (int, float)) else None,
+    }
+
+
+def save_viewer_note(data):
+    note = {
+        "content": str(data.get("content") or "")[:20000],
+        "left": data.get("left") if isinstance(data.get("left"), (int, float)) else None,
+        "top": data.get("top") if isinstance(data.get("top"), (int, float)) else None,
+    }
+    VIEWER_NOTE_PATH.write_text(
+        json.dumps(note, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return note
 
 
 def load_product_nav_diff_rows(db_path=DEFAULT_PRODUCT_DETAIL_DB):
@@ -283,21 +312,7 @@ def build_product_detail_view_row(row):
         'annualizedYield': annualized_yield(nav['nav'], establish_days),
         'periodTerm': row.get('periodTerm') or '',
         'riskLevel': row.get('riskLevel') or '',
-        'fetchedAt': row.get('fetchedAt') or '',
     }
-
-
-def load_product_raw_json(product_id, db_path=DEFAULT_PRODUCT_DETAIL_DB):
-    if not os.path.exists(db_path):
-        raise FileNotFoundError(f"数据库不存在: {db_path}")
-    with sqlite3.connect(db_path) as conn:
-        row = conn.execute(
-            "SELECT rawJson FROM product_details WHERE productId = ?",
-            (product_id,),
-        ).fetchone()
-    if not row:
-        return None
-    return row[0]
 
 
 def fetch_product_detail_bundle(product_id, sub_channel_id="31"):
@@ -484,24 +499,22 @@ def db_product_nav_diffs():
         return add_cors(jsonify({'success': False, 'error': str(e)})), 500
 
 
-@app.route('/db-product-raw-json', methods=['GET', 'OPTIONS'])
-def db_product_raw_json():
+@app.route('/db-viewer-note', methods=['GET', 'POST', 'OPTIONS'])
+def db_viewer_note():
     if request.method == 'OPTIONS':
         return add_cors(make_response()), 200
-    product_id = request.args.get('productId', '').strip().upper()
-    if not product_id:
-        return add_cors(jsonify({'success': False, 'error': '缺少 productId'})), 400
     try:
-        raw_json = load_product_raw_json(product_id)
-        if raw_json is None:
-            return add_cors(jsonify({'success': False, 'error': '产品不存在'})), 404
+        if request.method == 'POST':
+            data = request.get_json(silent=True) or {}
+            note = save_viewer_note(data)
+        else:
+            note = load_viewer_note()
         return add_cors(jsonify({
             'success': True,
-            'productId': product_id,
-            'rawJson': raw_json,
+            **note,
         }))
     except Exception as e:
-        print(f"[数据库rawJson] 失败: {e}")
+        print(f"[数据库查看器笔记] 失败: {e}")
         return add_cors(jsonify({'success': False, 'error': str(e)})), 500
 
 
