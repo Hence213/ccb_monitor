@@ -29,9 +29,17 @@
     font-size: 18px;
     white-space: nowrap;
   }
-  .meta {
+  .meta-group {
     flex: 1;
     min-width: 120px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    overflow: hidden;
+  }
+  .meta {
+    flex: 0 1 auto;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     color: #6b7280;
@@ -59,7 +67,26 @@
   }
   button:hover { border-color: #b4002a; color: #b4002a; }
   .path-toggle {
-    padding: 0 9px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #6b7280;
+  }
+  .path-toggle:hover {
+    border-color: transparent;
+    background: #fff7f8;
+  }
+  .path-toggle svg {
+    width: 13px;
+    height: 13px;
+    stroke: currentColor;
+  }
+  .view-toggle {
     font-size: 12px;
   }
   main { padding: 14px 16px 24px; }
@@ -206,6 +233,14 @@
     border-top: 1px solid #e8edf3;
   }
   tbody tr:hover { background: #fff7f8; }
+  th.row-index,
+  td.row-index {
+    width: 56px;
+    min-width: 56px;
+    text-align: center;
+    color: #6b7280;
+    font-variant-numeric: tabular-nums;
+  }
   td.name {
     white-space: normal;
     line-height: 1.35;
@@ -213,11 +248,48 @@
   td.num { text-align: left; font-variant-numeric: tabular-nums; }
   td.nav-dif {
     text-align: center;
-    font-size: 18px;
-    font-weight: 800;
-    line-height: 1.1;
+    line-height: 1.18;
   }
   th.nav-dif .th-inner { justify-content: center; }
+  .detail-table th,
+  .detail-table td {
+    height: 45px;
+  }
+  .detail-table th:nth-child(1),
+  .detail-table td:nth-child(1),
+  .detail-table th:nth-child(2),
+  .detail-table td:nth-child(2) {
+    position: sticky;
+    z-index: 1;
+    background: #fff;
+  }
+  .detail-table th:nth-child(1),
+  .detail-table td:nth-child(1) {
+    left: 0;
+  }
+  .detail-table th:nth-child(2),
+  .detail-table td:nth-child(2) {
+    left: 56px;
+  }
+  .detail-table th:nth-child(1),
+  .detail-table th:nth-child(2) {
+    z-index: 3;
+    background: #f1f4f8;
+  }
+  .detail-table tbody tr:hover td:nth-child(1),
+  .detail-table tbody tr:hover td:nth-child(2) { background: #fff7f8; }
+  .nav-dif-value {
+    display: block;
+    font-size: 18px;
+    font-weight: 800;
+  }
+  .nav-dif-date {
+    display: block;
+    margin-top: 3px;
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 500;
+  }
   .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   .nav-red { color: #b4002a; font-weight: 700; }
   .nav-green { color: #087f5b; font-weight: 700; }
@@ -228,6 +300,120 @@
     max-width: 220px;
     white-space: normal;
   }
+  .nav-diff-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    color: #4b5563;
+    font-size: 12px;
+  }
+  .nav-diff-stats,
+  .nav-diff-pager {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .nav-diff-sort-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-weight: 700;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .nav-diff-sort-btn:hover { color: #b4002a; }
+  .nav-diff-stat,
+  .nav-diff-page-btn {
+    height: 26px;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+  .nav-diff-stat.active {
+    border-color: #b4002a;
+    color: #b4002a;
+    background: #fff7f8;
+  }
+  .nav-diff-page-btn:disabled {
+    color: #a8b0bb;
+    cursor: not-allowed;
+  }
+  .nav-diff-detail {
+    margin-bottom: 8px;
+    background: #fff;
+    border: 1px solid #dde3ea;
+  }
+  .nav-diff-detail-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 10px;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 700;
+    border-bottom: 1px solid #e8edf3;
+  }
+  .nav-diff-detail-body {
+    max-height: 260px;
+    overflow: auto;
+  }
+  .nav-diff-detail-table {
+    min-width: 980px;
+    table-layout: fixed;
+  }
+  .nav-diff-detail-table th,
+  .nav-diff-detail-table td {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  .nav-diff-table {
+    min-width: max(100%, 960px);
+    table-layout: fixed;
+  }
+  .nav-diff-table th:nth-child(1),
+  .nav-diff-table td:nth-child(1),
+  .nav-diff-table th:nth-child(2),
+  .nav-diff-table td:nth-child(2) {
+    position: sticky;
+    z-index: 1;
+    background: #fff;
+  }
+  .nav-diff-table th:nth-child(1),
+  .nav-diff-table td:nth-child(1) {
+    left: 0;
+  }
+  .nav-diff-table th:nth-child(2),
+  .nav-diff-table td:nth-child(2) {
+    left: 56px;
+  }
+  .nav-diff-table th:nth-child(1),
+  .nav-diff-table th:nth-child(2) {
+    z-index: 3;
+    background: #f1f4f8;
+  }
+  .nav-diff-table tbody tr:hover td:nth-child(1),
+  .nav-diff-table tbody tr:hover td:nth-child(2) { background: #fff7f8; }
+  .nav-diff-date {
+    width: 82px;
+    text-align: center;
+    font-size: 12px;
+  }
+  td.nav-diff-cell {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .nav-diff-hot-30 { background: #fff4e6; color: #ad5f00; font-weight: 700; }
+  .nav-diff-hot-50 { background: #ffe3e3; color: #c92a2a; font-weight: 800; }
+  .nav-diff-hot-100 { background: #b4002a; color: #fff; font-weight: 900; }
   .cell-actions {
     display: flex;
     align-items: center;
@@ -261,7 +447,7 @@
   @media (max-width: 760px) {
     header { flex-wrap: wrap; }
     h1 { width: 100%; }
-    .meta { flex-basis: 100%; }
+    .meta-group { flex-basis: 100%; }
     input { flex-basis: calc(100% - 70px); width: auto; }
   }
 </style>
@@ -269,8 +455,11 @@
 <body>
   <header>
     <h1>产品详情数据库</h1>
-    <span class="meta" id="meta">读取中...</span>
-    <button class="path-toggle" id="togglePath" type="button" hidden>隐藏路径</button>
+    <span class="meta-group">
+      <span class="meta" id="meta">读取中...</span>
+      <button class="path-toggle" id="togglePath" type="button" title="显示路径" aria-label="显示路径" hidden></button>
+    </span>
+    <button class="view-toggle" id="toggleView" type="button">近一年净值变化</button>
     <input id="search" type="search" placeholder="搜索产品代码、名称或任意字段">
     <button id="reload" type="button">刷新</button>
   </header>
@@ -292,8 +481,20 @@
     pendingFilterValues: null,
     sortKey: "nav_dif",
     sortDir: "desc",
-    showDatabasePath: true,
+    showDatabasePath: false,
     rawJsonCache: {},
+    viewMode: "details",
+    navDiffData: null,
+    navDiffLoading: false,
+    navDiffPage: 0,
+    navDiffPageSize: 14,
+    navDiffDetailThreshold: "",
+    navDiffScrollTop: 0,
+    navDiffNameSortDir: "asc",
+    navDiffValueSortDate: "",
+    navDiffValueSortDir: "desc",
+    productOrderIds: [],
+    productOrderSource: "details",
   };
 
   const app = document.getElementById("app");
@@ -301,6 +502,7 @@
   const search = document.getElementById("search");
   const reload = document.getElementById("reload");
   const togglePath = document.getElementById("togglePath");
+  const toggleView = document.getElementById("toggleView");
 
   const columns = [
     { key: "productName", label: "productName", width: "320px" },
@@ -360,6 +562,11 @@
   function valuesForFilterPanel(key) {
     const selected = filterStateFor(key).selected;
     return selected === null ? new Set(uniqueValuesForColumn(key)) : new Set(selected);
+  }
+
+  function initialFilterPanelValues(key) {
+    const selected = filterStateFor(key).selected;
+    return selected === null ? new Set() : new Set(selected);
   }
 
   function escapeHtml(value) {
@@ -435,6 +642,7 @@
   async function load() {
     reload.disabled = true;
     reload.textContent = "读取中";
+    toggleView.disabled = true;
     app.innerHTML = '<div class="empty">正在读取数据库...</div>';
     try {
       const response = await fetch("/db-product-details");
@@ -451,6 +659,39 @@
       meta.textContent = "读取失败";
     } finally {
       reload.disabled = false;
+      toggleView.disabled = false;
+      reload.textContent = "刷新";
+    }
+  }
+
+  async function loadNavDiffs(force = false) {
+    if (state.navDiffData && !force) {
+      renderNavDiffView();
+      updateMeta();
+      return;
+    }
+    state.navDiffLoading = true;
+    reload.disabled = true;
+    toggleView.disabled = true;
+    app.innerHTML = '<div class="empty">正在读取近一年净值变化...</div>';
+    try {
+      const response = await fetch("/db-product-nav-diffs");
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || "读取失败");
+      state.navDiffData = data;
+      state.navDiffPage = 0;
+      state.navDiffDetailThreshold = "";
+      state.navDiffScrollTop = 0;
+      if (data.database) meta.dataset.database = data.database;
+      renderNavDiffView();
+      updateMeta();
+    } catch (error) {
+      app.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
+      meta.textContent = "读取失败";
+    } finally {
+      state.navDiffLoading = false;
+      reload.disabled = false;
+      toggleView.disabled = false;
       reload.textContent = "刷新";
     }
   }
@@ -470,7 +711,12 @@
         return selected.has(filterValue(row, column.key));
       });
     });
-    applySort();
+    if (state.productOrderSource === "navDiffs" && state.productOrderIds.length) {
+      applyProductOrder(state.filtered);
+    } else {
+      applySort();
+      setProductOrder(state.filtered, "details");
+    }
     render();
     updateMeta();
   }
@@ -495,6 +741,25 @@
     state.filtered.sort((left, right) => compareValues(sortValue(left, state.sortKey), sortValue(right, state.sortKey)) * direction);
   }
 
+  function setProductOrder(rows, source) {
+    state.productOrderIds = rows.map((row) => row.productId).filter(Boolean);
+    state.productOrderSource = source;
+  }
+
+  function productOrderIndex() {
+    return new Map(state.productOrderIds.map((productId, index) => [productId, index]));
+  }
+
+  function applyProductOrder(rows) {
+    const order = productOrderIndex();
+    rows.sort((left, right) => {
+      const leftIndex = order.has(left.productId) ? order.get(left.productId) : Number.MAX_SAFE_INTEGER;
+      const rightIndex = order.has(right.productId) ? order.get(right.productId) : Number.MAX_SAFE_INTEGER;
+      if (leftIndex !== rightIndex) return leftIndex - rightIndex;
+      return String(left.productName || "").localeCompare(String(right.productName || ""), "zh-CN");
+    });
+  }
+
   function compareValues(left, right) {
     if (left === null || left === undefined || left === "-") return 1;
     if (right === null || right === undefined || right === "-") return -1;
@@ -511,20 +776,54 @@
     const dbText = database || meta.dataset.database || "";
     if (database) meta.dataset.database = database;
     const activeCount = columns.filter((column) => column.filterable !== false && isColumnFiltered(column.key)).length;
-    const filterText = activeCount ? ` | 已筛选 ${activeCount} 列` : "";
+    const filterText = state.viewMode === "details" && activeCount ? ` | 已筛选 ${activeCount} 列` : "";
     const pathText = state.showDatabasePath && dbText ? ` | ${dbText}` : "";
-    meta.textContent = `显示 ${state.filtered.length} / ${state.rows.length} 条${filterText}${pathText}`;
+    if (state.viewMode === "navDiffs" && state.navDiffData) {
+      const visibleRows = navDiffRows().length;
+      const totalRows = state.navDiffData.products.length;
+      const dateCount = pagedNavDiffDates().length;
+      const totalDates = state.navDiffData.dates.length;
+      meta.textContent = `显示 ${visibleRows} / ${totalRows} 条 | 当前 ${dateCount} / 全年 ${totalDates} 个日期${pathText}`;
+    } else {
+      meta.textContent = `显示 ${state.filtered.length} / ${state.rows.length} 条${filterText}${pathText}`;
+    }
     togglePath.hidden = !dbText;
-    togglePath.textContent = state.showDatabasePath ? "隐藏路径" : "显示路径";
+    togglePath.title = state.showDatabasePath ? "隐藏路径" : "显示路径";
+    togglePath.setAttribute("aria-label", togglePath.title);
+    togglePath.innerHTML = pathToggleIcon(state.showDatabasePath);
+    toggleView.textContent = state.viewMode === "details" ? "近一年净值变化" : "产品详情";
+  }
+
+  function pathToggleIcon(isVisible) {
+    return isVisible ? `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="12" cy="12" r="3" stroke-width="2"/>
+      </svg>
+    ` : `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 3l18 18" stroke-width="2" stroke-linecap="round"/>
+        <path d="M10.6 5.2A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a17.7 17.7 0 0 1-3.1 4.1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6.1 6.8A17.1 17.1 0 0 0 2 12s3.5 7 10 7a10.5 10.5 0 0 0 4.3-.9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9.9 9.9A3 3 0 0 0 14.1 14.1" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
   }
 
   function uniqueValuesForColumn(key) {
-    return [...new Set(state.rows.map((row) => filterValue(row, key)))].sort((a, b) => {
+    const rows = state.viewMode === "navDiffs" && key === "productName" && state.navDiffData
+      ? state.navDiffData.products.map(navDiffProductFilterValue)
+      : state.rows.map((row) => filterValue(row, key));
+    return [...new Set(rows)].sort((a, b) => {
       const na = Number(a);
       const nb = Number(b);
       if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
       return a.localeCompare(b, "zh-CN");
     });
+  }
+
+  function navDiffProductFilterValue(row) {
+    return row.productName || row.productId || "-";
   }
 
   function isColumnFiltered(key) {
@@ -556,7 +855,12 @@
     `;
   }
 
+  function renderRowIndexHeadCell() {
+    return '<th class="row-index">#</th>';
+  }
+
   function sortMark(key) {
+    if (state.productOrderSource !== "details") return "";
     if (state.sortKey !== key) return "";
     return state.sortDir === "asc" ? " ▲" : " ▼";
   }
@@ -565,22 +869,237 @@
     app.innerHTML = `
       ${renderFilterPanel()}
       <div class="table-wrap">
-        <table>
+        <table class="detail-table">
           <colgroup>
+            <col style="width:56px">
             ${columns.map((column) => `<col style="width:${escapeHtml(column.width || "auto")}">`).join("")}
           </colgroup>
           <thead>
-            <tr>${columns.map(renderHeadCell).join("")}</tr>
+            <tr>${renderRowIndexHeadCell()}${columns.map(renderHeadCell).join("")}</tr>
           </thead>
           <tbody>
             ${state.filtered.length
-              ? state.filtered.map(renderRow).join("")
-              : `<tr><td colspan="${columns.length}" class="empty">没有匹配的数据。</td></tr>`}
+              ? state.filtered.map((row, index) => renderRow(row, index)).join("")
+              : `<tr><td colspan="${columns.length + 1}" class="empty">没有匹配的数据。</td></tr>`}
           </tbody>
         </table>
       </div>
     `;
     positionFilterPanel();
+  }
+
+  function navDiffRows() {
+    if (!state.navDiffData) return [];
+    const keyword = search.value.trim().toLowerCase();
+    const selectedNames = filterStateFor("productName").selected;
+    const rows = state.navDiffData.products.filter((row) => {
+      if (selectedNames && !selectedNames.has(navDiffProductFilterValue(row))) {
+        return false;
+      }
+      if (!keyword) return true;
+      return `${row.productName || ""} ${row.productId || ""} ${JSON.stringify(row.diffs || {})}`.toLowerCase().includes(keyword);
+    });
+    if (state.productOrderSource === "details" && state.productOrderIds.length) {
+      applyProductOrder(rows);
+      return rows;
+    }
+    applyNavDiffSort(rows);
+    setProductOrder(rows, "navDiffs");
+    return rows;
+  }
+
+  function applyNavDiffSort(rows) {
+    rows.sort((left, right) => {
+      if (state.navDiffValueSortDate) {
+        const direction = state.navDiffValueSortDir === "desc" ? -1 : 1;
+        return compareValues(
+          numberOrNull(left.diffs?.[state.navDiffValueSortDate]),
+          numberOrNull(right.diffs?.[state.navDiffValueSortDate])
+        ) * direction;
+      }
+      const direction = state.navDiffNameSortDir === "desc" ? -1 : 1;
+      const leftName = left.productName || left.productId || "";
+      const rightName = right.productName || right.productId || "";
+      return leftName.localeCompare(rightName, "zh-CN") * direction;
+    });
+  }
+
+  function navDiffPageCount() {
+    if (!state.navDiffData) return 1;
+    return Math.max(1, Math.ceil((state.navDiffData.dates || []).length / state.navDiffPageSize));
+  }
+
+  function clampNavDiffPage() {
+    state.navDiffPage = Math.min(Math.max(0, state.navDiffPage), navDiffPageCount() - 1);
+  }
+
+  function pagedNavDiffDates() {
+    if (!state.navDiffData) return [];
+    clampNavDiffPage();
+    const start = state.navDiffPage * state.navDiffPageSize;
+    return (state.navDiffData.dates || []).slice(start, start + state.navDiffPageSize);
+  }
+
+  function navDiffClass(value) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return "";
+    if (parsed > 100) return "nav-diff-hot-100";
+    if (parsed > 50) return "nav-diff-hot-50";
+    if (parsed > 30) return "nav-diff-hot-30";
+    return navDifClass(value);
+  }
+
+  function renderNavDiffView() {
+    if (!state.navDiffData) {
+      app.innerHTML = '<div class="empty">暂无近一年净值变化数据。</div>';
+      return;
+    }
+    const previousWrap = app.querySelector(".table-wrap");
+    if (previousWrap) state.navDiffScrollTop = previousWrap.scrollTop;
+    const dates = pagedNavDiffDates();
+    const rows = navDiffRows();
+    const stats = state.navDiffData.stats || {};
+    const pageCount = navDiffPageCount();
+    const dateRange = state.navDiffData.startDate && state.navDiffData.endDate
+      ? `${state.navDiffData.startDate} 至 ${state.navDiffData.endDate}`
+      : "-";
+    app.innerHTML = `
+      ${renderFilterPanel()}
+      <div class="nav-diff-summary">
+        <div>
+          日期范围：${escapeHtml(dateRange)} | 每页 ${state.navDiffPageSize} 个日期
+        </div>
+        <div class="nav-diff-stats">
+          ${renderNavDiffStatButton(">30", stats[">30"])}
+          ${renderNavDiffStatButton(">50", stats[">50"])}
+          ${renderNavDiffStatButton(">100", stats[">100"])}
+        </div>
+        <div class="nav-diff-pager">
+          <button class="nav-diff-page-btn" type="button" data-nav-diff-page="first" ${state.navDiffPage === 0 ? "disabled" : ""}>最新</button>
+          <button class="nav-diff-page-btn" type="button" data-nav-diff-page="prev" ${state.navDiffPage === 0 ? "disabled" : ""}>上一页</button>
+          <span>${state.navDiffPage + 1} / ${pageCount}</span>
+          <button class="nav-diff-page-btn" type="button" data-nav-diff-page="next" ${state.navDiffPage >= pageCount - 1 ? "disabled" : ""}>下一页</button>
+          <button class="nav-diff-page-btn" type="button" data-nav-diff-page="last" ${state.navDiffPage >= pageCount - 1 ? "disabled" : ""}>最早</button>
+        </div>
+      </div>
+      ${renderNavDiffDetail()}
+      <div class="table-wrap">
+        <table class="nav-diff-table">
+          <colgroup>
+            <col style="width:56px">
+            <col style="width:320px">
+            ${dates.map(() => '<col style="width:82px">').join("")}
+          </colgroup>
+          <thead>
+            <tr>
+              <th class="row-index">#</th>
+              <th>
+                <div class="th-inner">
+                  <button class="nav-diff-sort-btn" type="button" data-nav-diff-sort="productName">
+                    productName${state.productOrderSource === "navDiffs" && !state.navDiffValueSortDate ? (state.navDiffNameSortDir === "asc" ? " ▲" : " ▼") : ""}
+                  </button>
+                  <button
+                    class="filter-btn ${isColumnFiltered("productName") ? "active" : ""}"
+                    type="button"
+                    data-filter-column="productName"
+                    title="筛选"
+                  >▾</button>
+                </div>
+              </th>
+              ${dates.map((date) => `
+                <th class="nav-diff-date">
+                  <button class="nav-diff-sort-btn" type="button" data-nav-diff-sort-date="${escapeHtml(date)}">
+                    ${escapeHtml(date)}${state.productOrderSource === "navDiffs" && state.navDiffValueSortDate === date ? (state.navDiffValueSortDir === "asc" ? " ▲" : " ▼") : ""}
+                  </button>
+                </th>
+              `).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.length
+              ? rows.map((row, index) => renderNavDiffRow(row, dates, index)).join("")
+              : `<tr><td colspan="${dates.length + 2}" class="empty">没有匹配的数据。</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    `;
+    const nextWrap = app.querySelector(".table-wrap");
+    if (nextWrap) nextWrap.scrollTop = state.navDiffScrollTop;
+    positionFilterPanel();
+  }
+
+  function renderNavDiffStatButton(threshold, count) {
+    const active = state.navDiffDetailThreshold === threshold ? "active" : "";
+    return `
+      <button class="nav-diff-stat ${active}" type="button" data-nav-diff-threshold="${escapeHtml(threshold)}">
+        净值差 ${escapeHtml(threshold)}：${escapeHtml(count || 0)}
+      </button>
+    `;
+  }
+
+  function navDiffExceedances(threshold) {
+    if (!state.navDiffData || !threshold) return [];
+    const min = Number(String(threshold).replace(">", ""));
+    if (!Number.isFinite(min)) return [];
+    const items = state.navDiffData.exceedances || [];
+    return items.filter((item) => Number(item.navDif) > min).sort((left, right) => {
+      const valueDiff = Number(right.navDif) - Number(left.navDif);
+      if (valueDiff) return valueDiff;
+      return parseDate(right.currentDate) - parseDate(left.currentDate);
+    });
+  }
+
+  function renderNavDiffDetail() {
+    const threshold = state.navDiffDetailThreshold;
+    if (!threshold) return "";
+    const items = navDiffExceedances(threshold);
+    return `
+      <div class="nav-diff-detail">
+        <div class="nav-diff-detail-head">
+          <span>净值差 ${escapeHtml(threshold)} 明细（${items.length} 条）</span>
+          <button class="nav-diff-page-btn" type="button" data-nav-diff-detail-close="1">关闭</button>
+        </div>
+        <div class="nav-diff-detail-body">
+          <table class="nav-diff-detail-table">
+            <thead>
+              <tr>
+                <th>productName</th>
+                <th style="width:150px">productId</th>
+                <th style="width:110px">成立日期</th>
+                <th style="width:190px">净值差日期</th>
+                <th style="width:90px">当天年化</th>
+                <th style="width:90px">净值差</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map((item) => `
+                <tr>
+                  <td class="name">${escapeHtml(item.productName || "-")}</td>
+                  <td class="code">${escapeHtml(item.productId || "-")}</td>
+                  <td>${escapeHtml(item.establishDate || "-")}</td>
+                  <td>${escapeHtml(`${item.previousDate || "-"} -> ${item.currentDate || "-"}`)}</td>
+                  <td>${escapeHtml(item.annualizedYield || "-")}</td>
+                  <td class="${navDiffClass(item.navDif)}">${escapeHtml(item.navDif || "-")}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderNavDiffRow(row, dates, index) {
+    return `
+      <tr>
+        <td class="row-index">${index + 1}</td>
+        <td class="name" title="${escapeHtml(row.productId || "")}">${escapeHtml(row.productName || row.productId || "-")}</td>
+        ${dates.map((date) => {
+          const value = row.diffs?.[date] || "";
+          return `<td class="nav-diff-cell ${navDiffClass(value)}">${escapeHtml(value || "-")}</td>`;
+        }).join("")}
+      </tr>
+    `;
   }
 
   function renderFilterPanel() {
@@ -637,12 +1156,16 @@
     }
   }
 
-  function renderRow(row) {
+  function renderRow(row, index) {
     const openedField = row.productId === state.openedId ? state.openedField : "";
     return `
       <tr>
+        <td class="row-index">${index + 1}</td>
         <td class="name">${escapeHtml(row.productName)}</td>
-        <td class="num nav-dif ${navDifClass(row.navDif)}">${escapeHtml(safe(row.navDif))}</td>
+        <td class="num nav-dif ${navDifClass(row.navDif)}">
+          <span class="nav-dif-value">${escapeHtml(safe(row.navDif))}</span>
+          <span class="nav-dif-date">${escapeHtml(safe(row.navDate))}</span>
+        </td>
         <td>${escapeHtml(safe(row.riskLevel))}</td>
         <td>${escapeHtml(safe(row.periodTerm))}</td>
         <td>${escapeHtml(safe(row.establishDate))}</td>
@@ -657,7 +1180,7 @@
       </tr>
       ${openedField ? `
         <tr class="json-row">
-          <td colspan="${columns.length}"><pre>${escapeHtml(rawJsonText(row.productId))}</pre></td>
+          <td colspan="${columns.length + 1}"><pre>${escapeHtml(rawJsonText(row.productId))}</pre></td>
         </tr>
       ` : ""}
     `;
@@ -678,6 +1201,15 @@
     return formatRawJson(cached.rawJson);
   }
 
+  function refreshCurrentView() {
+    if (state.viewMode === "navDiffs") {
+      renderNavDiffView();
+      updateMeta();
+      return;
+    }
+    render();
+  }
+
   async function ensureRawJson(productId) {
     if (state.rawJsonCache[productId]) return;
     state.rawJsonCache[productId] = { rawJson: "" };
@@ -693,13 +1225,122 @@
     render();
   }
 
-  search.addEventListener("input", applyFilter);
-  reload.addEventListener("click", load);
+  search.addEventListener("input", () => {
+    if (state.viewMode === "navDiffs") {
+      renderNavDiffView();
+      updateMeta();
+      return;
+    }
+    applyFilter();
+  });
+  reload.addEventListener("click", () => {
+    if (state.viewMode === "navDiffs") {
+      loadNavDiffs(true);
+      return;
+    }
+    load();
+  });
   togglePath.addEventListener("click", () => {
     state.showDatabasePath = !state.showDatabasePath;
     updateMeta();
   });
+  toggleView.addEventListener("click", () => {
+    state.activeFilterColumn = "";
+    state.pendingFilterValues = null;
+    state.filterSearch = "";
+    state.filterSearchCaret = 0;
+    if (state.viewMode === "details") {
+      state.viewMode = "navDiffs";
+      loadNavDiffs();
+    } else {
+      state.viewMode = "details";
+      applyFilter();
+    }
+    updateMeta();
+  });
   app.addEventListener("click", (event) => {
+    if (state.viewMode === "navDiffs") {
+      const filterButton = event.target.closest("[data-filter-column]");
+      if (filterButton) {
+        const column = filterButton.dataset.filterColumn;
+        if (columns.find((item) => item.key === column)?.filterable === false) return;
+        if (state.activeFilterColumn === column) {
+          state.activeFilterColumn = "";
+          state.pendingFilterValues = null;
+          state.filterSearch = "";
+          state.filterSearchCaret = 0;
+        } else {
+          state.activeFilterColumn = column;
+          state.pendingFilterValues = initialFilterPanelValues(column);
+          const activeColumn = columns.find((item) => item.key === column);
+          state.filterSearch = activeColumn?.numericFilter ? filterStateFor(column).expr : "";
+          state.filterSearchCaret = 0;
+        }
+        renderNavDiffView();
+        return;
+      }
+
+      const actionButton = event.target.closest("[data-filter-action]");
+      if (actionButton) {
+        handleFilterAction(actionButton.dataset.filterAction);
+        return;
+      }
+
+      const pageButton = event.target.closest("[data-nav-diff-page]");
+      if (pageButton) {
+        const wrap = app.querySelector(".table-wrap");
+        if (wrap) state.navDiffScrollTop = wrap.scrollTop;
+        const action = pageButton.dataset.navDiffPage;
+        if (action === "first") state.navDiffPage = 0;
+        if (action === "prev") state.navDiffPage -= 1;
+        if (action === "next") state.navDiffPage += 1;
+        if (action === "last") state.navDiffPage = navDiffPageCount() - 1;
+        clampNavDiffPage();
+        renderNavDiffView();
+        updateMeta();
+        return;
+      }
+
+      if (event.target.closest("[data-nav-diff-sort='productName']")) {
+        state.navDiffNameSortDir = state.navDiffValueSortDate
+          ? "asc"
+          : (state.navDiffNameSortDir === "asc" ? "desc" : "asc");
+        state.navDiffValueSortDate = "";
+        state.productOrderSource = "navDiffs";
+        renderNavDiffView();
+        return;
+      }
+
+      const dateSortButton = event.target.closest("[data-nav-diff-sort-date]");
+      if (dateSortButton) {
+        const date = dateSortButton.dataset.navDiffSortDate;
+        if (state.navDiffValueSortDate === date) {
+          state.navDiffValueSortDir = state.navDiffValueSortDir === "desc" ? "asc" : "desc";
+        } else {
+          state.navDiffValueSortDate = date;
+          state.navDiffValueSortDir = "asc";
+        }
+        state.productOrderSource = "navDiffs";
+        renderNavDiffView();
+        updateMeta();
+        return;
+      }
+
+      const statButton = event.target.closest("[data-nav-diff-threshold]");
+      if (statButton) {
+        const threshold = statButton.dataset.navDiffThreshold;
+        state.navDiffDetailThreshold = state.navDiffDetailThreshold === threshold ? "" : threshold;
+        renderNavDiffView();
+        return;
+      }
+
+      if (event.target.closest("[data-nav-diff-detail-close]")) {
+        state.navDiffDetailThreshold = "";
+        renderNavDiffView();
+        return;
+      }
+      return;
+    }
     const sortButton = event.target.closest("[data-sort-column]");
     if (sortButton) {
       const column = sortButton.dataset.sortColumn;
@@ -710,6 +1351,7 @@
         state.sortKey = column;
         state.sortDir = "asc";
       }
+      state.productOrderSource = "details";
       applyFilter();
       return;
     }
@@ -725,7 +1367,7 @@
         state.filterSearchCaret = 0;
       } else {
         state.activeFilterColumn = column;
-        state.pendingFilterValues = valuesForFilterPanel(column);
+        state.pendingFilterValues = initialFilterPanelValues(column);
         const activeColumn = columns.find((item) => item.key === column);
         state.filterSearch = activeColumn?.numericFilter ? filterStateFor(column).expr : "";
         state.filterSearchCaret = 0;
@@ -758,7 +1400,7 @@
       if (event.isComposing) return;
       state.filterSearch = searchInput.value;
       state.filterSearchCaret = searchInput.selectionStart ?? searchInput.value.length;
-      render();
+      refreshCurrentView();
       return;
     }
   });
@@ -767,7 +1409,7 @@
     if (!searchInput) return;
     state.filterSearch = searchInput.value;
     state.filterSearchCaret = searchInput.selectionStart ?? searchInput.value.length;
-    render();
+    refreshCurrentView();
   });
   app.addEventListener("change", (event) => {
     const checkbox = event.target.closest("[data-filter-value]");
@@ -784,7 +1426,7 @@
     state.filterSearch = "";
     state.filterSearchCaret = 0;
     state.pendingFilterValues = null;
-    render();
+    refreshCurrentView();
   });
   window.addEventListener("resize", positionFilterPanel);
 
@@ -796,20 +1438,20 @@
       state.filterSearch = "";
       state.filterSearchCaret = 0;
       state.pendingFilterValues = null;
-      render();
+      refreshCurrentView();
       return;
     }
     if (action === "clear") {
       state.pendingFilterValues = new Set();
       state.filterSearch = "";
       state.filterSearchCaret = 0;
-      render();
+      refreshCurrentView();
       return;
     }
     if (action === "select-visible") {
       const visible = [...app.querySelectorAll("[data-filter-value]")].map((item) => item.dataset.filterValue);
       state.pendingFilterValues = new Set(visible);
-      render();
+      refreshCurrentView();
       return;
     }
     if (action === "apply") {
@@ -822,7 +1464,12 @@
         state.filterSearch = "";
         state.filterSearchCaret = 0;
         state.pendingFilterValues = null;
-        applyFilter();
+        if (state.viewMode === "navDiffs") {
+          renderNavDiffView();
+          updateMeta();
+        } else {
+          applyFilter();
+        }
         return;
       }
       filterState.expr = "";
@@ -837,7 +1484,12 @@
       state.filterSearch = "";
       state.filterSearchCaret = 0;
       state.pendingFilterValues = null;
-      applyFilter();
+      if (state.viewMode === "navDiffs") {
+        renderNavDiffView();
+        updateMeta();
+      } else {
+        applyFilter();
+      }
     }
   }
 

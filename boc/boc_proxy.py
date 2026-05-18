@@ -19,7 +19,7 @@ import json
 import os
 import sqlite3
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 if __package__ in (None, ""):
@@ -108,6 +108,86 @@ def load_product_detail_rows(db_path=DEFAULT_PRODUCT_DETAIL_DB):
         ).fetchall()
 
     return [build_product_detail_view_row(dict(row)) for row in rows]
+
+
+def load_product_nav_diff_rows(db_path=DEFAULT_PRODUCT_DETAIL_DB):
+    if not os.path.exists(db_path):
+        raise FileNotFoundError(f"数据库不存在: {db_path}")
+
+    with sqlite3.connect(db_path) as conn:
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            """
+            SELECT productId, productName, establishDate, nav_list
+            FROM product_details
+            ORDER BY productName ASC, productId ASC
+            """
+        ).fetchall()
+
+    product_rows = []
+    all_dates = set()
+    max_date = datetime.min
+    for row in rows:
+        nav_rows = parse_json_list(row["nav_list"])
+        for nav_row in nav_rows:
+            date = parse_date(nav_row.get("updateDate"))
+            if date > max_date:
+                max_date = date
+
+    cutoff = max_date - timedelta(days=365) if max_date != datetime.min else datetime.min
+    stats = {">30": 0, ">50": 0, ">100": 0}
+    exceedances = []
+    for row in rows:
+        nav_rows = parse_json_list(row["nav_list"])
+        diffs = {}
+        previous = None
+        establish_date = row["establishDate"] or ""
+        for nav_row in nav_rows:
+            current_date = parse_date(nav_row.get("updateDate"))
+            current_nav = nav_row.get("nav")
+            diff = ""
+            if previous:
+                try:
+                    diff_value = (float(current_nav) - float(previous.get("nav"))) * 10000
+                    diff = f"{diff_value:.2f}"
+                except (TypeError, ValueError):
+                    diff = ""
+            if current_date >= cutoff and diff:
+                date_text = str(nav_row.get("updateDate") or "")
+                diffs[date_text] = diff
+                all_dates.add(date_text)
+                diff_number = float(diff)
+                if diff_number > 30:
+                    stats[">30"] += 1
+                    exceedances.append({
+                        "productId": row["productId"] or "",
+                        "productName": row["productName"] or "",
+                        "establishDate": establish_date,
+                        "previousDate": str(previous.get("updateDate") or ""),
+                        "currentDate": date_text,
+                        "navDif": diff,
+                        "annualizedYield": annualized_yield(current_nav, days_between(establish_date, date_text)),
+                    })
+                if diff_number > 50:
+                    stats[">50"] += 1
+                if diff_number > 100:
+                    stats[">100"] += 1
+            previous = nav_row
+        product_rows.append({
+            "productId": row["productId"] or "",
+            "productName": row["productName"] or "",
+            "diffs": diffs,
+        })
+
+    dates = sorted(all_dates, key=parse_date, reverse=True)
+    return {
+        "dates": dates,
+        "products": product_rows,
+        "stats": stats,
+        "exceedances": exceedances,
+        "startDate": dates[-1] if dates else "",
+        "endDate": dates[0] if dates else "",
+    }
 
 
 def parse_json_list(value):
@@ -385,6 +465,22 @@ def db_product_details():
         }))
     except Exception as e:
         print(f"[数据库查看] 失败: {e}")
+        return add_cors(jsonify({'success': False, 'error': str(e)})), 500
+
+
+@app.route('/db-product-nav-diffs', methods=['GET', 'OPTIONS'])
+def db_product_nav_diffs():
+    if request.method == 'OPTIONS':
+        return add_cors(make_response()), 200
+    try:
+        data = load_product_nav_diff_rows()
+        return add_cors(jsonify({
+            'success': True,
+            'database': DEFAULT_PRODUCT_DETAIL_DB,
+            **data,
+        }))
+    except Exception as e:
+        print(f"[近一年净值变化] 失败: {e}")
         return add_cors(jsonify({'success': False, 'error': str(e)})), 500
 
 

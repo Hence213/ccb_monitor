@@ -11,7 +11,11 @@
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
     background: #0f1117; color: #e0e0e0; min-height: 100vh;
   }
-  .header { padding: 20px 32px 16px; border-bottom: 1px solid #1e2130; }
+  .header {
+    position: relative; z-index: 950;
+    padding: 20px 32px 16px; border-bottom: 1px solid #1e2130;
+    background: #0f1117;
+  }
   .header-top { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
   .header h1 { font-size: 20px; font-weight: 600; color: #fff; letter-spacing: 0.5px; white-space: nowrap; }
   .search-box { display: flex; align-items: center; gap: 6px; margin-left: auto; }
@@ -79,10 +83,13 @@
     border-radius: 12px; overflow: hidden;
   }
   .table-section.expanded {
-    position: fixed; inset: 24px; z-index: 900; margin: 0;
+    position: fixed;
+    top: var(--expanded-table-top, 120px); right: 24px; bottom: 24px; left: 24px;
+    z-index: 900; margin: 0;
     display: flex; flex-direction: column;
     box-shadow: 0 24px 80px rgba(0,0,0,0.48);
   }
+  body.table-expanded { overflow: hidden; }
   .table-section h3 {
     display: flex; align-items: center; gap: 12px;
     padding: 14px 20px; font-size: 14px; color: #b0b8cc; border-bottom: 1px solid #252840;
@@ -186,13 +193,13 @@
 
 <script id="embeddedNavData" type="application/json">
 {
-  "productId": "CYQQSESGZQ30DA",
+  "productId": "CYQWFXYJX30D8A",
   "circle": "3Y",
   "subChannelId": "31",
-  "fetchedAt": "2026-05-16T12:58:13.620461+00:00",
+  "fetchedAt": "2026-05-18T07:12:36.494554+00:00",
   "data": [
     {
-      "updateDate": "2026/04/22",
+      "updateDate": "2026/02/26",
       "nav": "1.00000000",
       "accumulativeNav": "1.00000000",
       "dayIncomeRatio": "0",
@@ -200,114 +207,418 @@
       "yield": "0"
     },
     {
+      "updateDate": "2026/02/27",
+      "nav": "1.00022000",
+      "accumulativeNav": "1.00022000",
+      "dayIncomeRatio": "0.022",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/02",
+      "nav": "1.00065600",
+      "accumulativeNav": "1.00065600",
+      "dayIncomeRatio": "0.0436",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/03",
+      "nav": "1.00071000",
+      "accumulativeNav": "1.00071000",
+      "dayIncomeRatio": "0.0054",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/04",
+      "nav": "1.00083100",
+      "accumulativeNav": "1.00083100",
+      "dayIncomeRatio": "0.0121",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/05",
+      "nav": "1.00088000",
+      "accumulativeNav": "1.00088000",
+      "dayIncomeRatio": "0.0049",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/06",
+      "nav": "1.00098500",
+      "accumulativeNav": "1.00098500",
+      "dayIncomeRatio": "0.0105",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/09",
+      "nav": "1.00105500",
+      "accumulativeNav": "1.00105500",
+      "dayIncomeRatio": "0.007",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/10",
+      "nav": "1.00110700",
+      "accumulativeNav": "1.00110700",
+      "dayIncomeRatio": "0.0052",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/11",
+      "nav": "1.00115900",
+      "accumulativeNav": "1.00115900",
+      "dayIncomeRatio": "0.0052",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/12",
+      "nav": "1.00121000",
+      "accumulativeNav": "1.00121000",
+      "dayIncomeRatio": "0.0051",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/13",
+      "nav": "1.00129800",
+      "accumulativeNav": "1.00129800",
+      "dayIncomeRatio": "0.0088",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/16",
+      "nav": "1.00141700",
+      "accumulativeNav": "1.00141700",
+      "dayIncomeRatio": "0.0119",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/17",
+      "nav": "1.00157100",
+      "accumulativeNav": "1.00157100",
+      "dayIncomeRatio": "0.0154",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/18",
+      "nav": "1.00188300",
+      "accumulativeNav": "1.00188300",
+      "dayIncomeRatio": "0.0312",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/19",
+      "nav": "1.00187700",
+      "accumulativeNav": "1.00187700",
+      "dayIncomeRatio": "-0.0006",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/20",
+      "nav": "1.00191100",
+      "accumulativeNav": "1.00191100",
+      "dayIncomeRatio": "0.0034",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/23",
+      "nav": "1.00201100",
+      "accumulativeNav": "1.00201100",
+      "dayIncomeRatio": "0.01",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/24",
+      "nav": "1.00213400",
+      "accumulativeNav": "1.00213400",
+      "dayIncomeRatio": "0.0123",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/25",
+      "nav": "1.00245200",
+      "accumulativeNav": "1.00245200",
+      "dayIncomeRatio": "0.0317",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/26",
+      "nav": "1.00265900",
+      "accumulativeNav": "1.00265900",
+      "dayIncomeRatio": "0.0206",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/27",
+      "nav": "1.00271000",
+      "accumulativeNav": "1.00271000",
+      "dayIncomeRatio": "0.0051",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/30",
+      "nav": "1.00294100",
+      "accumulativeNav": "1.00294100",
+      "dayIncomeRatio": "0.023",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/03/31",
+      "nav": "1.00297400",
+      "accumulativeNav": "1.00297400",
+      "dayIncomeRatio": "0.0033",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/01",
+      "nav": "1.00305800",
+      "accumulativeNav": "1.00305800",
+      "dayIncomeRatio": "0.0084",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/02",
+      "nav": "1.00462300",
+      "accumulativeNav": "1.00462300",
+      "dayIncomeRatio": "0.156",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/03",
+      "nav": "1.00388700",
+      "accumulativeNav": "1.00388700",
+      "dayIncomeRatio": "-0.0733",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/07",
+      "nav": "1.00427400",
+      "accumulativeNav": "1.00427400",
+      "dayIncomeRatio": "0.0386",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/08",
+      "nav": "1.00461900",
+      "accumulativeNav": "1.00461900",
+      "dayIncomeRatio": "0.0344",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/09",
+      "nav": "1.00690700",
+      "accumulativeNav": "1.00690700",
+      "dayIncomeRatio": "0.2277",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/10",
+      "nav": "1.00697700",
+      "accumulativeNav": "1.00697700",
+      "dayIncomeRatio": "0.007",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/13",
+      "nav": "1.00711800",
+      "accumulativeNav": "1.00711800",
+      "dayIncomeRatio": "0.014",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/14",
+      "nav": "1.00694500",
+      "accumulativeNav": "1.00694500",
+      "dayIncomeRatio": "-0.0172",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/15",
+      "nav": "1.00778200",
+      "accumulativeNav": "1.00778200",
+      "dayIncomeRatio": "0.0831",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/16",
+      "nav": "1.00778800",
+      "accumulativeNav": "1.00778800",
+      "dayIncomeRatio": "0.0006",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/17",
+      "nav": "1.00906700",
+      "accumulativeNav": "1.00906700",
+      "dayIncomeRatio": "0.1269",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/20",
+      "nav": "1.00945700",
+      "accumulativeNav": "1.00945700",
+      "dayIncomeRatio": "0.0386",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/21",
+      "nav": "1.00977800",
+      "accumulativeNav": "1.00977800",
+      "dayIncomeRatio": "0.0318",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
+      "updateDate": "2026/04/22",
+      "nav": "1.00976700",
+      "accumulativeNav": "1.00976700",
+      "dayIncomeRatio": "-0.0011",
+      "fundIncome": "0",
+      "yield": "0"
+    },
+    {
       "updateDate": "2026/04/23",
-      "nav": "1.00003200",
-      "accumulativeNav": "1.00003200",
-      "dayIncomeRatio": "0.0032",
+      "nav": "1.01052600",
+      "accumulativeNav": "1.01052600",
+      "dayIncomeRatio": "0.0752",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/04/24",
-      "nav": "1.00003600",
-      "accumulativeNav": "1.00003600",
-      "dayIncomeRatio": "0.0004",
+      "nav": "1.01053900",
+      "accumulativeNav": "1.01053900",
+      "dayIncomeRatio": "0.0013",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/04/27",
-      "nav": "1.00004800",
-      "accumulativeNav": "1.00004800",
-      "dayIncomeRatio": "0.0012",
+      "nav": "1.01065100",
+      "accumulativeNav": "1.01065100",
+      "dayIncomeRatio": "0.0111",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/04/28",
-      "nav": "1.00002700",
-      "accumulativeNav": "1.00002700",
-      "dayIncomeRatio": "-0.0021",
+      "nav": "1.01075300",
+      "accumulativeNav": "1.01075300",
+      "dayIncomeRatio": "0.0101",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/04/29",
-      "nav": "1.00010100",
-      "accumulativeNav": "1.00010100",
-      "dayIncomeRatio": "0.0074",
+      "nav": "1.01089500",
+      "accumulativeNav": "1.01089500",
+      "dayIncomeRatio": "0.014",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/04/30",
-      "nav": "1.00067600",
-      "accumulativeNav": "1.00067600",
-      "dayIncomeRatio": "0.0575",
+      "nav": "1.01094500",
+      "accumulativeNav": "1.01094500",
+      "dayIncomeRatio": "0.0049",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/05/06",
-      "nav": "1.00054200",
-      "accumulativeNav": "1.00054200",
-      "dayIncomeRatio": "-0.0134",
+      "nav": "1.01111200",
+      "accumulativeNav": "1.01111200",
+      "dayIncomeRatio": "0.0165",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/05/07",
-      "nav": "1.00098600",
-      "accumulativeNav": "1.00098600",
-      "dayIncomeRatio": "0.0444",
+      "nav": "1.01113800",
+      "accumulativeNav": "1.01113800",
+      "dayIncomeRatio": "0.0026",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/05/08",
-      "nav": "1.00108200",
-      "accumulativeNav": "1.00108200",
-      "dayIncomeRatio": "0.0096",
+      "nav": "1.01120900",
+      "accumulativeNav": "1.01120900",
+      "dayIncomeRatio": "0.007",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/05/11",
-      "nav": "1.00111200",
-      "accumulativeNav": "1.00111200",
-      "dayIncomeRatio": "0.003",
+      "nav": "1.01133100",
+      "accumulativeNav": "1.01133100",
+      "dayIncomeRatio": "0.0121",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/05/12",
-      "nav": "1.00161400",
-      "accumulativeNav": "1.00161400",
-      "dayIncomeRatio": "0.0501",
+      "nav": "1.01143800",
+      "accumulativeNav": "1.01143800",
+      "dayIncomeRatio": "0.0106",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/05/13",
-      "nav": "1.00161800",
-      "accumulativeNav": "1.00161800",
-      "dayIncomeRatio": "0.0004",
+      "nav": "1.01158100",
+      "accumulativeNav": "1.01158100",
+      "dayIncomeRatio": "0.0141",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/05/14",
-      "nav": "1.00203600",
-      "accumulativeNav": "1.00203600",
-      "dayIncomeRatio": "0.0417",
+      "nav": "1.01163100",
+      "accumulativeNav": "1.01163100",
+      "dayIncomeRatio": "0.0049",
       "fundIncome": "0",
       "yield": "0"
     },
     {
       "updateDate": "2026/05/15",
-      "nav": "1.00157800",
-      "accumulativeNav": "1.00157800",
-      "dayIncomeRatio": "-0.0457",
+      "nav": "1.01168100",
+      "accumulativeNav": "1.01168100",
+      "dayIncomeRatio": "0.0049",
       "fundIncome": "0",
       "yield": "0"
     }
@@ -482,6 +793,7 @@ function renderAll(prodCode, data) {
   renderStats(latest, maxAnn);
   renderChart();
   renderTable(data);
+  refreshExpandedTableLayout();
 }
 
 function renderStats(latest, maxAnn) {
@@ -670,8 +982,24 @@ function toggleTableExpanded() {
   var section = document.getElementById("tableSection");
   var button = document.getElementById("tableToggleBtn");
   var expanded = section.classList.toggle("expanded");
+  document.body.classList.toggle("table-expanded", expanded);
+  if (expanded) {
+    refreshExpandedTableLayout();
+  } else {
+    section.style.removeProperty("--expanded-table-top");
+  }
   button.textContent = expanded ? "还原" : "放大";
 }
+
+function refreshExpandedTableLayout() {
+  var section = document.getElementById("tableSection");
+  if (!section || !section.classList.contains("expanded")) return;
+  var header = document.querySelector(".header");
+  var headerBottom = header ? Math.ceil(header.getBoundingClientRect().bottom) : 96;
+  section.style.setProperty("--expanded-table-top", (headerBottom + 12) + "px");
+}
+
+window.addEventListener("resize", refreshExpandedTableLayout);
 
 /* 载入 Python 脚本预先嵌入的数据 */
 function loadEmbeddedData() {
